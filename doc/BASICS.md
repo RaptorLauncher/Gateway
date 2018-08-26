@@ -63,6 +63,58 @@ It is possible *(actually, it's expected!)* that a single server will host a gat
   * We have RP posts that are organized chronologically inside chapters. Each post is authored by a combination of account and character.
   * We have a permission system that says which accounts can view/edit/link/post as which chapters/timelines/characters and so on.
 
+## Protocol
+
+### Server-client
+
+Initially, a custom protocol will be used, based on Lisp S-expressions. *(Once the base features are complete, we will move to using ActivityPub over WebSockets.)*
+
+The protocol is message-based. The available types inside a message are:
+  * Symbols, in form `FOO BAR BAZ`, case-insensitive and automatically upcased when read,
+  * Strings, in form `"foobarbaz"` with `"` and `\` characters escaped via `\`,
+  * Integers, in standard decimal form,
+  * Floats, period separated or in form `1.23f4`,
+  * Doubles, in form `1.23d4`,
+  * Lists, in form `(element-1 element-2 element-3 ...)`, able to contain all other types, including nested lists.
+
+Each message must be a list.
+
+The first element of a message is a numerical ID of the message. The second element of a message is a symbol that denotes the type of the whole message. For example, `(1 LOGIN ...)` sent by a client is a login request, to which the server may respond with `(1 OK ...)` or `(1 ERROR ...)`.
+
+Each message is either a request or a response.
+  * The server is allowed to only create requests with even IDs where the client must only send messages with odd IDs. This means that the server-sent IDs start may start from `0` and then go on like `2, 4, 6, ...` where the client may start from `1` and then go on like `3, 5, 7, ...`.
+  * A response is allowed to have any ID. Its symbol must be either `OK` or `ERROR`. The body of the `OK` response, if present, should contain the response result, and the body of an `ERROR` response must always contain the details of the error that happened.
+
+An example session following this protocol is below. `S>` denotes a line sent by the server and `C>` denotes a line sent by the client. *(Please note that this is only the example of the syntax - the format and contents of the message bodies may not be understood by the Gateway software. Please refer to the documents describing the message contents, as soon as they become written, that is.)*
+
+```
+S> (0 HELLO "Gateway v.0.1234" "raptor.systems")
+C> (0 OK)
+
+C> (1 LOGIN "aza@raptor.systems" "StopUsingRaptorsAsPasswords")
+S> (1 OK)
+
+C> (3 SHOW CHARACTERS)
+S> (3 OK ((CHARACTER "Aza d'Orano" FEMALE ...)
+          (CHARACTER "Not Aza" FEMALE ...)
+          (CHARACTER "Also Not Aza" MALE ...)))
+
+C> (5 SHOW CHARACTER "Absolutely Not Aza")
+S> (5 ERROR (NO-SUCH-CHARACTER "Absolutely Not Aza"))
+
+S> (2 NEW-MESSAGE (MESSAGE (CHARACTER "Sebastian")
+                           (CHARACTER "Aza d'Orano")
+                           (DATE "2018-07-15T20:21:18Z")
+                           "Hello! How are you doing?"))
+C> (2 OK)
+
+...
+```
+
+### Server-server
+
+Once the base features are complete, federation via ActivityPub will be added.
+
 ## Glossary
 
 * **Gateway**
