@@ -87,7 +87,7 @@ Each message is either a request or a response.
 
 An example session following this protocol is below. `S>` denotes a line sent by the server and `C>` denotes a line sent by the client. *(Please note that this is only the example of the syntax - the format and contents of the message bodies may not be understood by the Gateway software. Please refer to the documents describing the message contents, as soon as they become written, that is.)*
 
-```lisp
+```common-lisp
 S> (0 HELLO "Gateway v.0.1234" "raptor.systems")
 C> (0 OK)
 
