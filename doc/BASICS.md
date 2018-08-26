@@ -54,6 +54,15 @@ Note that the blocks are local to these gateways and worlds only, and other part
 
 It is possible *(actually, it's expected!)* that a single server will host a gateway along with multiple worlds. In that case, the worlds will be accessible through a simple router embedded in the gateway that will route traffic between users and the respective worlds.
 
+## Goals
+
+  * We have user accounts.
+  * We have characters that are linked to user accounts. A character has its owner account and also some borrower accounts who can write posts "as" that character.
+  * We have RP timelines that contain chapters.
+  * We have RP chapters that contain posts. Chapters can be linked to one another in a before/after relationship.
+  * We have RP posts that are organized chronologically inside chapters. Each post is authored by a combination of account and character.
+  * We have a permission system that says which accounts can view/edit/link/post as which chapters/timelines/characters and so on.
+
 ## Glossary
 
 * **Gateway**
