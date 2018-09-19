@@ -4,13 +4,13 @@ Gateway is a movement and a project to create a service for cooperative storywri
 
 ## Ideas
 
-We are currently in the state of gathering ideas for what a good or better roleplaying service should look like and involve. 
+We are currently in the state of gathering ideas for what a good or better roleplaying service should look like and involve.
 
 If you would like to contribute, please [register at octo.sh](https://octo.sh/users/sign_in?#register-pane) and [open a new issue](https://octo.sh/Gateway/Gateway/issues) for each suggestion you have. (Please tag each issue with the `feature request` label!)
 
 ## Documents
 
-* [Basics](doc/BASICS.md)
+* [Overview](doc/OVERVIEW.md)
 * [Connector](doc/CONNECTOR.md)
 
 ## License

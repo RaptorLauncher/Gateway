@@ -4,7 +4,7 @@
 
 ### Overview
 
-![Overview](img/connector-01-overview.png)
+![Overview](img/connector/01-overview.png)
 
 The connector is a part of the Gateway server responsible for handling user connections and passing information between them and the game logic.
 
@@ -23,7 +23,7 @@ A connection is a wrapper around a socket object, providing methods for sending 
 
 ### Acceptor
 
-![Acceptor](img/connector-02-acceptor.png)
+![Acceptor](img/connector/02-acceptor.png)
 
 The acceptor's role is to accept the incoming connection from the user, create the connection object and insert it into the connection list. The communication will then happen through the created connection object.
 
@@ -31,7 +31,7 @@ After inserting the new connection, the acceptor also needs to notify the listen
 
 ### Listener
 
-![Listener](img/connector-03-listener.png)
+![Listener](img/connector/03-listener.png)
 
 The listener is responsible for waiting for input on the connection objects and passing it to the game logic each time a connection responds with valid Lisp data by means of calling a single callback function with the received message and the connection the message came from as that function's arguments.
 
@@ -39,7 +39,7 @@ The listener should have a notification method, through which it can be notified
 
 ### Writer
 
-![Writer](img/connector-04-writer.png)
+![Writer](img/connector/04-writer.png)
 
 The writer is responsible for writing data to connections. It is invoked by the game logic (or, in special situations, by the listener) whenever data needs to be sent to the client by invoking the writer's write method, passing the connection and the message as arguments.
 
