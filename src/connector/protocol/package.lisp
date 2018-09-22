@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; gateway.connector/protocol/package.lisp
+;;;; connector/protocol/package.lisp
 
 (uiop:define-package #:gateway.connector/protocol
   (:use

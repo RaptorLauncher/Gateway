@@ -1,11 +1,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; gateway.connector/impl/package.lisp
+;;;; connector/impl/package.lisp
 
 (uiop:define-package #:gateway.connector
   (:use
    #:cl
+   #:phoe-toolbox
    #:gateway.connector/protocol)
   (:reexport
    #:gateway.connector/protocol)

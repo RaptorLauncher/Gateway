@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; gateway.connector/protocol/acceptor.lisp
+;;;; connector/protocol/acceptor.lisp
 
 (in-package #:gateway.connector/protocol)
 

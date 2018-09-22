@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; gateway.connector/gateway.connector.asd
+;;;; connector/gateway.connector.asd
 
 (asdf:defsystem #:gateway.connector/protocol
   :description "Protocols for Gateway connector"
@@ -29,6 +29,12 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:gateway.connector/protocol)
+  :depends-on (#:usocket
+               #:verbose
+               #:phoe-toolbox
+               #:gateway.connector/protocol)
   :pathname "impl/"
-  :components ((:file "package")))
+  :components ((:file "package")
+               (:file "standard-socket")
+               ;; (:file "standard-connection")
+               ))
