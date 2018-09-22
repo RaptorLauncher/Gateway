@@ -11,7 +11,8 @@
   :serial t
   :depends-on (#:trivial-garbage
                #:bordeaux-threads
-               #:phoe-toolbox)
+               #:phoe-toolbox
+               #:cl-plumbing)
   :components ((:file "package")
                (:file "buffer")
                (:file "output")

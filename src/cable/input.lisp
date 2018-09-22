@@ -158,7 +158,9 @@ value."
 (defun %from-cable-buffered-buffer (stream buffer)
   (let* ((buffer-stream (make-string-input-stream buffer))
          (final-stream (make-concatenated-stream buffer-stream stream)))
-    (%from-cable-buffered-no-buffer final-stream)))
+    (multiple-value-bind (result new-buffer) (from-cable final-stream)
+      (setf (buffer-of stream) new-buffer)
+      result)))
 
 (defun from-cable-buffered (stream)
   "Reads from the provided cable stream and outputs the read object. In case
