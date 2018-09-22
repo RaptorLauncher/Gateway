@@ -34,7 +34,7 @@
           (tg:make-weak-hash-table :weakness :key)))
     (loop repeat 10
           for stream = (make-string-input-stream (make-string 10))
-          do (setf (buffer-of stream) "12345")
+          do (setf (gateway.cable::buffer-of stream) "12345")
              (close stream))
     (clean-buffers)
     (assert (= 0 (hash-table-count gateway.cable::*stream-buffers*)))))
