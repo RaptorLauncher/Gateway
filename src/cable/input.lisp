@@ -138,20 +138,22 @@
 ;;; FROM-CABLE
 
 (defun from-cable (stream)
+  "Reads from the provided cable stream and outputs the read object as its
+primary value. In case there is not enough data on the stream to form a complete
+object, returns NIL as its primary value and the read data as its secondary
+value."
   (let ((*backup-string* (make-backup-string)))
-    (flet ((incomplete-input-handler (err)
-             (return-from from-cable (values nil *backup-string* err))))
+    (flet ((incomplete-input-handler (err) (declare (ignore err))
+             (return-from from-cable (values nil *backup-string*))))
       (handler-bind ((incomplete-input #'incomplete-input-handler))
-        (values (read-sexpr stream) nil nil)))))
+        (values (read-sexpr stream) nil)))))
 
 ;;; FROM-CABLE-BUFFERED
 
 (defun %from-cable-buffered-no-buffer (stream)
-  (multiple-value-bind (result new-buffer condition) (from-cable stream)
+  (multiple-value-bind (result new-buffer) (from-cable stream)
     (setf (buffer-of stream) new-buffer)
-    (if (null new-buffer)
-        (values result nil nil)
-        (values nil new-buffer condition))))
+    result))
 
 (defun %from-cable-buffered-buffer (stream buffer)
   (let* ((buffer-stream (make-string-input-stream buffer))
@@ -159,6 +161,10 @@
     (%from-cable-buffered-no-buffer final-stream)))
 
 (defun from-cable-buffered (stream)
+  "Reads from the provided cable stream and outputs the read object. In case
+there is not enough data on the stream to form a complete object, returns NIL
+and saves the read data into an internal buffer to allow subsequent calls to
+FROM-CABLE-BUFFERED to read a complete object."
   (let* ((buffer (buffer-of stream)))
     (if buffer
         (%from-cable-buffered-buffer stream buffer)

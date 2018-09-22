@@ -6,6 +6,7 @@
 (in-package #:gateway.cable)
 
 (defun cable-equal (x y)
+  "Like EQUAL, except it returns T for gensyms with the same name."
   (declare (optimize speed))
   (labels ((%cable-equal (x y)
              (typecase x

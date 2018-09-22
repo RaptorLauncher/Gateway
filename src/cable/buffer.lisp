@@ -31,6 +31,11 @@
   new-value)
 
 (defun clean-buffers ()
+  "Cleans all buffers for closed streams stored in the internal hash table.
+The hash-table has key weakness and therefore its cleaning should be performed
+automatically, however it might nonetheless be favorable to call this function
+periodically in applications dealing with many buffered streams, e.g. network
+connections."
   (with-lock-held ()
     (loop for stream being the hash-keys of *stream-buffers*
           unless (open-stream-p stream)

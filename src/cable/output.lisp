@@ -9,7 +9,10 @@
 
 (in-package #:gateway.cable)
 
-(defgeneric to-cable (object stream))
+(defgeneric to-cable (object stream)
+  (:documentation
+   "Converts the provided object to the cable format and outputs it to the
+provided stream."))
 
 (defmethod to-cable ((object list) (stream stream))
   (write-char #\( stream)
