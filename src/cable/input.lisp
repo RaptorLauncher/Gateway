@@ -143,10 +143,9 @@ primary value. In case there is not enough data on the stream to form a complete
 object, returns NIL as its primary value and the read data as its secondary
 value."
   (let ((*backup-string* (make-backup-string)))
-    (flet ((incomplete-input-handler (err) (declare (ignore err))
-             (return-from from-cable (values nil *backup-string*))))
-      (handler-bind ((incomplete-input #'incomplete-input-handler))
-        (values (read-sexpr stream) nil)))))
+    (handler-case (values (read-sexpr stream) nil)
+      (incomplete-input ()
+        (return-from from-cable (values nil *backup-string*))))))
 
 ;;; FROM-CABLE-BUFFERED
 

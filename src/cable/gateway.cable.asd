@@ -24,8 +24,7 @@
   :license  "Artistic"
   :version "0.1"
   :serial t
-  :depends-on (#:gateway.cable
-               #:1am)
+  :depends-on (#:gateway.cable)
   :components ((:file "test")))
 
 (defmethod asdf:perform ((o asdf:test-op)

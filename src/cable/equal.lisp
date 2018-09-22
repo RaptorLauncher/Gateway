@@ -6,13 +6,13 @@
 (in-package #:gateway.cable)
 
 (defun cable-equal (x y)
-  "Like EQUAL, except it returns T for gensyms with the same name."
+  "Like EQUAL, except it compares symbols by its name only."
   (declare (optimize speed))
   (labels ((%cable-equal (x y)
              (typecase x
                (symbol (and (symbolp y)
-                            (eq (symbol-package x)
-                                (symbol-package y))))
+                            (string= (symbol-name x)
+                                     (symbol-name y))))
                (cons (and (consp y)
                           (%cable-equal (car x) (car y))
                           (%cable-equal (cdr x) (cdr y))))

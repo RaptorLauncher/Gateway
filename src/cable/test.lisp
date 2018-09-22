@@ -4,7 +4,7 @@
 ;;;; cable/test.lisp
 
 (defpackage #:gateway.cable/test
-  (:use #:cl #:gateway.cable #:1am)
+  (:use #:cl #:gateway.cable)
   (:shadow #:run)
   (:export #:run))
 
@@ -18,9 +18,16 @@
   (test-buffered-input)
   t)
 
+(defvar *input-sexp*
+  '(1 2.0d0 "foo BAR \\ \" baz" foo :foo #:foo (1 2 3) (4 5)))
+
+(defvar *input-string*
+  "(1 2.0 \"foo BAR \\\\ \\\" baz\" FOO FOO FOO (1 2 3) (4 5))")
+
 (defun test-equal ()
-  (assert (cable-equal '(1 (2 3) (4.0 5) "foo" "FOO" #:foo :foo foo)
-                       '(1 (2 3) (4.0 5) "foo" "FOO" #:foo :foo foo))))
+  (assert (cable-equal '#:foo :foo))
+  (let ((data '(1 (2 3) (4.0 5) "foo" "FOO" #:foo :foo foo)))
+    (assert (cable-equal data data))))
 
 (defun test-buffer ()
   (let ((gateway.cable::*stream-buffers*
@@ -33,16 +40,12 @@
     (assert (= 0 (hash-table-count gateway.cable::*stream-buffers*)))))
 
 (defun test-output ()
-  (let* ((input '(1 2.0d0 "foo BAR \\ \" baz" foo :foo #:foo (1 2 3) (4 5)))
-         (output "(1 2.0 \"foo BAR \\\\ \\\" baz\" FOO FOO FOO (1 2 3) (4 5))")
-         (result (with-output-to-string (s) (to-cable input s))))
-    (assert (string= result output))))
+  (let* ((result (with-output-to-string (s) (to-cable *input-sexp* s))))
+    (assert (string= result *input-string*))))
 
 (defun test-input ()
-  (let* ((input "(1 2.0 \"foo BAR \\\\ \\\" baz\" FOO (1 2 3) (4 5))")
-         (output '(1 2.0d0 "foo BAR \\ \" baz" #:foo (1 2 3) (4 5)))
-         (result (with-input-from-string (s input) (from-cable s))))
-    (assert (cable-equal result output))))
+  (let* ((result (with-input-from-string (s *input-string*) (from-cable s))))
+    (assert (cable-equal result *input-sexp*))))
 
 (defun test-buffered-input ()
   (let ((pipe (cl-plumbing:make-pipe)))
