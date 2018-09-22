@@ -122,6 +122,7 @@
     (lread stream)))
 
 (defun read-sexpr (stream)
+  (skip-whitespace stream)
   (let* ((char (lread stream)))
     (let ((result (case char
                     (#\Nul (error "Stray null found."))
