@@ -6,6 +6,11 @@
 (in-package #:gateway.connector/test)
 (in-readtable protest/parachute)
 
+;;; Utils
+
+(defun make-acceptor (handler)
+  (make-instance 'standard-acceptor :handler handler))
+
 ;;; Test suite
 
 (define-test-case standard-acceptor
@@ -27,17 +32,13 @@
   :assert
   3 "Assert the acceptor has accepted three connections.")
 
-(defun make-acceptor (handler)
-  (make-instance 'standard-acceptor :handler handler))
-
 (define-test standard-acceptor-unit
   :parent standard-acceptor
   (let* ((connections '())
          (lock (bt:make-lock))
          (handler (lambda (x) (bt:with-lock-held (lock) (push x connections)))))
     (finalized-let*
-        ((acceptor #1?(make-acceptor handler)
-                   (kill acceptor))
+        ((acceptor #1?(make-acceptor handler) (kill acceptor))
          (server-socket (gateway.connector::socket-of acceptor))
          (host (usocket:get-local-address server-socket))
          (port (usocket:get-local-port server-socket))
@@ -61,8 +62,7 @@
 
 (define-test standard-acceptor-death
   :parent standard-acceptor
-  (let ((acceptor #1?(make-instance 'standard-acceptor
-                                    :handler (constantly nil))))
+  (let ((acceptor #1?(make-acceptor (constantly nil))))
     (unwind-protect #2?(false (deadp acceptor))
       #3?(kill acceptor)
       #4?(true (wait () (deadp acceptor))))))
