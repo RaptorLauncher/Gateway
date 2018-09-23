@@ -50,8 +50,7 @@ connection is returned as the primary value.
 Dead connections are automatically removed from CONNECTIONS during the ~
 blocking period of this function. If the list of connections becomes empty as ~
 an effect of this, or an implementation's timeout expires, this function ~
-returns NIL instead. The list of connections that were still alive at the ~
-moment of finding a ready connection is returned as a secondary value."
+returns NIL instead."
   (:function ready-connection ((connections list)) (or null connection))
   "Calls READY-CONNECTION-USING-CLASS using the class of the first element of ~
 CONNECTIONS.")

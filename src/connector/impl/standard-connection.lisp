@@ -74,10 +74,16 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
     (loop
       (handler-case
           (let* ((connection (first (%ready connections))))
+            (when connection
+              (v:trace '(:gateway :connection)
+                       "Connection ~A is ready." connection))
+            (return connection))
+        (usocket:socket-error ()
+          (print "socket error")
+          (setf connections (remove-if #'deadp connections)))
+        (stream-error (e)
+          (let ((connection (find (stream-error-stream e) connections
+                                  :key #'usocket:socket-stream)))
             (v:trace '(:gateway :connection)
-                     "Connection ~A is ready." connection)
-            (return (values connection connections)))
-        ((or stream-error usocket:socket-error) ()
-          (setf connections (remove-if #'deadp connections))
-          ;; TODO make use of secondary value in listener
-          (unless connections (return (values nil nil))))))))
+                     "Connection ~A signaled a stream error." connection)
+            (return connection)))))))

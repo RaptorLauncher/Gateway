@@ -6,17 +6,6 @@
 (in-package #:gateway.connector/test)
 (in-readtable protest/parachute)
 
-;;; Utils
-
-(defun make-connection-pair ()
-  (let* ((socket-listen (usocket:socket-listen "127.0.0.1" 0))
-         (port (usocket:get-local-port socket-listen))
-         (socket-connect (usocket:socket-connect "127.0.0.1" port))
-         (socket-accept (usocket:socket-accept socket-listen)))
-    (usocket:socket-close socket-listen)
-    (list (change-class socket-connect 'standard-connection)
-          (change-class socket-accept'standard-connection))))
-
 ;;; Test suite
 
 (define-test-case standard-connection

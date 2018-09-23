@@ -13,6 +13,11 @@
   (:reexport
    #:gateway.connector/protocol)
   (:export
+   ;; UTILS
+   #:socket-local-address
+   #:socket-peer-address
+   #:make-connection-pair
+   ;; CLASSES
    #:standard-connection
    #:standard-acceptor
    #:standard-listener
