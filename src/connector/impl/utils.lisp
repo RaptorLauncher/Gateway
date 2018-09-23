@@ -1,17 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; connector/impl/standard-socket.lisp
+;;;; connector/impl/utils.lisp
 
 (in-package #:gateway.connector)
-
-(defclass standard-socket (usocket:stream-usocket)
-  ((owner :accessor owner
-          :initarg :owner
-          :initform (error "Must provide an owner."))))
-
-(define-print (standard-socket stream)
-  (format stream "owner: ~S" (owner standard-socket)))
 
 (defun socket-local-address (socket)
   "Returns a the socket's local address, in format A.B.C.D:E."

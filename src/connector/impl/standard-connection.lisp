@@ -6,112 +6,83 @@
 (in-package :gateway.connector)
 ;;(in-readtable protest)
 
-(defclass standard-connection (connection)
-  ((%socket :accessor socket-of)
-   (%address :accessor address)
-   (%auth :accessor authentication :initform nil))
+(defclass standard-connection (connection usocket:stream-usocket)
+  ((%address :accessor address)
+   ;; (%auth :accessor authentication :initform nil)
+   )
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class CONNECTION.
-
-This connection is a wrapper around a network socket (of class ~
-STANDARD-SOCKET, which is a trivial subclass of USOCKET:STREAM-SOCKET that ~
-also provides an owner slot, allowing to identify the connection the socket ~
-belongs to).")))
+\
+This connection is a subclass of USOCKET:STREAM-SOCKET.")))
 
 (define-print (standard-connection stream)
   (format stream "~A (~A)" (address standard-connection)
           (if (deadp standard-connection) "DEAD" "ALIVE")))
 
-(define-constructor (standard-connection (host "127.0.0.1") (port 65001) socket)
-  (check-type host string)
-  (check-type port (unsigned-byte 16))
-  (if socket
-      (check-type socket usocket:stream-usocket)
-      (setf socket (usocket:socket-connect host port)))
-  (change-class socket 'standard-socket :owner standard-connection)
-  (let ((address (socket-peer-address socket)))
+(define-constructor (standard-connection)
+  (%initialize-connection standard-connection))
+
+(defmethod update-instance-for-different-class
+    ((socket usocket:stream-usocket) (connection connection) &key)
+  (call-next-method)
+  (%initialize-connection connection))
+
+(defun %initialize-connection (connection)
+  (let ((address (socket-peer-address connection)))
     (v:trace :gateway "Standard connection created for ~A." address)
-    (setf (socket-of standard-connection) socket
-          (address standard-connection) address)))
+    (setf (address connection) address)))
 
 (defmethod deadp ((connection standard-connection))
-  (alivep-internal connection)
-  (not (open-stream-p (stream-of connection))))
+  (handler-case (peek-char-no-hang (usocket:socket-stream connection))
+    (error () (usocket:socket-close connection)))
+  (not (open-stream-p (usocket:socket-stream connection))))
 
 (defmethod kill ((connection standard-connection))
-  (connection-kill connection)
+  (usocket:socket-close connection)
   (v:trace :gateway "Standard connection killed for ~A." (address connection))
   (values))
 
-(defmethod stream-of ((connection connection))
-  (usocket:socket-stream (socket-of connection)))
-
-(defun alivep-internal (connection)
-  (handler-case
-      (peek-char-no-hang (stream-of connection))
-    (error () (connection-kill connection))))
-
-(defun connection-kill (connection)
-  (usocket:socket-close (socket-of connection)))
-
-;; (defmacro with-connection ((connection) &body body)
-;;   `(when (alivep ,connection)
-;;      (handler-case
-;;          (with-lock-held ((lock ,connection))
-;;            ,@body)
-;;        (error (e)
-;;          (kill ,connection)
-;;          (error e)))))
+(defun connection-readyp (connection)
+  (peek-char-no-hang (usocket:socket-stream connection)))
 
 (defmethod readyp ((connection standard-connection))
-  (or (not (open-stream-p (stream-of connection)))
+  (or (not (open-stream-p (usocket:socket-stream connection)))
       (connection-readyp connection)))
 
-(defun connection-readyp (connection)
-  (peek-char-no-hang (stream-of connection)))
-
 (defmethod connection-receive ((connection standard-connection))
-  (if (deadp connection)
-      (values nil nil)
-      (with-connection (connection)
-        (if (connection-readyp connection)
-            (multiple-value-bind (message condition)
-                (safe-read (stream-of connection))
-              (if (and (null message) (eq condition :incomplete-input))
-                  (values nil t)
-                  (values message t)))
-            (values nil t)))))
+  (cond ((deadp connection) (values nil nil))
+        ((not (connection-readyp connection)) (values nil t))
+        (t (values (from-cable (usocket:socket-stream connection)) t))))
 
 (defmethod connection-send ((connection standard-connection) object)
-  (with-connection (connection)
-    (let ((sexp (serialize object :type :string)))
-      (fformat (stream-of connection) sexp)
-      t)))
+  (let ((stream (usocket:socket-stream connection)))
+    (to-cable object stream)
+    (terpri stream)
+    (force-output stream)))
 
 (defmethod ready-connection-using-class
     ((class (eql (find-class 'standard-connection))) connections)
   (let ((connections connections))
-    (tagbody :start
-       (let ((sockets (mapcar #'socket-of connections)))
-         (handler-case
-             (let* ((ready (wait-for-input sockets :timeout 0.1 :ready-only t)))
-               (return-from ready-connection-using-class
-                 (if ready (owner (first ready)) nil)))
-           (socket-error ()
-             (setf connections (remove-if #'deadp connections))
-             ;; TODO return this as second value and make use of that value in listener
-             (go :start)))))))
+    (loop
+      (handler-case
+          (let ((result (usocket:wait-for-input connections :timeout 0.1
+                                                            :ready-only t)))
+            (return (values (first result) connections)))
+        ((or stream-error usocket:socket-error) ()
+          (setf connections (remove-if #'deadp connections))
+          ;; TODO make use of secondary value in listener
+          (unless connections (return (values nil nil))))))))
 
 ;;; TESTS
 
-;; (defun make-connection-pair ()
-;;   (let* ((socket-listen (socket-listen "127.0.0.1" 0))
-;;          (port (get-local-port socket-listen))
-;;          (socket-connect (socket-connect "127.0.0.1" port))
-;;          (socket-accept (socket-accept socket-listen)))
-;;     (socket-close socket-listen)
-;;     (values (make-instance 'standard-connection :socket socket-connect)
-;;             (make-instance 'standard-connection :socket socket-accept))))
+(defun make-connection-pair ()
+  (let* ((socket-listen (usocket:socket-listen "127.0.0.1" 0))
+         (port (usocket:get-local-port socket-listen))
+         (socket-connect (usocket:socket-connect "127.0.0.1" port))
+         (socket-accept (usocket:socket-accept socket-listen)))
+    (usocket:socket-close socket-listen)
+    (list (change-class socket-connect 'standard-connection)
+          (change-class socket-accept'standard-connection))))
 
 ;; (define-test-case standard-connection-unit
 ;;     (:description "Unit tests for STANDARD-CONNECTION."

@@ -18,16 +18,15 @@ Each such object has an authentication slot." ;; TODO Shinmera's wire protocol
      :export t)
   (:class connection (killable addressed) ())
   "A connection object. See protocol CONNECTION for details."
-  (:function authentication ((connection connection)) t) ;; TODO mixin
-  "Returns the implementation-dependent object representing the user that ~
-authenticated themselves using this connection."
-  (:function (setf authentication) (new-value (connection connection)) t)
-  "Sets the implementation-dependent object representing the user that ~
-authenticated themselves using this connection."
+  ;;   (:function authentication ((connection connection)) t) ;; TODO mixin
+  ;;   "Returns the implementation-dependent object representing the user that ~
+  ;; authenticated themselves using this connection."
+  ;;   (:function (setf authentication) (new-value (connection connection)) t)
+  ;;   "Sets the implementation-dependent object representing the user that ~
+  ;; authenticated themselves using this connection."
   (:function connection-send ((connection connection) object) boolean)
-  "Sends the provided reduced S-expression through the connection and returns ~
-T if the sending succeeded. Otherwise (e.g. if the connection is dead, as by ~
-#'DEADP), this function returns NIL."
+  "Sends the provided reduced S-expression through the connection. Returns no ~
+interesting value."
   (:function connection-receive ((connection connection)) (values list boolean))
   "Attempts to receive a message from the provided connection. If a message ~
 is successfully retrieved, this function returns (VALUES MESSAGE T), where ~
@@ -52,12 +51,13 @@ arriving on the connection causes CONNECTION-RECEIVE to return a full message."
              (or null connection))
   "Provided with a concrete connection class and a list of instances of that ~
 class, blocks until a connection has available data, at which point that ~
-connection is returned.
+connection is returned as the primary value.
 \
 Dead connections are automatically removed from CONNECTIONS during the ~
 blocking period of this function. If the list of connections becomes empty as ~
 an effect of this, or an implementation's timeout expires, this function ~
-returns NIL instead."
+returns NIL instead. The list of connections that were still alive at the ~
+moment of finding a ready connection is returned as a secondary value."
   (:function ready-connection ((connections list)) (or null connection))
   "Calls READY-CONNECTION-USING-CLASS using the class of the first element of ~
 CONNECTIONS.")

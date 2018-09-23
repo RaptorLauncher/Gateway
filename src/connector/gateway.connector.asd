@@ -9,7 +9,8 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:protest/common/addressed
+  :depends-on (#:gateway.cable
+               #:protest/common/addressed
                #:protest/common/handling
                #:protest/common/killable
                #:protest/common/named
@@ -35,6 +36,5 @@
                #:gateway.connector/protocol)
   :pathname "impl/"
   :components ((:file "package")
-               (:file "standard-socket")
-               ;; (:file "standard-connection")
-               ))
+               (:file "utils")
+               (:file "standard-connection")))

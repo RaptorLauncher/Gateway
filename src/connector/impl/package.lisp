@@ -7,7 +7,8 @@
   (:use
    #:cl
    #:phoe-toolbox
-   #:gateway.connector/protocol)
+   #:gateway.connector/protocol
+   #:gateway.cable)
   (:reexport
    #:gateway.connector/protocol)
   (:export

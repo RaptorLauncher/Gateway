@@ -15,6 +15,7 @@
                #:cl-plumbing)
   :components ((:file "package")
                (:file "buffer")
+               (:file "equal")
                (:file "output")
                (:file "input")))
 
