@@ -12,18 +12,12 @@ to send and receive messages in form of reduced S-expressions (S-expressions ~
 which contain only proper lists, uninterned symbols, strings, numbers and ~
 serializable objects, which are serialized before sending).
 \
-Each such object has an authentication slot." ;; TODO Shinmera's wire protocol
+Each such object has an authentication slot."
      :tags (:connection)
      :dependencies (killable serializable addressed)
      :export t)
   (:class connection (killable addressed) ())
   "A connection object. See protocol CONNECTION for details."
-  ;;   (:function authentication ((connection connection)) t) ;; TODO mixin
-  ;;   "Returns the implementation-dependent object representing the user that ~
-  ;; authenticated themselves using this connection."
-  ;;   (:function (setf authentication) (new-value (connection connection)) t)
-  ;;   "Sets the implementation-dependent object representing the user that ~
-  ;; authenticated themselves using this connection."
   (:function connection-send ((connection connection) object) boolean)
   "Sends the provided reduced S-expression through the connection. Returns no ~
 interesting value."

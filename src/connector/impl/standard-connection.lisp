@@ -7,9 +7,7 @@
 ;;(in-readtable protest)
 
 (defclass standard-connection (connection usocket:stream-usocket)
-  ((%address :accessor address)
-   ;; (%auth :accessor authentication :initform nil)
-   )
+  ((%address :accessor address))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class CONNECTION.
 \
