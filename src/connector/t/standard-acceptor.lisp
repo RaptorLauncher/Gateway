@@ -34,18 +34,20 @@
 
 (define-test standard-acceptor-unit
   :parent standard-acceptor
-  (let* ((connections '())
-         (lock (bt:make-lock))
-         (handler (lambda (x) (bt:with-lock-held (lock) (push x connections)))))
-    (finalized-let*
-        ((acceptor #1?(make-acceptor handler) (kill acceptor))
-         (server-socket (gateway.connector::socket-of acceptor))
-         (host (usocket:get-local-address server-socket))
-         (port (usocket:get-local-port server-socket))
-         (sockets #2?(loop repeat 3 collect (usocket:socket-connect host port))
-                  (mapc #'usocket:socket-close sockets)))
-      #3?(true (wait () (= 3 (length (bt:with-lock-held (lock)
-                                       connections))))))))
+  (finalized-let*
+      ((connections '() (mapc #'kill connections))
+       (lock (bt:make-lock))
+       (handler (lambda (x) (bt:with-lock-held (lock)
+                              (usocket:socket-close x)
+                              (push x connections))))
+       (acceptor #1?(make-acceptor handler) (kill acceptor))
+       (server-socket (gateway.connector::socket-of acceptor))
+       (host (usocket:get-local-address server-socket))
+       (port (usocket:get-local-port server-socket))
+       (sockets #2?(loop repeat 3 collect (usocket:socket-connect host port))
+                (mapc #'usocket:socket-close sockets)))
+    #3?(true (wait () (= 3 (length (bt:with-lock-held (lock)
+                                     connections)))))))
 
 ;;; Protocol tests
 
