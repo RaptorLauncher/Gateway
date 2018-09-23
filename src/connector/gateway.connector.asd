@@ -18,7 +18,7 @@
   :pathname "protocol/"
   :components ((:file "package")
                (:file "connection")
-               ;; (:file "acceptor")
+               (:file "acceptor")
                ;; (:file "listener")
                ;; (:file "writer")
                ))
@@ -30,16 +30,19 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:usocket
+  :depends-on (#:alexandria
+               #:bordeaux-threads
+               #:usocket
                #:verbose
                #:phoe-toolbox
                #:gateway.connector/protocol)
   :pathname "impl/"
   :components ((:file "package")
                (:file "utils")
-               (:file "standard-connection")))
+               (:file "standard-connection")
+               (:file "standard-acceptor")))
 
-(asdf:defsystem #:gateway.test
+(asdf:defsystem #:gateway.connector/test
   :description "Tests for Gateway connector"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license  "AGPL3"
@@ -51,12 +54,16 @@
                #:protest/parachute
                #:gateway.connector/protocol
                #:gateway.connector)
-  :pathname "impl/"
+  :pathname "t/"
   :components ((:file "package")
                (:file "standard-connection")))
 
 (defmethod asdf:perform ((o asdf:test-op)
                          (c (eql (asdf:find-system ':gateway.connector))))
-  (asdf:operate 'load-op :gateway.connector/test)
-  ;; (uiop:symbol-call :gateway.connector/test :run) ;; verify
-  )
+  (asdf:load-system :gateway.connector/test)
+  (let ((*package* (find-package '#:gateway.connector/test)))
+    (uiop:symbol-call :protest/parachute
+                      :test (intern (symbol-name '#:connector)
+                                    '#:gateway.connector/test)
+                      :report (intern (symbol-name '#:interactive)
+                                      '#:parachute))))

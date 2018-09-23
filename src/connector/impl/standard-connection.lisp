@@ -4,14 +4,13 @@
 ;;;; connector/impl/standard-connection.lisp
 
 (in-package :gateway.connector)
-;;(in-readtable protest)
 
 (defclass standard-connection (connection usocket:stream-usocket)
   ((%address :accessor address))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
-class CONNECTION.
-\
-This connection is a subclass of USOCKET:STREAM-SOCKET.")))
+class CONNECTION. This class is a subclass of USOCKET:STREAM-SOCKET and may be ~
+instantiated in one of two ways: using MAKE-INSTANCE on it, or invoking
+CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
 
 (define-print (standard-connection stream)
   (format stream "~A (~A)" (address standard-connection)

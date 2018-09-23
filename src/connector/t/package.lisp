@@ -6,6 +6,7 @@
 (uiop:define-package #:gateway.connector/test
   (:use
    #:cl
+   #:alexandria
    #:phoe-toolbox
    #:gateway.connector/protocol
    #:gateway.connector
@@ -18,4 +19,14 @@
    #:protest/parachute
    #:define-test
    #:true #:false #:is #:isnt #:is-values #:isnt-values
-   #:protest/parachute))
+   #:protest/parachute)
+  (:export
+   #:connector))
+
+(in-package #:gateway.connector/test)
+
+(define-test-case connector
+    (:documentation "Test suite for Gateway connector."
+     :tags (:gateway :connector :suite)))
+
+(define-test connector)

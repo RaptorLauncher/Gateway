@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; connector/t/package.lisp
+;;;; connector/t/standard-connection.lisp
 
 (in-package #:gateway.connector/test)
 (in-readtable protest/parachute)
@@ -23,7 +23,8 @@
     (:documentation "Test suite for STANDARD-CONNECTION."
      :tags (:gateway :connection :standard-connection :suite)))
 
-(define-test standard-connection)
+(define-test standard-connection
+  :parent connector)
 
 ;;; Unit tests
 
@@ -132,9 +133,9 @@
   3 "Assert connection 2 is ready."
   4 "Assert the received data matches the data that was sent.")
 
-(defvar *standard-connection-send-receive-data*
+(defparameter *standard-connection-send-receive-data*
   '((1 2 3 4 5 6 7 8 9 0)
-    (#:a #:b #:c #:d #:e #:f (#:g) ((((#:h #:i #:j #:k (#:l 2000) #:m 3.0)))))
+    (#:a #:b #:c #:d #:e #:f (#:g) ((((#:h #:i #:j #:k (#:l 2000) #:m 3.0d0)))))
     ("Jackdaws loves my big sphinx of quarts.")
     (#:lorem #:ipsum #:dolor #:sit #:amet)
     ("a" #:a "a" #:a "a" "b")))

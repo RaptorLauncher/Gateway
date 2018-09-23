@@ -6,6 +6,7 @@
 (uiop:define-package #:gateway.connector
   (:use
    #:cl
+   #:alexandria
    #:phoe-toolbox
    #:gateway.connector/protocol
    #:gateway.cable)

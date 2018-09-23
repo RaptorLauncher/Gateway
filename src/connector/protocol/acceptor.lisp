@@ -21,3 +21,5 @@ connections in a way defined by the implementing class."
      :export t)
   (:class acceptor (killable named addressed handling) ())
   "An acceptor object. See protocol ACCEPTOR for details.")
+
+(execute-protocol acceptor)
