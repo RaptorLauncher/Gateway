@@ -38,3 +38,25 @@
   :components ((:file "package")
                (:file "utils")
                (:file "standard-connection")))
+
+(asdf:defsystem #:gateway.test
+  :description "Tests for Gateway connector"
+  :author "Michał \"phoe\" Herda <phoe@disroot.org>"
+  :license  "AGPL3"
+  :version "0.0.1"
+  :serial t
+  :depends-on (#:phoe-toolbox
+               #:named-readtables
+               #:protest/test
+               #:protest/parachute
+               #:gateway.connector/protocol
+               #:gateway.connector)
+  :pathname "impl/"
+  :components ((:file "package")
+               (:file "standard-connection")))
+
+(defmethod asdf:perform ((o asdf:test-op)
+                         (c (eql (asdf:find-system ':gateway.connector))))
+  (asdf:operate 'load-op :gateway.connector/test)
+  ;; (uiop:symbol-call :gateway.connector/test :run) ;; verify
+  )

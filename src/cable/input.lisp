@@ -50,6 +50,12 @@
     (unless char (fail))
     char))
 
+(defun lpeek* (stream &key eof)
+  (when *read-limit*
+    (when (<= *read-limit* *read-counter*)
+      (error 'read-limit-hit)))
+  (phoe-toolbox:peek-char-no-hang stream (not eof) eof))
+
 (defun lunread (char stream)
   (when *read-limit*
     (decf *read-counter*))
@@ -123,18 +129,21 @@
 
 (defun read-sexpr (stream)
   (skip-whitespace stream)
-  (let* ((char (lread stream)))
-    (let ((result (case char
-                    (#\Nul (error "Stray null found."))
-                    (#\( (read-sexpr-list stream))
-                    (#\) (error "Encountered closing parenthesis."))
-                    (#\" (read-sexpr-string stream))
-                    ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 #\.)
-                     (lunread char stream)
-                     (read-sexpr-number stream))
-                    (t (lunread char stream)
-                     (read-sexpr-symbol stream)))))
-      result)))
+  (let* ((char (lread stream))
+         (result (case char
+                   (#\Nul (error "Stray null found."))
+                   (#\( (read-sexpr-list stream))
+                   (#\) (error "Encountered closing parenthesis."))
+                   (#\" (read-sexpr-string stream))
+                   ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 #\.)
+                    (lunread char stream)
+                    (read-sexpr-number stream))
+                   (t (lunread char stream)
+                    (read-sexpr-symbol stream)))))
+    (loop for char = (lpeek* stream :eof stream)
+          while (whitespace-p char)
+          do (lread stream))
+    result))
 
 ;;; FROM-CABLE
 

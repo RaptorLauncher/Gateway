@@ -48,10 +48,14 @@
     (assert (cable-equal result *input-sexp*))))
 
 (defun test-buffered-input ()
+  (%test-buffered-input "(1 2 3 " "4 5 6)" '(1 2 3 4 5 6))
+  (%test-buffered-input "(1 2 3" " 4 5 6)" '(1 2 3 4 5 6)))
+
+(defun %test-buffered-input (left right expected)
   (let ((pipe (cl-plumbing:make-pipe)))
-    (loop for char across "(1 2 3 "
+    (loop for char across left
           do (write-char char pipe))
     (assert (null (from-cable-buffered pipe)))
-    (loop for char across "4 5 6)"
+    (loop for char across right
           do (write-char char pipe))
-    (assert (equal '(1 2 3 4 5 6) (from-cable-buffered pipe)))))
+    (assert (equal expected (from-cable-buffered pipe)))))

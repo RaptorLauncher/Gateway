@@ -17,6 +17,12 @@ This connection is a subclass of USOCKET:STREAM-SOCKET.")))
   (format stream "~A (~A)" (address standard-connection)
           (if (deadp standard-connection) "DEAD" "ALIVE")))
 
+(defun %initialize-connection (connection)
+  (let ((address (socket-peer-address connection)))
+    (v:trace '(:gateway :connection)
+             "Standard connection created for ~A." address)
+    (setf (address connection) address)))
+
 (define-constructor (standard-connection)
   (%initialize-connection standard-connection))
 
@@ -25,11 +31,6 @@ This connection is a subclass of USOCKET:STREAM-SOCKET.")))
   (call-next-method)
   (%initialize-connection connection))
 
-(defun %initialize-connection (connection)
-  (let ((address (socket-peer-address connection)))
-    (v:trace :gateway "Standard connection created for ~A." address)
-    (setf (address connection) address)))
-
 (defmethod deadp ((connection standard-connection))
   (handler-case (peek-char-no-hang (usocket:socket-stream connection))
     (error () (usocket:socket-close connection)))
@@ -37,11 +38,13 @@ This connection is a subclass of USOCKET:STREAM-SOCKET.")))
 
 (defmethod kill ((connection standard-connection))
   (usocket:socket-close connection)
-  (v:trace :gateway "Standard connection killed for ~A." (address connection))
+  (v:trace '(:gateway :connection)
+           "Standard connection killed for ~A." (address connection))
   (values))
 
 (defun connection-readyp (connection)
-  (peek-char-no-hang (usocket:socket-stream connection)))
+  (handler-case (peek-char-no-hang (usocket:socket-stream connection))
+    (end-of-file () t)))
 
 (defmethod readyp ((connection standard-connection))
   (or (not (open-stream-p (usocket:socket-stream connection)))
@@ -50,64 +53,37 @@ This connection is a subclass of USOCKET:STREAM-SOCKET.")))
 (defmethod connection-receive ((connection standard-connection))
   (cond ((deadp connection) (values nil nil))
         ((not (connection-readyp connection)) (values nil t))
-        (t (values (from-cable (usocket:socket-stream connection)) t))))
+        (t (let ((result (from-cable (usocket:socket-stream connection))))
+             (v:trace '(:gateway :connection)
+                      "Received ~S from ~A." result connection)
+             (values result t)))))
 
 (defmethod connection-send ((connection standard-connection) object)
   (let ((stream (usocket:socket-stream connection)))
+    (v:trace '(:gateway :connection)
+             "Sending ~S to ~A." object connection)
     (to-cable object stream)
     (terpri stream)
     (force-output stream)))
+
+(defun %ready (connections)
+  (usocket:wait-for-input connections :timeout 0.1 :ready-only t))
 
 (defmethod ready-connection-using-class
     ((class (eql (find-class 'standard-connection))) connections)
   (let ((connections connections))
     (loop
       (handler-case
-          (let ((result (usocket:wait-for-input connections :timeout 0.1
-                                                            :ready-only t)))
-            (return (values (first result) connections)))
+          (let* ((connection (first (%ready connections))))
+            (v:trace '(:gateway :connection)
+                     "Connection ~A is ready." connection)
+            (return (values connection connections)))
         ((or stream-error usocket:socket-error) ()
           (setf connections (remove-if #'deadp connections))
           ;; TODO make use of secondary value in listener
           (unless connections (return (values nil nil))))))))
 
 ;;; TESTS
-
-(defun make-connection-pair ()
-  (let* ((socket-listen (usocket:socket-listen "127.0.0.1" 0))
-         (port (usocket:get-local-port socket-listen))
-         (socket-connect (usocket:socket-connect "127.0.0.1" port))
-         (socket-accept (usocket:socket-accept socket-listen)))
-    (usocket:socket-close socket-listen)
-    (list (change-class socket-connect 'standard-connection)
-          (change-class socket-accept'standard-connection))))
-
-;; (define-test-case standard-connection-unit
-;;     (:description "Unit tests for STANDARD-CONNECTION."
-;;      :tags (:connection :unit)
-;;      :type :unit-suite))
-
-;; (define-test standard-connection-unit
-;;   (finalized-let*
-;;       ((conns (multiple-value-list (make-connection-pair))
-;;               (mapc #'kill conns)))
-;;     #1?(is (eq t (connection-send (first conns) '(1 2 3 4))))
-;;     #2?(is (readyp (second conns)))
-;;     (multiple-value-bind (message alivep) (connection-receive (second conns))
-;;       #3?(is (not (readyp (second conns))))
-;;       #4?(is (equal message '(1 2 3 4)))
-;;       #5?(is (eq alivep t)))
-;;     (fformat (stream-of (first conns)) "(")
-;;     #6?(is (readyp (second conns)))
-;;     (multiple-value-bind (message alivep) (connection-receive (second conns))
-;;       #7?(is (not (readyp (second conns))))
-;;       #8?(is (null message))
-;;       #9?(is (eq alivep t)))
-;;     (kill (first conns))
-;;     #10?(is (wait () (readyp (second conns))))
-;;     (multiple-value-bind (message alivep) (connection-receive (second conns))
-;;       #11?(is (null message))
-;;       #12?(is (null alivep)))))
 
 ;; (define-test-case standard-connection-send-receive
 ;;     (:description "Test of sending and receiving data for STANDARD-CONNECTIONs."
