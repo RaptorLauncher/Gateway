@@ -40,3 +40,6 @@ provided stream."))
 
 (defmethod to-cable ((object symbol) (stream stream))
   (format stream "~A" (symbol-name object)))
+
+(defmethod to-cable ((object null) (stream stream))
+  (format stream "()"))
