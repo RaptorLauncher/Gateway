@@ -37,22 +37,31 @@ argument.")))
           (thread standard-acceptor) (bt:make-thread fn :name name))))
 
 (defun acceptor-loop (acceptor)
-  (with-restartability (acceptor)
-    (loop with socket = (socket-of acceptor)
-          for accept = (usocket:socket-accept (usocket:wait-for-input socket))
-          for connection = (change-class accept 'standard-connection)
-          do (v:debug '(:gateway :acceptor)
-                      "Accepting a connection from ~A."
-                      (socket-peer-address accept))
-             (funcall (handler acceptor) connection))))
+  (labels
+      ((accept (socket)
+         (loop
+           (unless (server-socket-alive-p socket)
+             (v:trace '(:gateway :acceptor)
+                      "Standard acceptor from ~A quitting." (address acceptor))
+             (return-from acceptor-loop))
+           (when (usocket:wait-for-input socket :timeout 0.1 :ready-only t)
+             (return (usocket:socket-accept socket))))))
+    (let ((socket (socket-of acceptor)))
+      (with-restartability (acceptor)
+        (loop
+          (let* ((connection (accept socket)))
+            (change-class connection'standard-connection)
+            (v:debug '(:gateway :acceptor)
+                     "Accepting a connection from ~A."
+                     (socket-peer-address connection))
+            (funcall (handler acceptor) connection)))))))
 
 (defmethod deadp ((acceptor standard-acceptor))
   (not (bt:thread-alive-p (thread acceptor))))
 
 ;; TODO trace KILL, take care of multiple KILL calls
 (defmethod kill ((acceptor standard-acceptor))
-  (v:trace :gateway "Standard acceptor from ~A was killed." (address acceptor))
-  (unless (eq (thread acceptor) (bt:current-thread))
-    (bt:destroy-thread (thread acceptor)))
+  (v:trace '(:gateway :acceptor)
+           "Standard acceptor from ~A was requested to die." (address acceptor))
   (usocket:socket-close (socket-of acceptor))
   (values))

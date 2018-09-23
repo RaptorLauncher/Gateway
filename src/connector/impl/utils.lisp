@@ -25,7 +25,14 @@
       (v:debug '(:gateway :socket) "Socket error: ~A" e)
       (usocket:socket-close socket) "<error>")))
 
+(defun server-socket-alive-p (socket)
+  "Returns T if the server socket is still alive, NIL otherwise."
+  (check-type socket usocket:stream-server-usocket)
+  (handler-case (progn (usocket:get-local-name socket) t)
+    (error () nil)))
+
 (defun make-connection-pair ()
+  "Returns a pair of connections bound to each other."
   (let* ((socket-listen (usocket:socket-listen "127.0.0.1" 0))
          (port (usocket:get-local-port socket-listen))
          (socket-connect (usocket:socket-connect "127.0.0.1" port))
