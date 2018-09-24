@@ -31,7 +31,6 @@ function with the connection and the command as arguments.")))
           (connection-count standard-listener)))
 
 (define-constructor (standard-listener)
-  (v:trace '(:gateway :acceptor) "Standard listener starting.")
   (destructuring-bind (conn-1 conn-2) (make-connection-pair)
     (bt:with-lock-held ((lock standard-listener))
       (let ((fn (curry #'listener-loop standard-listener)))
@@ -39,7 +38,8 @@ function with the connection and the command as arguments.")))
               (control-output-connection standard-listener) conn-2
               (connections standard-listener) (list conn-2)
               (thread standard-listener)
-              (bt:make-thread fn :name (name standard-listener)))))))
+              (bt:make-thread fn :name (name standard-listener))))))
+  (v:trace '(:gateway :listener) "~A: starting." standard-listener))
 
 (defmethod add-connection ((listener standard-listener) (connection connection))
   (bt:with-lock-held ((lock listener))
@@ -54,7 +54,7 @@ function with the connection and the command as arguments.")))
   (loop for conns = (bt:with-lock-held ((lock listener)) (connections listener))
         for conn = (ready-connection conns)
         when conn do (v:trace '(:gateway :listener)
-                              "Standard listener: receiving from ~A."
+                              "Receiving from ~A."
                               (socket-peer-address conn))
         and return conn))
 
@@ -73,7 +73,7 @@ function with the connection and the command as arguments.")))
                       ((and (eq connection control-connection)
                             (cable-equal command '(#:goodbye)))
                        (v:trace '(:gateway :listener)
-                                "Standard listener: quitting.")
+                                "~A: quitting." listener)
                        (kill (control-output-connection listener))
                        (kill (control-input-connection listener))
                        (mapc #'kill (connections listener))
@@ -88,7 +88,7 @@ function with the connection and the command as arguments.")))
               (stream (stream-error-stream condition))
               (predicate (lambda (x) (eq stream (usocket:socket-stream x))))
               (connection (find-if predicate connections)))
-    (v:debug :gateway "Standard listener: removing dead connection ~A."
+    (v:debug :gateway "Removing dead ~A."
              (address connection))
     (kill connection)
     (removef (connections listener) connection :count 1)))
@@ -97,7 +97,7 @@ function with the connection and the command as arguments.")))
   (not (bt:thread-alive-p (thread listener))))
 
 (defmethod kill ((listener standard-listener))
-  (v:trace :gateway "Standard listener requested to quit.")
+  (v:trace '(:gateway :listener) "~A: killed." listener)
   (connection-send (control-input-connection listener) '(#:goodbye))
   (values))
 

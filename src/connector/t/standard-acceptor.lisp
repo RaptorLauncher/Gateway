@@ -56,11 +56,11 @@
      :tags (:gateway :protocol :killable :acceptor))
   :arrange
   1 "Create an acceptor."
-  2 "Assert acceptor is alive."
+  2 "Assert the acceptor is alive."
   :act
-  3 "Kill acceptor."
+  3 "Kill the acceptor."
   :assert
-  4 "Assert acceptor is dead.")
+  4 "Assert the acceptor is dead.")
 
 (define-test standard-acceptor-death
   :parent standard-acceptor

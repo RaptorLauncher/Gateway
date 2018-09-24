@@ -19,14 +19,12 @@ a connection is created and the handler function is called with it as an ~
 argument.")))
 
 (define-print (standard-acceptor stream)
-  (format stream "~A (~A)" (address standard-acceptor)
-          (if (deadp standard-acceptor) "DEAD" "ALIVE")))
+  (format stream "~A (~:[ALIVE~;DEAD~])" (address standard-acceptor)
+          (deadp standard-acceptor)))
 
 (define-constructor (standard-acceptor (host "127.0.0.1") (port 0))
   (check-type host string)
   (check-type port (unsigned-byte 16))
-  (v:trace '(:gateway :acceptor)
-           "Standard acceptor starting at ~A:~D." host port)
   (let* ((socket (usocket:socket-listen "127.0.0.1" port :reuseaddress t))
          (address (socket-local-address socket))
          (name (format nil "Gateway - Acceptor for ~A" address))
@@ -34,7 +32,8 @@ argument.")))
     (setf (socket-of standard-acceptor) socket
           (address standard-acceptor) address
           (name standard-acceptor) name
-          (thread standard-acceptor) (bt:make-thread fn :name name))))
+          (thread standard-acceptor) (bt:make-thread fn :name name)))
+  (v:trace '(:gateway :acceptor) "~A: starting." acceptor))
 
 (defun acceptor-loop (acceptor)
   (labels
@@ -42,7 +41,7 @@ argument.")))
          (loop
            (unless (server-socket-alive-p socket)
              (v:trace '(:gateway :acceptor)
-                      "Standard acceptor from ~A quitting." (address acceptor))
+                      "~A: quitting." acceptor)
              (return-from acceptor-loop))
            (when (usocket:wait-for-input socket :timeout 0.1 :ready-only t)
              (return (usocket:socket-accept socket))))))
@@ -52,7 +51,7 @@ argument.")))
           (let* ((connection (accept socket)))
             (change-class connection'standard-connection)
             (v:debug '(:gateway :acceptor)
-                     "Accepting a connection from ~A."
+                     "Accepting from ~A."
                      (socket-peer-address connection))
             (funcall (handler acceptor) connection)))))))
 
@@ -61,7 +60,6 @@ argument.")))
 
 ;; TODO trace KILL, take care of multiple KILL calls
 (defmethod kill ((acceptor standard-acceptor))
-  (v:trace '(:gateway :acceptor)
-           "Standard acceptor from ~A was requested to die." (address acceptor))
+  (v:trace '(:gateway :acceptor) "~A: killed." acceptor)
   (usocket:socket-close (socket-of acceptor))
   (values))

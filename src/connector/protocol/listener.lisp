@@ -17,7 +17,7 @@ and pass it to other parts of the program.
 \
 The listener, when instantiated, automatically begins handling client ~
 connections in a way defined by the implementing class."
-     :tags (:listener)
+     :tags (:gateway :listener)
      :dependencies (acceptor connection killable named handling)
      :export t)
   (:class listener (killable named handling) ())

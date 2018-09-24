@@ -32,6 +32,7 @@
   :serial t
   :depends-on (#:alexandria
                #:bordeaux-threads
+               #:lparallel
                #:usocket
                #:verbose
                #:phoe-toolbox

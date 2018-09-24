@@ -13,7 +13,7 @@ which contain only proper lists, uninterned symbols, strings, numbers and ~
 serializable objects, which are serialized before sending).
 \
 Each such object has an authentication slot."
-     :tags (:connection)
+     :tags (:gateway :connection)
      :dependencies (killable serializable addressed)
      :export t)
   (:class connection (killable addressed) ())
