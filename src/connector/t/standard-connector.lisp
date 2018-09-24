@@ -38,11 +38,13 @@
 
 (define-test standard-connector-echo
   :parent standard-connector
-  (let* ((writer (make-instance 'standard-writer)))
-    (flet ((fn (connection data)
-             (write-data writer connection data)))
+  (let ((writer (make-instance 'standard-writer)))
+    (flet ((fn (connection data) (write-data writer connection data)))
       (finalized-let*
-          ((connector #1?(make-connector #'fn) (kill connector))
+          ((connector #1?(make-instance 'standard-connector
+                                        :writer writer
+                                        :listener-handler #'fn)
+                      (kill connector))
            (socket (gateway.connector::socket-of (first (acceptors connector))))
            ;; TODO proper HOST and PORT accessors for acceptor
            (host (usocket:get-local-address socket))
