@@ -44,6 +44,7 @@
       (finalized-let*
           ((connector #1?(make-connector #'fn) (kill connector))
            (socket (gateway.connector::socket-of (first (acceptors connector))))
+           ;; TODO proper HOST and PORT accessors for acceptor
            (host (usocket:get-local-address socket))
            (port (usocket:get-local-port socket))
            (conns #2?(loop repeat 10 collect (make-connection host port))
