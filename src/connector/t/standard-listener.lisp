@@ -66,9 +66,9 @@ STANDARD-LISTENER."
   4 "Create both sides of connection 3."
   5 "Add first sides of the three connections to the listener's connection ~
 list."
-  :loop-act
+  :act
   6 "Send a message through the other side of connection 1, 2 or 3."
-  :loop-assert
+  :assert
   7 "Assert the message was pushed onto the list."
   8 "Pop the message from the list and go back to step 6 a few times.")
 
@@ -87,10 +87,11 @@ list."
     #5?(progn (add-connection listener c1a)
               (add-connection listener c2a)
               (add-connection listener c3a))
-    (loop for i below 30
+    (loop with test-fn = (lambda (x) (member x (bt:with-lock-held (lock) list)
+                                             :test #'equal :key #'second))
+          for i below 30
           for data = (make-list 10 :initial-element i)
           do (progn
                #6?(connection-send (whichever c1b c2b c3b) data)
-               #7?(true (wait (1 0.001) (member data (bt:with-lock-held (lock) list)
-                                                :test #'equal :key #'second)))
+               #7?(true (wait () (funcall test-fn data)))
                #8?(bt:with-lock-held (lock) (pop list))))))

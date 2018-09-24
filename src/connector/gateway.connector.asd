@@ -59,7 +59,8 @@
   :pathname "t/"
   :components ((:file "package")
                (:file "standard-connection")
-               (:file "standard-acceptor")))
+               (:file "standard-acceptor")
+               (:file "standard-listener")))
 
 (defmethod asdf:perform ((o asdf:test-op)
                          (c (eql (asdf:find-system ':gateway.connector))))
