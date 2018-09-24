@@ -6,98 +6,99 @@
 (in-package #:gateway.connector)
 
 (defclass standard-listener (listener)
-  ((%lock :accessor lock
-          :initform (bt:make-lock "Gateway - Listener lock"))
-   (%connections :accessor connections)
-   (%notifier-connection :accessor notifier-connection)
-   (%thread :accessor thread)
-   (%name :accessor name
+  ((%name :accessor name
           :initform "Gateway - Listener")
    (%handler :accessor handler
              :initarg :handler
-             :initform (error "Must define a handler function.")))
+             :initform (error "Must define a handler function."))
+   (%control-input-connection :accessor control-input-connection)
+   (%control-output-connection :accessor control-output-connection)
+   (%connections :accessor connections)
+   (%lock :accessor lock
+          :initform (bt:make-recursive-lock "Gateway - Listener lock"))
+   (%thread :accessor thread))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class LISTENER.
-
+\
 The STANDARD-LISTENER spawns a thread which monitors the CONNECTIONs on the ~
 connection list by means of READY-CONNECTION. It then attempts ~
 to read a command by CONNECTION-RECEIVE and, if it is read, call its handler ~
-function with the connection and the command as arguments.
-
-The handler is expected to push a message in form (CONNECTION COMMAND) into ~
-a designated place.")))
+function with the connection and the command as arguments.")))
 
 (define-print (standard-listener stream)
-  (if (deadp standard-listener)
-      (format stream "(DEAD)")
-      (let ((connections (connections standard-listener)))
-        (format stream "(~D connections, ALIVE)" (length connections)))))
+  (format stream "(~:[ALIVE, ~D connections~;DEAD~])"
+          (deadp standard-listener)
+          (connection-count standard-listener)))
 
 (define-constructor (standard-listener)
   (v:trace '(:gateway :acceptor) "Standard listener starting.")
-  (destructuring-bind (connection-1 connection-2) (make-connection-pair)
-    (let ((fn (curry #'listener-loop standard-listener)))
-      (setf (notifier-connection standard-listener) connection-1
-            (connections standard-listener) (list connection-2)
-            (thread standard-listener)
-            (bt:make-thread fn :name (name standard-listener))))))
+  (destructuring-bind (conn-1 conn-2) (make-connection-pair)
+    (bt:with-lock-held ((lock standard-listener))
+      (let ((fn (curry #'listener-loop standard-listener)))
+        (setf (control-input-connection standard-listener) conn-1
+              (control-output-connection standard-listener) conn-2
+              (connections standard-listener) (list conn-2)
+              (thread standard-listener)
+              (bt:make-thread fn :name (name standard-listener)))))))
 
 (defmethod add-connection ((listener standard-listener) (connection connection))
   (bt:with-lock-held ((lock listener))
     (push connection (connections listener))
-    (connection-send (notifier-connection listener) '())))
+    (connection-send (control-input-connection listener) '())))
 
 (defmethod connection-count ((listener standard-listener))
-  (length (connections listener)))
+  (bt:with-lock-held ((lock listener))
+    (1- (length (connections listener)))))
 
 (defun listener-ready-connection (listener)
-  (let ((conns (bt:with-lock-held ((lock listener)) (connections listener))))
-    (tagbody :start
-       (assert (not (null conns)) () "Listener: connection list is empty.")
-       (let ((conn (ready-connection conns)))
-         (unless conn (go :start))
-         (v:trace :gateway "Standard listener: receiving from ~A."
-                  (socket-peer-address conn))
-         (return-from listener-ready-connection conn)))))
+  (loop for conns = (bt:with-lock-held ((lock listener)) (connections listener))
+        for conn = (ready-connection conns)
+        when conn do (v:trace '(:gateway :listener)
+                              "Standard listener: receiving from ~A."
+                              (socket-peer-address conn))
+        and return conn))
 
 (defun listener-loop (listener)
-  (with-restartability (listener)
-    (loop
-      (handler-case
-          (let ((connection (listener-ready-connection listener)))
-            (multiple-value-bind (command alivep)
-                (connection-receive connection)
-              (unless alivep
-                (bt:with-lock-held ((lock listener))
-                  (removef (connections listener) connection :count 1)))
-              (when command
-                (funcall (handler listener) connection command))))
-        (stream-error (e) (listener-error listener e))))))
+  (with-restartability ()
+    (let ((control-connection (control-output-connection listener)))
+      (loop
+        (handler-case
+            (let ((connection (listener-ready-connection listener)))
+              (multiple-value-bind (command alivep)
+                  (connection-receive connection)
+                (cond ((not alivep)
+                       (bt:with-lock-held ((lock listener))
+                         (removef (connections listener) connection :count 1)))
+                      ((null command))
+                      ((and (eq connection control-connection)
+                            (cable-equal command '(#:goodbye)))
+                       (v:trace '(:gateway :listener)
+                                "Standard listener: quitting.")
+                       (kill (control-output-connection listener))
+                       (kill (control-input-connection listener))
+                       (mapc #'kill (connections listener))
+                       (return-from listener-loop))
+                      (t (funcall (handler listener) connection command)))))
+          (stream-error (e)
+            (bt:with-lock-held ((lock listener))
+              (listener-stream-error listener e))))))))
 
-(defun listener-error (listener condition)
-  (let* ((connections (bt:with-lock-held ((lock listener))
-                        (connections listener)))
-         (stream (stream-error-stream condition))
-         (predicate (lambda (x) (eq stream (usocket:socket-stream x))))
-         (connection (find-if predicate connections)))
-    (when connection
-      (v:debug :gateway "Standard listener: removing dead connection ~A."
-               (address connection))
-      (kill connection)
-      (bt:with-lock-held ((lock listener))
-        (removef (connections listener) connection :count 1)))))
+(defun listener-stream-error (listener condition)
+  (when-let* ((connections (connections listener))
+              (stream (stream-error-stream condition))
+              (predicate (lambda (x) (eq stream (usocket:socket-stream x))))
+              (connection (find-if predicate connections)))
+    (v:debug :gateway "Standard listener: removing dead connection ~A."
+             (address connection))
+    (kill connection)
+    (removef (connections listener) connection :count 1)))
 
 (defmethod deadp ((listener standard-listener))
   (not (bt:thread-alive-p (thread listener))))
 
 (defmethod kill ((listener standard-listener))
-  (v:trace :gateway "Standard listener was killed.")
-  (unless (eq (thread listener) (bt:current-thread))
-    (bt:destroy-thread (thread listener)))
-  (kill (notifier-connection listener))
-  (bt:with-lock-held ((lock listener))
-    (mapc #'kill (connections listener))
-    (setf (connections listener) '()))
+  (v:trace :gateway "Standard listener requested to quit.")
+  (connection-send (control-input-connection listener) '(#:goodbye))
   (values))
 
 ;; Oh goodness, I remember the days when I've had no idea what a closure was
@@ -117,5 +118,3 @@ a designated place.")))
 ;; I was a soloist back then, without any kind of other people backing the
 ;; project up. There's a whole community around it right now.
 ;; ~phoe, 23 Sep 2018
-
-;;; TESTS

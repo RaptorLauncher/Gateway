@@ -45,27 +45,15 @@ from a listener's connection list."
   (finalized-let* ((listener #1?(make-listener (constantly nil))
                              (kill listener)))
     (destructuring-bind (connection-1 connection-2) #2?(make-connection-pair)
-      #3?(add-connection listener connection-1)
-      #4?(false (deadp listener))
-      #5?(is = 2 (connection-count listener))
-      #6?(kill connection-2)
-      #7?(true (wait () (deadp connection-1)))
-      #8?(true (deadp connection-2))
-      #9?(true (wait () (= 1 (connection-count listener))))
-      #10?(false (deadp listener)))))
-
-(defun my-test ()
-  (finalized-let* ((listener (make-listener (constantly nil))
-                             (kill listener)))
-    (destructuring-bind (connection-1 connection-2) (make-connection-pair)
-      (add-connection listener connection-1)
-      (assert (not (deadp listener)))
-      (assert (= 2 (connection-count listener)))
-      (kill connection-2)
-      (assert (wait () (deadp connection-1)))
-      (assert (deadp connection-2))
-      (assert (wait (4) (= 1 (connection-count listener))))
-      (assert (not (deadp listener))))))
+      (unwind-protect
+           (progn #3?(add-connection listener connection-1)
+                  #4?(false (deadp listener))
+                  #5?(is = 1 (connection-count listener))
+                  #6?(kill connection-2)
+                  #7?(true (wait () (= 0 (connection-count listener))))
+                  #8?(false (deadp listener)))
+        (kill connection-1)
+        (kill connection-2)))))
 
 (define-test-case standard-listener-message
     (:documentation "Tests the message-passing functionality of the ~
@@ -103,45 +91,6 @@ list."
           for data = (make-list 10 :initial-element i)
           do (progn
                #6?(connection-send (whichever c1b c2b c3b) data)
-               #7?(true (wait () (member data (bt:with-lock-held (lock) list)
-                                         :test #'equal :key #'second)))
+               #7?(true (wait (1 0.001) (member data (bt:with-lock-held (lock) list)
+                                                :test #'equal :key #'second)))
                #8?(bt:with-lock-held (lock) (pop list))))))
-
-;;; Protocol tests
-
-(define-test-case standard-listener-death
-    (:documentation "Test of KILLABLE protocol for STANDARD-LISTENER."
-     :tags (:gateway :protocol :killable :listener))
-  :arrange
-  1  "Create a listener."
-  2  "Get the reference to one side of the listener's notifier connection."
-  3  "Get the reference to other side of the listener's notifier connection."
-  4  "Create a connection."
-  5  "Add the connection to the listener."
-  6  "Assert the listener is alive."
-  7  "Assert one side of the listener's notifier connection is alive."
-  8  "Assert the other side of the listener's notifier connection is alive."
-  :act
-  9  "Kill the listener."
-  :assert
-  10 "Assert the listener is dead."
-  11 "Assert the one side of the listener's notifier connection is dead."
-  12 "Assert the other side of the listener's notifier connection is dead."
-  13 "Assert the connection is dead.")
-
-(define-test standard-listener-death
-  :parent standard-listener
-  (let* ((listener #1?(make-listener (constantly nil)))
-         (notifier-1 #2?(gateway.connector::notifier-connection listener))
-         (notifier-2 #3?(first (gateway.connector::connections listener))))
-    (destructuring-bind (connection-1 connection-2) #4?(make-connection-pair)
-      (declare (ignore connection-2))
-      #5?(add-connection listener connection-1)
-      #6?(false (deadp listener))
-      #7?(false (deadp notifier-1))
-      #8?(false (deadp notifier-2))
-      #9?(kill listener)
-      #10?(true (wait () (deadp listener)))
-      #11?(true (deadp notifier-1))
-      #12?(true (deadp notifier-2))
-      #13?(true (deadp connection-1)))))
