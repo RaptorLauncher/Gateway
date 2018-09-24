@@ -33,7 +33,7 @@ argument.")))
           (address standard-acceptor) address
           (name standard-acceptor) name
           (thread standard-acceptor) (bt:make-thread fn :name name)))
-  (v:trace '(:gateway :acceptor) "~A: starting." acceptor))
+  (v:trace '(:gateway :acceptor) "~A: starting." standard-acceptor))
 
 (defun acceptor-loop (acceptor)
   (labels
@@ -58,7 +58,6 @@ argument.")))
 (defmethod deadp ((acceptor standard-acceptor))
   (not (bt:thread-alive-p (thread acceptor))))
 
-;; TODO trace KILL, take care of multiple KILL calls
 (defmethod kill ((acceptor standard-acceptor))
   (v:trace '(:gateway :acceptor) "~A: killed." acceptor)
   (usocket:socket-close (socket-of acceptor))

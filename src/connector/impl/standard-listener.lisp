@@ -97,8 +97,12 @@ function with the connection and the command as arguments.")))
   (not (bt:thread-alive-p (thread listener))))
 
 (defmethod kill ((listener standard-listener))
-  (v:trace '(:gateway :listener) "~A: killed." listener)
-  (connection-send (control-input-connection listener) '(#:goodbye))
+  (handler-case
+      (progn (v:trace '(:gateway :listener) "~A: killed." listener)
+             (connection-send (control-input-connection listener) '(#:goodbye)))
+    (stream-error (e)
+      (v:debug '(:gateway :listener) "Stream error while killing ~A: ~A"
+               listener e)))
   (values))
 
 ;; Oh goodness, I remember the days when I've had no idea what a closure was

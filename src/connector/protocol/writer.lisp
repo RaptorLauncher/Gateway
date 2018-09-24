@@ -10,11 +10,9 @@
 responsible for writing data to connections. Only writers are allowed to write ~
 to connections to avoid race conditions."
      :tags (:gateway :writer)
-     :dependencies (connection killable named)
+     :dependencies (connection killable named writing handling)
      :export t)
-  (:class writer (killable named handling) ())
-  "A writer object. See protocol WRITER for details."
-  (:function write-data ((writer writer) (connection connection) data) t)
-  "Schedules the data to be written by the writer to the connection.")
+  (:class writer (killable named writing handling) ())
+  "A writer object. See protocol WRITER for details.")
 
 (execute-protocol writer)

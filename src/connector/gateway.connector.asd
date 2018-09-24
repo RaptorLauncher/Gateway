@@ -18,10 +18,11 @@
   :pathname "protocol/"
   :components ((:file "package")
                (:file "connection")
+               (:file "mixin/writing")
                (:file "acceptor")
                (:file "listener")
-               ;; (:file "writer")
-               ))
+               (:file "writer")
+               (:file "connector")))
 
 (asdf:defsystem #:gateway.connector
   :description
@@ -43,7 +44,8 @@
                (:file "standard-connection")
                (:file "standard-acceptor")
                (:file "standard-listener")
-               ))
+               (:file "standard-writer")
+               (:file "standard-connector")))
 
 (asdf:defsystem #:gateway.connector/test
   :description "Tests for Gateway connector"
@@ -61,7 +63,9 @@
   :components ((:file "package")
                (:file "standard-connection")
                (:file "standard-acceptor")
-               (:file "standard-listener")))
+               (:file "standard-listener")
+               (:file "standard-writer")
+               (:file "standard-connector")))
 
 (defmethod asdf:perform ((o asdf:test-op)
                          (c (eql (asdf:find-system ':gateway.connector))))
