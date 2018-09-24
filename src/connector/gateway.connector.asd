@@ -41,7 +41,7 @@
                (:file "utils")
                (:file "standard-connection")
                (:file "standard-acceptor")
-               ;; (:file "standard-listener")
+               (:file "standard-listener")
                ))
 
 (asdf:defsystem #:gateway.connector/test
