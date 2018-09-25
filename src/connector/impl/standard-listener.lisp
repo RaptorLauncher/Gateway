@@ -58,6 +58,12 @@ function with the connection and the command as arguments.")))
                               (socket-peer-address conn))
         and return conn))
 
+(defun remove-connection (listener connection)
+  ;; TODO define disconnection handler
+  ;; TODO call disconnection handler here
+  (bt:with-lock-held ((lock listener))
+    (removef (connections listener) connection :count 1)))
+
 (defun listener-loop (listener)
   (with-restartability ()
     (let ((control-connection (control-output-connection listener)))
@@ -67,8 +73,7 @@ function with the connection and the command as arguments.")))
               (multiple-value-bind (command alivep)
                   (connection-receive connection)
                 (cond ((not alivep)
-                       (bt:with-lock-held ((lock listener))
-                         (removef (connections listener) connection :count 1)))
+                       (remove-connection listener connection))
                       ((null command))
                       ((and (eq connection control-connection)
                             (cable-equal command '(#:goodbye)))
@@ -91,7 +96,7 @@ function with the connection and the command as arguments.")))
     (v:debug :gateway "Removing dead ~A."
              (address connection))
     (kill connection)
-    (removef (connections listener) connection :count 1)))
+    (remove-connection listener connection)))
 
 (defmethod deadp ((listener standard-listener))
   (not (bt:thread-alive-p (thread listener))))
