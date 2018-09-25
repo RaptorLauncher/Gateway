@@ -12,7 +12,7 @@ to send and receive messages in form of reduced S-expressions (S-expressions ~
 which contain only proper lists, uninterned symbols, strings, numbers and ~
 serializable objects, which are serialized before sending).
 \
-Each such object has an authentication slot."
+The ADDRESSED protocol refers to this connection's local address."
      :tags (:gateway :connection)
      :dependencies (killable serializable addressed)
      :export t)

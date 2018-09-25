@@ -8,8 +8,9 @@
 
 ;;; Utils
 
-(defun make-connector (handler)
-  (make-instance 'standard-connector :listener-handler handler))
+(defun make-connector (handler &optional writer)
+  (make-instance 'standard-connector :listener-handler handler
+                                     :writer writer))
 
 (defun make-connection (host port)
   (change-class (usocket:socket-connect host port) 'standard-connection))
@@ -41,14 +42,10 @@
   (let ((writer (make-instance 'standard-writer)))
     (flet ((fn (connection data) (write-data writer connection data)))
       (finalized-let*
-          ((connector #1?(make-instance 'standard-connector
-                                        :writer writer
-                                        :listener-handler #'fn)
+          ((connector #1?(make-connector #'fn writer)
                       (kill connector))
-           (socket (gateway.connector::socket-of (first (acceptors connector))))
-           ;; TODO proper HOST and PORT accessors for acceptor
-           (host (usocket:get-local-address socket))
-           (port (usocket:get-local-port socket))
+           (acceptor (first (acceptors connector)))
+           (host (hostname acceptor)) (port (port acceptor))
            (conns #2?(loop repeat 10 collect (make-connection host port))
                   (mapc #'kill conns)))
         (loop repeat 30

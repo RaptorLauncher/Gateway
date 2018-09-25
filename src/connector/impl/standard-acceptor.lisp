@@ -9,10 +9,15 @@
   ((%socket :accessor socket-of)
    (%thread :accessor thread)
    (%name :reader name)
-   (%address :reader address)
    (%timeout :accessor timeout
              :initarg :timeout
              :initform 0.01)
+   (%hostname :reader hostname
+              :initarg :hostname
+              :initform "127.0.0.1")
+   (%port :reader port
+          :initarg :port
+          :initform 0)
    (%queue :reader queue
            :initform (lparallel.queue:make-queue))
    (%handler :reader handler
@@ -27,17 +32,19 @@ argument.")))
   (format stream "~A (~:[ALIVE~;DEAD~])" (address standard-acceptor)
           (deadp standard-acceptor)))
 
-(define-constructor (standard-acceptor (host "127.0.0.1") (port 0))
-  (check-type host string)
+(define-constructor (standard-acceptor (port 0))
   (check-type port (unsigned-byte 16))
-  (let* ((socket (usocket:socket-listen "127.0.0.1" port :reuseaddress t))
-         (address (socket-local-address socket))
-         (name (format nil "Gateway - Acceptor for ~A" address))
-         (fn (curry #'acceptor-loop standard-acceptor)))
-    (setf (socket-of standard-acceptor) socket
-          (slot-value standard-acceptor '%address) address
-          (slot-value standard-acceptor '%name) name
-          (thread standard-acceptor) (bt:make-thread fn :name name)))
+  (let* ((host (hostname standard-acceptor))
+         (socket (usocket:socket-listen host port :reuseaddress t)))
+    (when (= 0 port)
+      (setf (slot-value standard-acceptor '%port)
+            (usocket:get-local-port socket)))
+    (let* ((address (address standard-acceptor))
+           (name (format nil "Gateway - Acceptor for ~A" address))
+           (fn (curry #'acceptor-loop standard-acceptor)))
+      (setf (socket-of standard-acceptor) socket
+            (slot-value standard-acceptor '%name) name
+            (thread standard-acceptor) (bt:make-thread fn :name name))))
   (v:trace '(:gateway :acceptor) "~A: starting." standard-acceptor))
 
 (defun acceptor-loop (acceptor)
