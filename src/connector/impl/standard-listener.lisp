@@ -16,7 +16,10 @@
    (%connections :accessor connections)
    (%lock :accessor lock
           :initform (bt:make-recursive-lock "Gateway - Listener lock"))
-   (%thread :accessor thread))
+   (%thread :accessor thread)
+   (%timeout :accessor timeout
+             :initarg :timeout
+             :initform 0.01))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class LISTENER.
 \
@@ -50,9 +53,9 @@ function with the connection and the command as arguments.")))
   (bt:with-lock-held ((lock listener))
     (1- (length (connections listener)))))
 
-(defun listener-ready-connection (listener)
+(defun listener-ready-connection (listener timeout)
   (loop for conns = (bt:with-lock-held ((lock listener)) (connections listener))
-        for conn = (ready-connection conns)
+        for conn = (ready-connection conns :timeout timeout)
         when conn do (v:trace '(:gateway :listener)
                               "Receiving from ~A."
                               (socket-peer-address conn))
@@ -66,10 +69,11 @@ function with the connection and the command as arguments.")))
 
 (defun listener-loop (listener)
   (with-restartability ()
-    (let ((control-connection (control-output-connection listener)))
+    (let ((control-connection (control-output-connection listener))
+          (timeout (timeout listener)))
       (loop
         (handler-case
-            (let ((connection (listener-ready-connection listener)))
+            (let ((connection (listener-ready-connection listener timeout)))
               (multiple-value-bind (command alivep)
                   (connection-receive connection)
                 (cond ((not alivep)

@@ -9,7 +9,7 @@
 ;;; Utils
 
 (defun make-acceptor (handler)
-  (make-instance 'standard-acceptor :handler handler))
+  (make-instance 'standard-acceptor :handler handler :timeout 0.001))
 
 ;;; Test suite
 

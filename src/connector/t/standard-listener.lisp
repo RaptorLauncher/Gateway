@@ -9,7 +9,7 @@
 ;;; Utils
 
 (defun make-listener (handler)
-  (make-instance 'standard-listener :handler handler))
+  (make-instance 'standard-listener :handler handler :timeout 0.001))
 
 ;;; Test suite
 

@@ -10,6 +10,9 @@
    (%thread :accessor thread)
    (%name :accessor name)
    (%address :accessor address)
+   (%timeout :accessor timeout
+             :initarg :timeout
+             :initform 0.01)
    (%handler :accessor handler
              :initarg :handler
              :initform (error "Must define a handler function.")))
@@ -36,24 +39,26 @@ argument.")))
   (v:trace '(:gateway :acceptor) "~A: starting." standard-acceptor))
 
 (defun acceptor-loop (acceptor)
-  (labels
-      ((accept (socket)
-         (loop
-           (unless (server-socket-alive-p socket)
-             (v:trace '(:gateway :acceptor)
-                      "~A: quitting." acceptor)
-             (return-from acceptor-loop))
-           (when (usocket:wait-for-input socket :timeout 0.1 :ready-only t)
-             (return (usocket:socket-accept socket))))))
-    (let ((socket (socket-of acceptor)))
-      (with-restartability (acceptor)
-        (loop
-          (let* ((connection (accept socket)))
-            (change-class connection'standard-connection)
-            (v:debug '(:gateway :acceptor)
-                     "Accepting from ~A."
-                     (socket-peer-address connection))
-            (funcall (handler acceptor) connection)))))))
+  (let ((timeout (timeout acceptor)))
+    (labels
+        ((accept (socket)
+           (loop
+             (unless (server-socket-alive-p socket)
+               (v:trace '(:gateway :acceptor)
+                        "~A: quitting." acceptor)
+               (return-from acceptor-loop))
+             (when (usocket:wait-for-input socket :timeout timeout
+                                                  :ready-only t)
+               (return (usocket:socket-accept socket))))))
+      (let ((socket (socket-of acceptor)))
+        (with-restartability (acceptor)
+          (loop
+            (let* ((connection (accept socket)))
+              (change-class connection'standard-connection)
+              (v:debug '(:gateway :acceptor)
+                       "Accepting from ~A."
+                       (socket-peer-address connection))
+              (funcall (handler acceptor) connection))))))))
 
 (defmethod deadp ((acceptor standard-acceptor))
   (not (bt:thread-alive-p (thread acceptor))))
