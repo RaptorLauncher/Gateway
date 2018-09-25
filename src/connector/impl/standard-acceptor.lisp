@@ -46,11 +46,12 @@ argument.")))
                (loop
                  (when (lparallel.queue:try-pop-queue (queue acceptor))
                    (v:trace '(:gateway :acceptor) "~A: quitting." acceptor)
+                   (usocket:socket-close socket)
                    (return-from acceptor-loop))
                  (when (wait-for-sockets socket timeout)
                    (return (usocket:socket-accept socket))))))
       (let ((socket (socket-of acceptor)))
-        (with-restartability (acceptor)
+        (with-restartability ()
           (loop
             (let* ((connection (accept socket)))
               (change-class connection'standard-connection)
