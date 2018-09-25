@@ -45,19 +45,16 @@ argument.")))
     (labels ((accept (socket)
                (loop
                  (when (lparallel.queue:try-pop-queue (queue acceptor))
-                   (v:trace '(:gateway :acceptor)
-                            "~A: quitting." acceptor)
+                   (v:trace '(:gateway :acceptor) "~A: quitting." acceptor)
                    (return-from acceptor-loop))
-                 (when (usocket:wait-for-input socket :timeout timeout
-                                                      :ready-only t)
+                 (when (wait-for-sockets socket timeout)
                    (return (usocket:socket-accept socket))))))
       (let ((socket (socket-of acceptor)))
         (with-restartability (acceptor)
           (loop
             (let* ((connection (accept socket)))
               (change-class connection'standard-connection)
-              (v:debug '(:gateway :acceptor)
-                       "Accepting from ~A."
+              (v:debug '(:gateway :acceptor) "Accepting from ~A."
                        (socket-peer-address connection))
               (funcall (handler acceptor) connection))))))))
 

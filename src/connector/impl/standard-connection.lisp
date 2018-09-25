@@ -62,16 +62,13 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
     (fresh-line stream)
     (force-output stream)))
 
-(defun %ready (connections timeout)
-  (usocket:wait-for-input connections :timeout timeout :ready-only t))
-
 (defmethod ready-connection-using-class
     ((class (eql (find-class 'standard-connection))) connections
      &key (timeout 0.01))
   (let ((connections connections))
     (loop
       (handler-case
-          (let* ((connection (first (%ready connections timeout))))
+          (let* ((connection (first (wait-for-sockets connections timeout))))
             (when connection
               (v:trace '(:gateway :connection)
                        "~A is ready." connection))

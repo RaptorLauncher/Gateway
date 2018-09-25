@@ -40,3 +40,6 @@
     (usocket:socket-close socket-listen)
     (list (change-class socket-connect 'standard-connection)
           (change-class socket-accept'standard-connection))))
+
+(defun wait-for-sockets (socket-or-sockets &optional timeout)
+  (usocket:wait-for-input socket-or-sockets :timeout timeout :ready-only t))
