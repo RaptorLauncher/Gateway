@@ -62,10 +62,12 @@ function with the connection and the command as arguments.")))
         and return conn))
 
 (defun remove-connection (listener connection)
+  ;; TODO handler is setfable, take that into account
+  ;; TODO fix connector test with proper SETF HANDLER on listener
   ;; TODO define disconnection handler
   ;; TODO call disconnection handler here
-  ;; TODO modify protocols ADDRESSED and HANDLING to take multiple addresses
-  ;; and handlers into account: (handler object &optional type)
+  ;; TODO modify protocols HANDLING to take multiple handlers into account:
+  ;; (handler object &optional type)
   (bt:with-lock-held ((lock listener))
     (removef (connections listener) connection :count 1)))
 
