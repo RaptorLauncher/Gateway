@@ -64,6 +64,8 @@ function with the connection and the command as arguments.")))
 (defun remove-connection (listener connection)
   ;; TODO define disconnection handler
   ;; TODO call disconnection handler here
+  ;; TODO modify protocols ADDRESSED and HANDLING to take multiple addresses
+  ;; and handlers into account: (handler object &optional type)
   (bt:with-lock-held ((lock listener))
     (removef (connections listener) connection :count 1)))
 
