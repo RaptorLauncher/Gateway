@@ -16,7 +16,6 @@ Implementations are encouraged to provide their own optimized methods."
      :tags (:gateway :connector)
      :dependencies (killable named writing acceptor listener writer)
      :export t)
-  ;; TODO make sure no SETF functions are exported from all implementations
   (:class connector (killable named writing) ())
   "A connector object. See protocol CONNECTOR for details."
   (:function acceptors ((connector connector)) list)

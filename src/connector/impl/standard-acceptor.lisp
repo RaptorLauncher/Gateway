@@ -8,12 +8,12 @@
 (defclass standard-acceptor (acceptor)
   ((%socket :accessor socket-of)
    (%thread :accessor thread)
-   (%name :accessor name)
-   (%address :accessor address)
+   (%name :reader name)
+   (%address :reader address)
    (%timeout :accessor timeout
              :initarg :timeout
              :initform 0.01)
-   (%handler :accessor handler
+   (%handler :reader handler
              :initarg :handler
              :initform (error "Must define a handler function.")))
   (:documentation #.(format nil "A standard acceptor implementation, with a ~
@@ -33,8 +33,8 @@ argument.")))
          (name (format nil "Gateway - Acceptor for ~A" address))
          (fn (curry #'acceptor-loop standard-acceptor)))
     (setf (socket-of standard-acceptor) socket
-          (address standard-acceptor) address
-          (name standard-acceptor) name
+          (slot-value standard-acceptor '%address) address
+          (slot-value standard-acceptor '%name) name
           (thread standard-acceptor) (bt:make-thread fn :name name)))
   (v:trace '(:gateway :acceptor) "~A: starting." standard-acceptor))
 
@@ -65,5 +65,6 @@ argument.")))
 
 (defmethod kill ((acceptor standard-acceptor))
   (v:trace '(:gateway :acceptor) "~A: killed." acceptor)
+  ;; TODO this is not thread-safe
   (usocket:socket-close (socket-of acceptor))
   (values))

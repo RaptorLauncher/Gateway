@@ -6,7 +6,7 @@
 (in-package :gateway.connector)
 
 (defclass standard-connection (connection usocket:stream-usocket)
-  ((%address :accessor address))
+  ((%address :reader address))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class CONNECTION. This class is a subclass of USOCKET:STREAM-SOCKET and may be ~
 instantiated in one of two ways: using MAKE-INSTANCE on it, or invoking
@@ -18,7 +18,7 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
 
 (defun %initialize-connection (connection)
   (let ((address (socket-peer-address connection)))
-    (setf (address connection) address))
+    (setf (slot-value connection' %address) address))
   (v:trace '(:gateway :connection) "~A: created." connection))
 
 (define-constructor (standard-connection)

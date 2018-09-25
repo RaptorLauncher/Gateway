@@ -6,9 +6,9 @@
 (in-package #:gateway.connector)
 
 (defclass standard-writer (writer)
-  ((%name :accessor name
+  ((%name :reader name
           :initform "Gateway - Writer")
-   (%queue :accessor queue
+   (%queue :reader queue
            :initform (lparallel.queue:make-queue))
    (%thread :accessor thread)))
 
