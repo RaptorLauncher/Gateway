@@ -12,7 +12,8 @@ to send and receive messages in form of reduced S-expressions (S-expressions ~
 which contain only proper lists, uninterned symbols, strings, numbers and ~
 serializable objects, which are serialized before sending).
 \
-The ADDRESSED protocol refers to this connection's local address."
+The functions from the ADDRESSED protocol have two possible types, :LOCAL and ~
+:PEER. The default is :PEER."
      :tags (:gateway :connection)
      :dependencies (killable serializable addressed)
      :export t)

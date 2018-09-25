@@ -6,7 +6,8 @@
 (in-package :gateway.connector)
 
 (defclass standard-connection (connection usocket:stream-usocket)
-  ((%address :reader address))
+  ((%local-address :reader local-address)
+   (%peer-address :reader peer-address))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class CONNECTION. This class is a subclass of USOCKET:STREAM-SOCKET and may be ~
 instantiated in one of two ways: using MAKE-INSTANCE on it, or invoking
@@ -17,8 +18,10 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
           (deadp standard-connection)))
 
 (defun %initialize-connection (connection)
-  (let ((address (socket-peer-address connection)))
-    (setf (slot-value connection' %address) address))
+  (let ((peer-address (socket-peer-address connection))
+        (local-address (socket-local-address connection)))
+    (setf (slot-value connection' %peer-address) peer-address
+          (slot-value connection' %local-address) local-address))
   (v:trace '(:gateway :connection) "~A: created." connection))
 
 (define-constructor (standard-connection)
@@ -82,3 +85,19 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
             (v:trace '(:gateway :connection)
                      "~A signaled a stream error." connection)
             (return connection)))))))
+
+(defmethod hostname ((connection standard-connection) &optional type)
+  (let ((name (ecase type
+                (:local (usocket:get-local-name connection))
+                ((nil :peer) (usocket:get-peer-name connection)))))
+    (format nil "~{~D.~D.~D.~D~}" (coerce name 'list))))
+
+(defmethod port ((connection standard-connection) &optional type)
+  (ecase type
+    (:local (usocket:get-local-port connection))
+    ((nil :peer) (usocket:get-peer-port connection))))
+
+(defmethod address ((connection standard-connection) &optional type)
+  (ecase type
+    (:local (local-address connection))
+    ((nil :peer) (peer-address connection))))

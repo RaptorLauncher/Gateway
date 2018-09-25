@@ -12,11 +12,9 @@
    (%timeout :accessor timeout
              :initarg :timeout
              :initform 0.01)
-   (%hostname :reader hostname
-              :initarg :hostname
+   (%hostname :initarg :hostname
               :initform "127.0.0.1")
-   (%port :reader port
-          :initarg :port
+   (%port :initarg :port
           :initform 0)
    (%queue :reader queue
            :initform (lparallel.queue:make-queue))
@@ -73,3 +71,11 @@ argument.")))
   (v:trace '(:gateway :acceptor) "~A: killed." acceptor)
   (lparallel.queue:push-queue t (queue acceptor))
   (values))
+
+(defmethod hostname ((acceptor standard-acceptor) &optional type)
+  (declare (ignore type))
+  (slot-value acceptor '%hostname))
+
+(defmethod port ((acceptor standard-acceptor) &optional type)
+  (declare (ignore type))
+  (slot-value acceptor '%port))
