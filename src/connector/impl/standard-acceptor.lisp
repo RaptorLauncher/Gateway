@@ -13,6 +13,8 @@
    (%timeout :accessor timeout
              :initarg :timeout
              :initform 0.01)
+   (%queue :reader queue
+           :initform (lparallel.queue:make-queue))
    (%handler :reader handler
              :initarg :handler
              :initform (error "Must define a handler function.")))
@@ -40,16 +42,15 @@ argument.")))
 
 (defun acceptor-loop (acceptor)
   (let ((timeout (timeout acceptor)))
-    (labels
-        ((accept (socket)
-           (loop
-             (unless (server-socket-alive-p socket)
-               (v:trace '(:gateway :acceptor)
-                        "~A: quitting." acceptor)
-               (return-from acceptor-loop))
-             (when (usocket:wait-for-input socket :timeout timeout
-                                                  :ready-only t)
-               (return (usocket:socket-accept socket))))))
+    (labels ((accept (socket)
+               (loop
+                 (when (lparallel.queue:try-pop-queue (queue acceptor))
+                   (v:trace '(:gateway :acceptor)
+                            "~A: quitting." acceptor)
+                   (return-from acceptor-loop))
+                 (when (usocket:wait-for-input socket :timeout timeout
+                                                      :ready-only t)
+                   (return (usocket:socket-accept socket))))))
       (let ((socket (socket-of acceptor)))
         (with-restartability (acceptor)
           (loop
@@ -65,6 +66,5 @@ argument.")))
 
 (defmethod kill ((acceptor standard-acceptor))
   (v:trace '(:gateway :acceptor) "~A: killed." acceptor)
-  ;; TODO this is not thread-safe
-  (usocket:socket-close (socket-of acceptor))
+  (lparallel.queue:push-queue t (queue acceptor))
   (values))

@@ -73,7 +73,6 @@ list."
   8 "Pop the message from the list and go back to step 6 a few times.")
 
 (define-test standard-listener-message
-  ;; TODO test again and check if socket errors still occur
   :parent standard-listener
   (finalized-let* ((lock (bt:make-lock)) (list '())
                    (fn (lambda (conn data) (bt:with-lock-held (lock)
