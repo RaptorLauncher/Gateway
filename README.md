@@ -2,11 +2,15 @@
 
 Gateway is a movement and a project to create a service for cooperative storywriting and textual roleplaying that is free software and belongs to the community.
 
-## Ideas
+## Current state
 
-We are currently in the state of gathering ideas for what a good or better roleplaying service should look like and involve.
+We are currently in the state of gathering ideas for what a good or better roleplaying service should look like and involve, and implementing the basics of the UI and the backend.
 
-If you would like to contribute, please [register at octo.sh](https://octo.sh/users/sign_in?#register-pane) and [open a new issue](https://octo.sh/Gateway/Gateway/issues) for each suggestion you have. (Please tag each issue with the `feature request` label!)
+## Contributing
+
+If you would like to contribute or watch the status of the project, join us on [Discord](https://discord.gg/V3qDShG).
+
+For filing bug tickets or improvements, please let us know of the idea on Discord or [register at octo.sh](https://octo.sh/users/sign_in?#register-pane) and [open a new issue](https://octo.sh/Gateway/Gateway/issues) for each suggestion you have.
 
 ## Documents
 
@@ -27,4 +31,4 @@ I suggest Gateway to be licensed under [GNU Affero General Public License, versi
 
 * **Wiki**: https://octo.sh/Gateway/Gateway/wikis/home
 
-* **Matrix**: https://riot.im/app/#/room/#gateway:matrix.org
+* **Discord**: https://discord.gg/V3qDShG
