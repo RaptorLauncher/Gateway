@@ -100,3 +100,36 @@ list."
                #6?(connection-send (whichever c1b c2b c3b) data)
                #7?(true (wait () (funcall test-fn data)))
                #8?(bt:with-lock-held (lock) (pop list))))))
+
+(define-test-case standard-listener-invalid-input
+    (:documentation "Tests the input validation inside STANDARD-LISTENER."
+     :tags (:gateway :listener :connection :standard-listener :unit))
+  :arrange
+  1 "Create a listener."
+  2 "Create a connection pair."
+  3 "Add one of the connections to the listener."
+  :act
+  4 "Send invalid input to the listener."
+
+  5 "Send valid input to the listener."
+  :assert
+  6 "Assert the message callback was called.")
+
+(defparameter *standard-listener-invalid-input*
+  '((")")))
+
+(define-test standard-listener-invalid-input
+  :parent standard-listener
+  (finalized-let* ((flag nil)
+                   (listener #1?(make-listener (lambda (&rest args)
+                                                 (declare (ignore args))
+                                                 (setf flag t)))
+                             (kill listener))
+                   (conns #2?(make-connection-pair) (mapc #'kill conns))
+                   (stream (usocket:socket-stream (second conns))))
+    #3?(add-connection listener (first conns))
+    (dolist (inputs *standard-listener-invalid-input*)
+      #4?(dolist (input inputs) (princ input stream) (fresh-line stream))
+      (force-output stream)
+      (sleep 1)))) ;; TODO this causes an error in the listener
+;; TODO handle cable errors inside connection

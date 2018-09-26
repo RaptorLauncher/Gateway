@@ -37,17 +37,21 @@
   :assert
   4 "Assert that the data was echoed back on the connection.")
 
+(defun make-echo-connector ()
+  (let* ((connector (make-instance 'standard-connector :port 9001))
+         (handler (lambda (connection data)
+                    (write-data (writer connector) connection data))))
+    (setf (handler (listener connector)) handler)
+    connector))
+
 (define-test standard-connector-echo
   :parent standard-connector
   (finalized-let*
-      ((connector #1?(make-connector) (kill connector))
+      ((connector #1?(make-echo-connector) (kill connector))
        (acceptor (first (acceptors connector)))
        (host (hostname acceptor)) (port (port acceptor))
        (conns #2?(loop repeat 10 collect (make-connection host port))
-              (mapc #'kill conns))
-       (handler (lambda (connection data)
-                  (write-data (writer connector) connection data))))
-    (setf (handler (listener connector)) handler)
+              (mapc #'kill conns)))
     (loop repeat 30
           for data = (list (random 10000) '#:foo "bar" (random 10000))
           for conn = (elt conns (random (length conns)))
