@@ -27,8 +27,4 @@ I suggest Gateway to be licensed under [GNU Affero General Public License, versi
 
 * **Issues**: https://octo.sh/Gateway/Gateway/issues
 
-* **Board**: https://octo.sh/Gateway/Gateway/boards
-
-* **Wiki**: https://octo.sh/Gateway/Gateway/wikis/home
-
 * **Discord**: https://discord.gg/V3qDShG
