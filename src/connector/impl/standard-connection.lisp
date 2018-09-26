@@ -50,12 +50,17 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
   (or (not (open-stream-p (usocket:socket-stream connection)))
       (connection-readyp connection)))
 
+(defun read-from-cable (stream)
+  (handler-case (from-cable-buffered stream)
+    (cable-error () nil)))
+
 (defmethod connection-receive ((connection standard-connection))
   (cond ((deadp connection) (values nil nil))
         ((not (connection-readyp connection)) (values nil t))
-        (t (let ((data (from-cable (usocket:socket-stream connection))))
-             (v:trace '(:gateway :connection) "~A: got ~S." connection data)
-             (values data t)))))
+        (t
+         (let ((data (read-from-cable (usocket:socket-stream connection))))
+           (v:trace '(:gateway :connection) "~A: got ~S." connection data)
+           (values data t)))))
 
 (defmethod connection-send ((connection standard-connection) object)
   (let ((stream (usocket:socket-stream connection)))

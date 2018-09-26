@@ -24,12 +24,18 @@
 
 (define-condition incomplete-input () ())
 
-(defun fail () (error 'incomplete-input))
+(define-condition cable-error (simple-condition error) ())
+
+(defun make-cable-error (&optional format-control &rest format-arguments)
+  "Creates a CABLE-ERROR with the provided format control and arguments."
+  (make-instance 'cable-error :format-control format-control
+                              :format-arguments format-arguments))
 
 (defun whitespace-p (char)
   (find char *whitespace*))
 
 ;;; LREAD/LPEEK/LUNREAD
+
 
 (defun lread (stream &optional eof)
   (when *read-limit*
@@ -37,7 +43,7 @@
       (error 'read-limit-hit))
     (incf *read-counter*))
   (let ((char (read-char-no-hang stream (not eof) eof)))
-    (cond ((null char) (fail))
+    (cond ((null char) (signal 'incomplete-input))
           (*backup-string*
            (vector-push-extend char *backup-string*)))
     char))
@@ -47,7 +53,7 @@
     (when (<= *read-limit* *read-counter*)
       (error 'read-limit-hit)))
   (let ((char (phoe-toolbox:peek-char-no-hang stream)))
-    (unless char (fail))
+    (unless char (signal 'incomplete-input))
     char))
 
 (defun lpeek* (stream &key eof)
@@ -66,7 +72,7 @@
 (defun skip-whitespace (stream)
   (loop for char = (lread stream)
         unless char
-          do (fail)
+          do (signal 'incomplete-input)
         while (find char *whitespace*)
         finally (lunread char stream)))
 
@@ -175,8 +181,12 @@ value."
   "Reads from the provided cable stream and outputs the read object. In case
 there is not enough data on the stream to form a complete object, returns NIL
 and saves the read data into an internal buffer to allow subsequent calls to
-FROM-CABLE-BUFFERED to read a complete object."
-  (let* ((buffer (buffer-of stream)))
-    (if buffer
-        (%from-cable-buffered-buffer stream buffer)
-        (%from-cable-buffered-no-buffer stream))))
+FROM-CABLE-BUFFERED to read a complete object. In case a cable error is
+signaled, the buffer is reset to an empty state."
+  (handler-bind
+      ((cable-error
+         (lambda (e) (declare (ignore e)) (setf (buffer-of stream) nil))))
+    (let* ((buffer (buffer-of stream)))
+      (if buffer
+          (%from-cable-buffered-buffer stream buffer)
+          (%from-cable-buffered-no-buffer stream)))))

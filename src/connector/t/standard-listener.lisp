@@ -110,13 +110,15 @@ list."
   3 "Add one of the connections to the listener."
   :act
   4 "Send invalid input to the listener."
-
   5 "Send valid input to the listener."
   :assert
   6 "Assert the message callback was called.")
 
 (defparameter *standard-listener-invalid-input*
-  '((")")))
+  (let ((paren ")") (nul (code-char 0)))
+    `((,paren)
+      (,nul)
+      (,paren ,paren ,nul ,paren "dfsdfsdf" ,nul))))
 
 (define-test standard-listener-invalid-input
   :parent standard-listener
@@ -129,7 +131,8 @@ list."
                    (stream (usocket:socket-stream (second conns))))
     #3?(add-connection listener (first conns))
     (dolist (inputs *standard-listener-invalid-input*)
+      (setf flag nil)
       #4?(dolist (input inputs) (princ input stream) (fresh-line stream))
       (force-output stream)
-      (sleep 1)))) ;; TODO this causes an error in the listener
-;; TODO handle cable errors inside connection
+      #5?(connection-send (second conns) '(1 2 3))
+      #6?(true (wait () flag)))))

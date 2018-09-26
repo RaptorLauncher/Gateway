@@ -12,5 +12,7 @@
    #:to-cable
    #:from-cable
    #:from-cable-buffered
+   #:incomplete-input
+   #:cable-error
    ;; EQUAL
    #:cable-equal))
