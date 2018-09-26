@@ -12,3 +12,7 @@ differes from it in the following ways:
     its primary value and the string read so far as the secondary value. The
     function `FROM-WIRE-BUFFERED` uses a simple internal buffer to capture this
     string for use in later read attempts.
+
+## License
+
+This module is licensed under Artistic License 2.0.

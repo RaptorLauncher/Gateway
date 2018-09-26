@@ -15,11 +15,14 @@ For filing bug tickets or improvements, please let us know of the idea on Discor
 ## Documents
 
 * [Overview](doc/OVERVIEW.md)
+* [Cable protocol](doc/CABLE.md)
 * [Connector](doc/CONNECTOR.md)
 
 ## License
 
-I suggest Gateway to be licensed under [GNU Affero General Public License, version 3](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0)) - see [LICENSE](LICENSE) for details.
+I suggest Gateway in general to be licensed under [GNU Affero General Public License, version 3](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0)) - see [the license file](LICENSE.md) for details.
+
+Individual Gateway modules may be licensed differently, especially if they are derived from other software - see the documentation for each module for details.
 
 ## Links
 
