@@ -24,6 +24,8 @@
 
 (define-condition incomplete-input () ())
 
+(define-condition read-limit-hit (error) ())
+
 (define-condition cable-error (simple-condition error) ())
 
 (defun make-cable-error (&optional format-control &rest format-arguments)
@@ -39,28 +41,29 @@
 
 (defun lread (stream &optional eof)
   (when *read-limit*
-    (when (<= *read-limit* *read-counter*)
+    (when (< *read-limit* *read-counter*)
       (error 'read-limit-hit))
     (incf *read-counter*))
   (let ((char (read-char-no-hang stream (not eof) eof)))
     (cond ((null char) (signal 'incomplete-input))
-          (*backup-string*
+          ((and *backup-string* (not (eql char eof)))
            (vector-push-extend char *backup-string*)))
     char))
 
 (defun lpeek (stream)
-  (when *read-limit*
-    (when (<= *read-limit* *read-counter*)
-      (error 'read-limit-hit)))
   (let ((char (phoe-toolbox:peek-char-no-hang stream)))
     (unless char (signal 'incomplete-input))
+    (when *read-limit*
+      (when (<= *read-limit* *read-counter*)
+        (error 'read-limit-hit)))
     char))
 
 (defun lpeek* (stream &key eof)
-  (when *read-limit*
-    (when (<= *read-limit* *read-counter*)
-      (error 'read-limit-hit)))
-  (phoe-toolbox:peek-char-no-hang stream (not eof) eof))
+  (let ((char (phoe-toolbox:peek-char-no-hang stream (not eof) eof)))
+    (when (and (characterp char) *read-limit*)
+      (when (<= *read-limit* *read-counter*)
+        (error 'read-limit-hit)))
+    char))
 
 (defun lunread (char stream)
   (when *read-limit*
@@ -74,6 +77,9 @@
         unless char
           do (signal 'incomplete-input)
         while (find char *whitespace*)
+        when *read-limit*
+          do (when (< *read-limit* *read-counter*)
+               (error 'read-limit-hit))
         finally (lunread char stream)))
 
 ;;; READ-SEXPR
@@ -158,7 +164,8 @@
 primary value. In case there is not enough data on the stream to form a complete
 object, returns NIL as its primary value and the read data as its secondary
 value."
-  (let ((*backup-string* (make-backup-string)))
+  (let ((*backup-string* (make-backup-string))
+        (*read-counter* 0))
     (handler-case (values (read-sexpr stream) nil)
       (incomplete-input ()
         (return-from from-cable (values nil *backup-string*))))))

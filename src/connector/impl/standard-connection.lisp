@@ -51,8 +51,9 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
       (connection-readyp connection)))
 
 (defun read-from-cable (stream)
-  (handler-case (from-cable-buffered stream)
-    (cable-error () nil)))
+  (let ((*read-limit* #.(expt 2 16)))
+    (handler-case (from-cable-buffered stream)
+      (cable-error () nil))))
 
 (defmethod connection-receive ((connection standard-connection))
   (cond ((deadp connection) (values nil nil))

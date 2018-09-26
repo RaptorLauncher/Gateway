@@ -16,6 +16,7 @@
   (test-output)
   (test-input)
   (test-buffered-input)
+  (test-read-limit)
   t)
 
 (defmacro is (form)
@@ -62,3 +63,23 @@
     (loop for char across right
           do (write-char char pipe))
     (is (equal expected (from-cable-buffered pipe)))))
+
+(defun test-read-limit ()
+  (let ((success-inputs '("1234567890"
+                          "(asdf 123)"
+                          "         1"))
+        (failure-inputs '("12345678901"
+                          "(asdf 1234)"
+                          "          1")))
+    (mapc #'%test-read-limit-success success-inputs)
+    (mapc #'%test-read-limit-failure failure-inputs)))
+
+(defun %test-read-limit-success (string)
+  (let ((*read-limit* 10))
+    (from-cable (make-string-input-stream string))))
+
+(defun %test-read-limit-failure (string)
+  (let ((*read-limit* 10))
+    (handler-case (progn (from-cable (make-string-input-stream string))
+                         (error 'error))
+      (read-limit-hit ()))))

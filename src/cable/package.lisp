@@ -14,5 +14,7 @@
    #:from-cable-buffered
    #:incomplete-input
    #:cable-error
+   #:read-limit-hit
+   #:*read-limit*
    ;; EQUAL
    #:cable-equal))
