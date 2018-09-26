@@ -43,3 +43,7 @@
 
 (defun wait-for-sockets (socket-or-sockets &optional timeout)
   (usocket:wait-for-input socket-or-sockets :timeout timeout :ready-only t))
+
+(defun default-handler (object)
+  (lambda (&rest args)
+    (v:error `(:gateway) "~A: default handler called with ~S." object args)))

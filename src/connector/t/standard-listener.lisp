@@ -8,8 +8,10 @@
 
 ;;; Utils
 
-(defun make-listener (handler)
-  (make-instance 'standard-listener :handler handler :timeout 0.001))
+(defun make-listener (message-handler &optional disconnection-handler)
+  (make-instance 'standard-listener :message-handler message-handler
+                                    :disconnection-handler disconnection-handler
+                                    :timeout 0.001))
 
 ;;; Test suite
 
@@ -31,18 +33,20 @@ from a listener's connection list."
   2  "Create both sides of a connection."
   3  "Add the first side of connection to the listener."
   4  "Assert the listener is alive."
-  5  "Assert there are two connections in the listener."
+  5  "Assert there is one connection in the listener."
   :act
   6  "Kill the second side of the connection."
   :assert
-  7  "Assert the first side of the connection is dead."
-  8  "Assert the second side of the connection is dead."
-  9  "Assert the listener's connection list contains only one element."
-  10 "Assert the listener is alive.")
+  7 "Assert the listener's connection list contains only one element."
+  8 "Assert the listener is alive."
+  9 "Assert the listener's disconnection handler has been called.")
 
 (define-test standard-listener-dead-connection
   :parent standard-listener
-  (finalized-let* ((listener #1?(make-listener (constantly nil))
+  (finalized-let* ((flag nil)
+                   (listener #1?(make-listener (constantly nil)
+                                               (lambda (x) (declare (ignore x))
+                                                 (setf flag t)))
                              (kill listener)))
     (destructuring-bind (connection-1 connection-2) #2?(make-connection-pair)
       (unwind-protect
@@ -51,7 +55,8 @@ from a listener's connection list."
                   #5?(is = 1 (connection-count listener))
                   #6?(kill connection-2)
                   #7?(true (wait () (= 0 (connection-count listener))))
-                  #8?(false (deadp listener)))
+                  #8?(false (deadp listener))
+                  #9?(true flag))
         (kill connection-1)
         (kill connection-2)))))
 

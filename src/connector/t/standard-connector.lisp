@@ -8,8 +8,8 @@
 
 ;;; Utils
 
-(defun make-connector (handler &optional writer)
-  (make-instance 'standard-connector :listener-handler handler
+(defun make-connector (&optional handler writer)
+  (make-instance 'standard-connector :listener-message-handler handler
                                      :writer writer))
 
 (defun make-connection (host port)
@@ -39,21 +39,21 @@
 
 (define-test standard-connector-echo
   :parent standard-connector
-  (let ((writer (make-instance 'standard-writer)))
-    (flet ((fn (connection data) (write-data writer connection data)))
-      (finalized-let*
-          ((connector #1?(make-connector #'fn writer)
-                      (kill connector))
-           (acceptor (first (acceptors connector)))
-           (host (hostname acceptor)) (port (port acceptor))
-           (conns #2?(loop repeat 10 collect (make-connection host port))
-                  (mapc #'kill conns)))
-        (loop repeat 30
-              for data = (list (random 10000) '#:foo "bar" (random 10000))
-              for conn = (elt conns (random (length conns)))
-              do #3?(connection-send conn data)
-              #4?(true (wait ()
-                         (cable-equal data (connection-receive conn)))))))))
+  (finalized-let*
+      ((connector #1?(make-connector) (kill connector))
+       (acceptor (first (acceptors connector)))
+       (host (hostname acceptor)) (port (port acceptor))
+       (conns #2?(loop repeat 10 collect (make-connection host port))
+              (mapc #'kill conns))
+       (handler (lambda (connection data)
+                  (write-data (writer connector) connection data))))
+    (setf (handler (listener connector)) handler)
+    (loop repeat 30
+          for data = (list (random 10000) '#:foo "bar" (random 10000))
+          for conn = (elt conns (random (length conns)))
+          do #3?(connection-send conn data)
+          #4?(true (wait ()
+                     (cable-equal data (connection-receive conn)))))))
 
 ;;; Protocol tests
 

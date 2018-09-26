@@ -22,12 +22,12 @@ single acceptor, listener and writer.")))
           (connection-count (listener standard-connector))))
 
 (define-constructor (standard-connector (host "127.0.0.1") (port 0)
-                                        acceptor-handler listener-handler
+                                        acceptor-handler
+                                        listener-message-handler
+                                        listener-disconnection-handler
                                         acceptor listener writer)
   (check-type host string)
   (check-type port (unsigned-byte 16))
-  (assert (or listener listener-handler) (listener-handler)
-          "Must provide a listener handler or a listener.")
   (unless acceptor-handler
     (setf acceptor-handler (acceptor-handler standard-connector)))
   (with-slots (%acceptor %listener %writer %acceptors %listeners %writers)
@@ -36,7 +36,10 @@ single acceptor, listener and writer.")))
                                                 :host host :port port
                                                 :handler acceptor-handler))
           %listener (or listener (make-instance 'standard-listener
-                                                :handler listener-handler))
+                                                :message-handler
+                                                listener-message-handler
+                                                :disconnection-handler
+                                                listener-disconnection-handler))
           %writer (or writer (make-instance 'standard-writer))
           %acceptors (list (acceptor standard-connector))
           %listeners (list (listener standard-connector))

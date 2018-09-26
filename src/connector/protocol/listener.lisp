@@ -11,12 +11,18 @@ list of connections and constantly scan them for incoming data, reading it ~
 and calling their handler function on them to pass it to other parts of the ~
 system.
 \
-The handler function is a two-argument function that is meant to accept a ~
-connection object and the data that came from that connection as its arguments ~
-and pass it to other parts of the program.
+The listener has two handler functions. The message handler function is a ~
+two-argument function that accepts a connection object and the data that came ~
+from that connection as its arguments and pass it to other parts of the ~
+program. The disconnection handler function is an one-argument function that ~
+accepts a connection object and is called after that connection dies to inform ~
+other parts of the program of the disconnection.
 \
 The listener, when instantiated, automatically begins handling client ~
-connections in a way defined by the implementing class."
+connections in a way defined by the implementing class.
+\
+The HANDLER function from the HANDLING protocol has two possible types, ~
+:MESSAGE and :DISCONNECTION. The default is :MESSAGE."
      :tags (:gateway :listener)
      :dependencies (acceptor connection killable named handling)
      :export t)

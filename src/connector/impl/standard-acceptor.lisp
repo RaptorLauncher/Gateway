@@ -18,9 +18,7 @@
           :initform 0)
    (%queue :reader queue
            :initform (lparallel.queue:make-queue))
-   (%handler :reader handler
-             :initarg :handler
-             :initform (error "Must define a handler function.")))
+   (%handler :initarg :handler))
   (:documentation #.(format nil "A standard acceptor implementation, with a ~
 single server socket. Whenever a socket connection is initiated from outside, ~
 a connection is created and the handler function is called with it as an ~
@@ -30,8 +28,10 @@ argument.")))
   (format stream "~A (~:[ALIVE~;DEAD~])" (address standard-acceptor)
           (deadp standard-acceptor)))
 
-(define-constructor (standard-acceptor (port 0))
+(define-constructor (standard-acceptor (port 0) handler)
   (check-type port (unsigned-byte 16))
+  (unless handler
+    (setf (handler standard-acceptor) (default-handler standard-acceptor)))
   (let* ((host (hostname standard-acceptor))
          (socket (usocket:socket-listen host port :reuseaddress t)))
     (when (= 0 port)
@@ -79,3 +79,12 @@ argument.")))
 (defmethod port ((acceptor standard-acceptor) &optional type)
   (declare (ignore type))
   (slot-value acceptor '%port))
+
+(defmethod handler ((acceptor standard-acceptor) &optional type)
+  (declare (ignore type))
+  (slot-value acceptor '%handler))
+
+(defmethod (setf handler)
+    (new-value (acceptor standard-acceptor) &optional type)
+  (declare (ignore type))
+  (setf (slot-value acceptor '%handler) new-value))

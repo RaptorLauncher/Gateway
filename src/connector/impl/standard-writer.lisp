@@ -12,6 +12,15 @@
            :initform (lparallel.queue:make-queue))
    (%thread :accessor thread)))
 
+(defmethod handler ((acceptor standard-acceptor) &optional type)
+  (declare (ignore type))
+  (slot-value acceptor '%handler))
+
+(defmethod (setf handler)
+    (new-value (acceptor standard-acceptor) &optional type)
+  (declare (ignore type))
+  (setf (slot-value acceptor '%handler) new-value))
+
 (define-print (standard-writer stream)
   (format stream "(~:[ALIVE~;DEAD~])" (deadp standard-writer)))
 

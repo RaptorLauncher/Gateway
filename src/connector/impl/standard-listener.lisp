@@ -8,9 +8,8 @@
 (defclass standard-listener (listener)
   ((%name :accessor name
           :initform "Gateway - Listener")
-   (%handler :accessor handler
-             :initarg :handler
-             :initform (error "Must define a handler function."))
+   (%message-handler :initarg :message-handler)
+   (%disconnection-handler :initarg :disconnection-handler)
    (%control-input-connection :accessor control-input-connection)
    (%control-output-connection :accessor control-output-connection)
    (%connections :accessor connections)
@@ -33,7 +32,12 @@ function with the connection and the command as arguments.")))
           (deadp standard-listener)
           (connection-count standard-listener)))
 
-(define-constructor (standard-listener)
+(define-constructor (standard-listener message-handler disconnection-handler)
+  (unless message-handler
+    (setf (handler standard-listener :message)
+          (default-handler standard-listener)))
+  (unless disconnection-handler
+    (setf (handler standard-listener :disconnection) (constantly nil)))
   (destructuring-bind (conn-1 conn-2) (make-connection-pair)
     (bt:with-lock-held ((lock standard-listener))
       (let ((fn (curry #'listener-loop standard-listener)))
@@ -62,14 +66,9 @@ function with the connection and the command as arguments.")))
         and return conn))
 
 (defun remove-connection (listener connection)
-  ;; TODO handler is setfable, take that into account
-  ;; TODO fix connector test with proper SETF HANDLER on listener
-  ;; TODO define disconnection handler
-  ;; TODO call disconnection handler here
-  ;; TODO modify protocols HANDLING to take multiple handlers into account:
-  ;; (handler object &optional type)
   (bt:with-lock-held ((lock listener))
-    (removef (connections listener) connection :count 1)))
+    (removef (connections listener) connection :count 1))
+  (funcall (handler listener :disconnection) connection))
 
 (defun listener-loop (listener)
   (with-restartability ()
@@ -99,6 +98,18 @@ function with the connection and the command as arguments.")))
   (v:trace '(:gateway :listener) "~A: killed." listener)
   (connection-send (control-input-connection listener) '(#:goodbye))
   (values))
+
+(defmethod handler ((listener standard-listener) &optional type)
+  (ecase type
+    ((nil :message) (slot-value listener '%message-handler))
+    (:disconnection (slot-value listener '%disconnection-handler))))
+
+(defmethod (setf handler)
+    (new-value (listener standard-listener) &optional type)
+  (ecase type
+    ((nil :message) (setf (slot-value listener '%message-handler) new-value))
+    (:disconnection (setf (slot-value listener '%disconnection-handler)
+                          new-value))))
 
 ;; Oh goodness, I remember the days when I've had no idea what a closure was
 ;; and how a function can be an object.
