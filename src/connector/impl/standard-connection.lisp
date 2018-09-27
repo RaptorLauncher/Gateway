@@ -51,7 +51,8 @@ CHANGE-CLASS on an instance of USOCKET:STREAM-SOCKET.")))
       (connection-readyp connection)))
 
 (defun read-from-cable (stream)
-  (let ((*read-limit* #.(expt 2 16)))
+  (let ((*read-limit* #.(expt 2 16))
+        (*depth-limit* 40))
     (handler-case (from-cable-buffered stream)
       (cable-error () nil))))
 

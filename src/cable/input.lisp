@@ -17,8 +17,9 @@
 
 (defvar *read-limit* nil)
 (defvar *read-counter*)
+(defvar *depth-limit* nil)
+(defvar *depth-counter*)
 (defvar *backup-string* nil)
-;; TODO depth limit
 
 (defun make-backup-string ()
   (make-array 0 :element-type 'character :adjustable t :fill-pointer 0))
@@ -26,6 +27,8 @@
 (define-condition incomplete-input () ())
 
 (define-condition read-limit-hit (error) ())
+
+(define-condition depth-limit-hit (error) ())
 
 (define-condition cable-error (simple-condition error) ())
 
@@ -135,6 +138,10 @@
     (make-symbol token)))
 
 (defun read-sexpr-list (stream)
+  (when *depth-limit*
+    (when (<= *depth-limit* *depth-counter*)
+      (error 'depth-limit-hit))
+    (print (incf *depth-counter*)))
   (prog1 (loop do (skip-whitespace stream)
                until (eql #\) (lpeek stream))
                collect (read-sexpr stream))
@@ -166,7 +173,8 @@ primary value. In case there is not enough data on the stream to form a complete
 object, returns NIL as its primary value and the read data as its secondary
 value."
   (let ((*backup-string* (make-backup-string))
-        (*read-counter* 0))
+        (*read-counter* 0)
+        (*depth-counter* 0))
     (handler-case (values (read-sexpr stream) nil)
       (incomplete-input ()
         (return-from from-cable (values nil *backup-string*))))))

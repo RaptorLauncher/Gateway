@@ -17,6 +17,7 @@
   (test-input)
   (test-buffered-input)
   (test-read-limit)
+  (test-depth-limit)
   t)
 
 (defmacro is (form)
@@ -83,3 +84,10 @@
     (handler-case (progn (from-cable (make-string-input-stream string))
                          (error 'error))
       (read-limit-hit ()))))
+
+(defun test-depth-limit ()
+  (let ((*depth-limit* 4))
+    (from-cable (make-string-input-stream "(((())))"))
+    (handler-case (progn (from-cable (make-string-input-stream "((((()))))"))
+                         (error 'error))
+      (depth-limit-hit ()))))

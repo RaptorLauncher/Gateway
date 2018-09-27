@@ -16,5 +16,7 @@
    #:cable-error
    #:read-limit-hit
    #:*read-limit*
+   #:depth-limit-hit
+   #:*depth-limit*
    ;; EQUAL
    #:cable-equal))
