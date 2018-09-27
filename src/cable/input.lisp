@@ -18,6 +18,7 @@
 (defvar *read-limit* nil)
 (defvar *read-counter*)
 (defvar *backup-string* nil)
+;; TODO depth limit
 
 (defun make-backup-string ()
   (make-array 0 :element-type 'character :adjustable t :fill-pointer 0))
