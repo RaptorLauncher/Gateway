@@ -143,9 +143,9 @@
   (skip-whitespace stream)
   (let* ((char (lread stream))
          (result (case char
-                   (#\Nul (cable-error "Stray null found."))
+                   (#\Nul (error (make-cable-error "Stray null found.")))
                    (#\( (read-sexpr-list stream))
-                   (#\) (cable-error "Encountered closing parenthesis."))
+                   (#\) (error (make-cable-error "Stray closing paren found.")))
                    (#\" (read-sexpr-string stream))
                    ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 #\.)
                     (lunread char stream)
