@@ -141,7 +141,7 @@
   (when *depth-limit*
     (when (<= *depth-limit* *depth-counter*)
       (error 'depth-limit-hit))
-    (print (incf *depth-counter*)))
+    (incf *depth-counter*))
   (prog1 (loop do (skip-whitespace stream)
                until (eql #\) (lpeek stream))
                collect (read-sexpr stream))
