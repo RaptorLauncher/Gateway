@@ -9,7 +9,7 @@
     (:documentation "The WRITER protocol describes objects which are ~
 responsible for writing data to connections. Only writers are allowed to write ~
 to connections to avoid race conditions."
-     :tags (:gateway :writer)
+     :tags (:gateway :engine :writer)
      :dependencies (connection killable named writing)
      :export t)
   (:class writer (killable named writing) ())

@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; connector/gateway.sentinel.asd
+;;;; engine/sentinel/sentinel.lisp
 
 ;; Class SENTINEL
 ;; - AUTHENTICATION authenticator connection -> T/account/NIL

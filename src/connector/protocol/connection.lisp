@@ -14,7 +14,7 @@ serializable objects, which are serialized before sending).
 \
 The functions from the ADDRESSED protocol have two possible types, :LOCAL and ~
 :PEER. The default is :PEER."
-     :tags (:gateway :connection)
+     :tags (:gateway :engine :connection)
      :dependencies (killable serializable addressed)
      :export t)
   (:class connection (killable addressed) ())

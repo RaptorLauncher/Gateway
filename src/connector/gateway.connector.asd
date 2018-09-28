@@ -9,7 +9,8 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:protest/common/addressed
+  :depends-on (#:protest/protocol
+               #:protest/common/addressed
                #:protest/common/handling
                #:protest/common/killable
                #:protest/common/named
@@ -24,7 +25,7 @@
                (:file "writer")
                (:file "connector")))
 
-(asdf:defsystem #:gateway.connector
+(asdf:defsystem #:gateway.connector/impl
   :description
   "Part of Gateway responsible for routing data between users and game logic"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
@@ -55,7 +56,7 @@
   :serial t
   :depends-on (#:phoe-toolbox
                #:named-readtables
-               #:protest/test
+               #:protest/test-case
                #:protest/parachute
                #:gateway.connector/protocol
                #:gateway.connector)

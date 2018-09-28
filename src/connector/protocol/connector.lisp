@@ -13,7 +13,7 @@ Each connector object contains one or more acceptors, listeners and writers.
 The default method for WRITE-DATA specialized on connectors simply picks a ~
 writer at random from the connector's writers list and calls WRITE-DATA on it. ~
 Implementations are encouraged to provide their own optimized methods."
-     :tags (:gateway :connector)
+     :tags (:gateway :engine :connector)
      :dependencies (killable named writing acceptor listener writer)
      :export t)
   (:class connector (killable named writing) ())

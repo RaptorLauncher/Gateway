@@ -8,7 +8,7 @@
 (define-protocol writing
     (:documentation "The WRITING protocol describes objects which are ~
 capable of writing data to connections.."
-     :tags (:gateway :writing)
+     :tags (:gateway :engine :writing)
      :dependencies (connection)
      :export t)
   (:class writing () ())

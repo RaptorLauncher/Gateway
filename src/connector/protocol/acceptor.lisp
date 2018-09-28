@@ -16,7 +16,7 @@ connection object as its argument and pass it to other parts of the program.
 \
 The acceptor, when instantiated, automatically begins handling client ~
 connections in a way defined by the implementing class."
-     :tags (:gateway :acceptor)
+     :tags (:gateway :engine :acceptor)
      :dependencies (connection killable named addressed handling)
      :export t)
   (:class acceptor (killable named addressed handling) ())

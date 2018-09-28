@@ -23,7 +23,7 @@ connections in a way defined by the implementing class.
 \
 The HANDLER function from the HANDLING protocol has two possible types, ~
 :MESSAGE and :DISCONNECTION. The default is :MESSAGE."
-     :tags (:gateway :listener)
+     :tags (:gateway :engine :listener)
      :dependencies (acceptor connection killable named handling)
      :export t)
   (:class listener (killable named handling) ())
