@@ -4,7 +4,7 @@
 ;;;; connector/gateway.authenticator.asd
 
 ;; Class AUTHENTICATOR
-;; - AUTHENTICATE authenticator connection credentials
+;; - AUTHENTICATE authenticator connection credentials ;; fold into PERMITTED-P
 ;; - AUTHENTICATION authenticator connection
 ;; - PERMITTED-P authenticator connection command
 
