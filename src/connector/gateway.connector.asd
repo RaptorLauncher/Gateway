@@ -9,12 +9,12 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:gateway.cable
-               #:protest/common/addressed
+  :depends-on (#:protest/common/addressed
                #:protest/common/handling
                #:protest/common/killable
                #:protest/common/named
-               #:protest/common/serializable)
+               #:protest/common/serializable
+               #:gateway.cable)
   :pathname "protocol/"
   :components ((:file "package")
                (:file "connection")
