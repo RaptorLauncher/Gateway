@@ -25,7 +25,7 @@
                (:file "writer")
                (:file "connector")))
 
-(asdf:defsystem #:gateway.connector/impl
+(asdf:defsystem #:gateway.connector
   :description
   "Part of Gateway responsible for routing data between users and game logic"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
