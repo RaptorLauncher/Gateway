@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; connector/impl/utils.lisp
 
-(in-package #:gateway.connector)
+(in-package #:gateway.connector/impl)
 
 (defun socket-local-address (socket)
   "Returns a the socket's local address, in format A.B.C.D:E."

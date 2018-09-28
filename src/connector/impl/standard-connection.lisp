@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; connector/impl/standard-connection.lisp
 
-(in-package :gateway.connector)
+(in-package #:gateway.connector/impl)
 
 (defclass standard-connection (connection usocket:stream-usocket)
   ((%local-address :reader local-address)

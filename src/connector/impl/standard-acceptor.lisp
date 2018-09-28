@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; connector/impl/standard-acceptor.lisp
 
-(in-package :gateway.connector)
+(in-package #:gateway.connector/impl)
 
 (defclass standard-acceptor (acceptor)
   ((%socket :accessor socket-of)

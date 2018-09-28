@@ -3,9 +3,9 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; connector/impl/standard-connector.lisp
 
-(in-package :gateway.connector)
+(in-package #:gateway.connector/impl)
 
-(defclass standard-connector (connector)
+(defclass standard-connector (connector/impl)
   ((%acceptor :reader acceptor)
    (%listener :reader listener)
    (%writer :reader writer)

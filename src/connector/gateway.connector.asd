@@ -3,6 +3,17 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; connector/gateway.connector.asd
 
+(asdf:defsystem #:gateway.connector
+  :description
+  "Part of Gateway responsible for routing data between users and game logic"
+  :author "Michał \"phoe\" Herda <phoe@disroot.org>"
+  :license  "AGPL3"
+  :version "0.0.1"
+  :serial t
+  :depends-on (#:gateway.connector/protocol
+               #:gateway.connector/impl)
+  :components ((:file "package")))
+
 (asdf:defsystem #:gateway.connector/protocol
   :description "Protocols for Gateway connector"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
@@ -25,9 +36,8 @@
                (:file "writer")
                (:file "connector")))
 
-(asdf:defsystem #:gateway.connector
-  :description
-  "Part of Gateway responsible for routing data between users and game logic"
+(asdf:defsystem #:gateway.connector/impl
+  :description "Concrete classes for Gateway connector"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license  "AGPL3"
   :version "0.0.1"
