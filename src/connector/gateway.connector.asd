@@ -25,7 +25,6 @@
                #:protest/common/handling
                #:protest/common/killable
                #:protest/common/named
-               #:protest/common/serializable
                #:gateway.cable)
   :pathname "protocol/"
   :components ((:file "package")
@@ -68,7 +67,6 @@
                #:named-readtables
                #:protest/test-case
                #:protest/parachute
-               #:gateway.connector/protocol
                #:gateway.connector)
   :pathname "t/"
   :components ((:file "package")
@@ -79,8 +77,8 @@
                (:file "standard-connector")))
 
 (defmethod asdf:perform ((o asdf:test-op)
-                         (c (eql (asdf:find-system ':gateway.connector))))
-  (asdf:load-system :gateway.connector/test)
+                         (c (eql (asdf:find-system '#:gateway.connector))))
+  (asdf:load-system '#:gateway.connector/test)
   (let ((*package* (find-package '#:gateway.connector/test)))
     (uiop:symbol-call :protest/parachute
                       :test (intern (symbol-name '#:connector)

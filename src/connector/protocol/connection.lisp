@@ -8,14 +8,12 @@
 (define-protocol connection
     (:documentation "The CONNECTION protocol describes objects representing ~
 network connections to individual remote machines. These connections are able ~
-to send and receive messages in form of reduced S-expressions (S-expressions ~
-which contain only proper lists, uninterned symbols, strings, numbers and ~
-serializable objects, which are serialized before sending).
+to send and receive messages using a predefined format.
 \
 The functions from the ADDRESSED protocol have two possible types, :LOCAL and ~
 :PEER. The default is :PEER."
      :tags (:gateway :engine :connection)
-     :dependencies (killable serializable addressed)
+     :dependencies (killable addressed)
      :export t)
   (:class connection (killable addressed) ())
   "A connection object. See protocol CONNECTION for details."

@@ -9,14 +9,12 @@
    #:protest/common/addressed
    #:protest/common/killable
    #:protest/common/handling
-   #:protest/common/named
-   #:protest/common/serializable)
+   #:protest/common/named)
   (:reexport
    #:protest/common/addressed
    #:protest/common/killable
    #:protest/common/handling
-   #:protest/common/named
-   #:protest/common/serializable)
+   #:protest/common/named)
   (:import-from
    #:protest/protocol
    #:define-protocol
