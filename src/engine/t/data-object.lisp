@@ -40,7 +40,11 @@
     (:documentation "Test of DATA-OBJECT and OBJECT-DATA for all concrete
 Gateway objects.
 \
-The test is Each test loop has two inputs, a test object and test data."
+The test body runs for each entry in *DATA-OBJECT-INPUT*, which in turn contains
+two test inputs, an object (indirect instance of GATEWAY-OBJECT or
+GATEWAY-CONDITION) and cable data matching the object. The test asserts whether
+calling DATA-OBJECT and OBJECT-DATA on the object and data produces consistent
+results."
      :tags (:gateway :data-object :gateway-object :gateway-condition))
   :precondition
   1 "Assert that all concrete Gateway classes and condition types are tested."
