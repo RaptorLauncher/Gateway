@@ -5,7 +5,6 @@
 
 (uiop:define-package #:gateway.engine/protocol
   (:use #:cl)
-  (:import-from
-   #:protest/protocol
-   #:define-protocol
-   #:execute-protocol))
+  (:import-from #:protest/protocol
+                #:define-protocol
+                #:execute-protocol))
