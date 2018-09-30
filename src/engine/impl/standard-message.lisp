@@ -5,51 +5,61 @@
 
 (in-package #:gateway.engine/impl)
 
-(defclass standard-message (message)
+(define-protocol-class standard-message (message)
   ((%id :reader id
-        :initarg :id)
+        :initarg :id
+        :initform nil)
    (%status :reader status
             :initarg :status
-            :initform :request)
-   (%condition :reader condition-of
-               :initarg :condition
-               :initform nil)))
+            :initform :request)))
 
 (define-constructor (standard-message id status)
-  (check-type id (cons (member :client :server) (cons unsigned-byte null)))
-  (check-type status (member nil :request :ok :error))
-  (when (eq (class-of standard-message) (find-class 'standard-message))
-    (warn "Creating a direct instance of STANDARD-MESSAGE.")))
+  (assert (typep id '(cons (member :client :server) (cons unsigned-byte null))))
+  (assert (typep status '(member nil :request :ok :error))))
 
 (define-print (standard-message stream :type nil)
-  (let ((name (class-name (class-of standard-message)))
-        (status (status standard-message)))
-    (if (eq status :request)
-        (prin1 name stream)
-        (format stream "(~A ~S)" status name))
-    (destructuring-bind (owner number) (id standard-message)
-      (let ((owner (ecase owner (:server :s) (:client :c))))
-        (format stream " (~A ~A)" owner number)))))
+  (let ((name (class-name (class-of standard-message))))
+    (if (and (slot-boundp standard-message '%id)
+             (slot-boundp standard-message '%status))
+        (let ((id (id standard-message))
+              (status (status standard-message)))
+          (if (eq status :request)
+              (prin1 name stream)
+              (format stream "(~A ~S)" status name))
+          (destructuring-bind (owner number) id
+            (let ((owner (ecase owner (:server :s) (:client :c))))
+              (format stream " (~A ~A)" owner number))))
+        (prin1 name stream))))
 
+;; TODO rewrite using data-object-using-class(?)
 (defmethod data-message ((data cons))
+  ;; (handler-case
+  ;;     (destructuring-bind (id message-type . body) data
+  ;;       )
+  ;;   (destructuring-error (e)))
   (destructuring-bind (id message-type . body) data
     (destructuring-bind (owner number) id
       (assert (member owner '(:c :s) :test #'cable-equal))
       ;; TODO add signaling proper condition types here
       (check-type number unsigned-byte))
     (check-type message-type (or symbol (cons symbol (cons symbol null))))
-    (let* ((status (message-type-status message-type))
-           (message-type (ensure-car message-type))
-           (superclass (find-class 'gateway-condition))
-           (names (mapcar #'class-name (subclasses superclass)))
-           (class (find message-type names :test #'string=)))
-      (assert (not (null class)))
-      (make-instance class :id id :status status :body body))))
+    (multiple-value-bind (message-type status)
+        (parse-message-type message-type)
+      (let* (;; (status (message-type-status message-type))
+             ;; (message-type (ensure-car message-type))
+             (superclass (find-class 'gateway-condition))
+             (names (mapcar #'class-name (subclasses superclass)))
+             (class (find message-type names :test #'string=)))
+        (assert (not (null class)))
+        (assert (not (protocol-object-p class)))
+        (make-instance class :id id :status status :body body)))))
 
-(defun message-type-status (message-type)
-  (cond ((atom message-type) :request)
-        ((cable-equal (first message-type) :ok) :ok)
-        ((cable-equal (first message-type) :error) :error)
-        (t (error "Invalid status"))))
+(defun parse-message-type (message-type)
+  (cond ((atom message-type) (values message-type :request))
+        ((cable-equal (first message-type) :ok)
+         (values (second message-type) :ok))
+        ((cable-equal (first message-type) :error)
+         (values (second message-type) :error))
+        (t (error "Invalid message type"))))
 
 ;; TODO support the PROXY protocol

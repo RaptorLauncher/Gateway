@@ -33,12 +33,14 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:destructuring-bind-star
+  :depends-on (#:alexandria
+               #:moptilities
+               #:destructuring-bind-star
                #:gateway.cable
                #:gateway.engine/protocol)
   :pathname "condition/"
   :components ((:file "package")
-               (:file "destructuring-error")
+               (:file "gateway-destructuring-error")
                (:file "message-read-error")
                (:file "invalid-message-id")
                (:file "invalid-message-type")
@@ -53,6 +55,7 @@
   :depends-on (#:alexandria
                #:phoe-toolbox
                #:moptilities
+               #:protest/base
                #:gateway.cable
                #:gateway.engine/protocol
                #:gateway.engine/condition)
@@ -68,8 +71,11 @@
   :serial t
   :depends-on (#:phoe-toolbox
                #:named-readtables
+               #:moptilities
+               #:protest/base
                #:protest/test
                #:protest/parachute
+               #:gateway.cable
                #:gateway.engine)
   :pathname "t/"
   :components ((:file "package")))

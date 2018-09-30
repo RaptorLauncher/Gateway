@@ -8,8 +8,10 @@
         #:alexandria
         #:phoe-toolbox
         #:moptilities
+        #:protest/base
         #:gateway.cable
-        #:gateway.engine/protocol)
+        #:gateway.engine/protocol
+        #:gateway.engine/condition)
   (:import-from #:destructuring-bind-star
                 #:destructuring-error
                 #:destructuring-error-lambda-list

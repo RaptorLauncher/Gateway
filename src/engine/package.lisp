@@ -11,7 +11,7 @@
              #:gateway.engine/condition
              #:gateway.engine/impl))
 
-;; Class SENTINEL
+;; TODO Class SENTINEL
 ;; - AUTHENTICATION authenticator connection -> T/account/NIL
 ;; - (SETF AUTHENTICATION) new-value authenticator connection
 ;; - AUTHORIZE authenticator connection command -> ()/!?
@@ -19,5 +19,4 @@
 ;; - DECRYPT authenticator connection string -> command/!?
 
 ;; TODO take care of SERIALIZABLE protocol, somehow
-;; TODO define a command as a CLOS object
 ;; TODO Gateway protocol on top of cable

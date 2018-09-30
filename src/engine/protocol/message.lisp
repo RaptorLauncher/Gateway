@@ -16,7 +16,7 @@ denoting an error of some sort."
      :tags (:gateway :engine :message)
      :dependencies (gateway-object)
      :export t)
-  (:class message () ())
+  (:class message (gateway-object) ())
   "A message object. See protocol MESSAGE for details."
   (:function id ((message message))
              (cons (member :client :server) (cons unsigned-byte null)))
