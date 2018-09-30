@@ -31,6 +31,11 @@
               (format stream " (~A ~A)" owner number))))
         (prin1 name stream))))
 
+;; TODO: data-message-using-class
+;; We have separate protocols here; one for messages (for network communication)
+;; and one for objects (serializable data). Messages can contain objects.
+;; That's why we must have separate serialization protocols.
+
 ;; TODO rewrite using data-object-using-class(?)
 (defmethod data-message ((data cons))
   ;; (handler-case
