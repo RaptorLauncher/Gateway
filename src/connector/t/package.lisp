@@ -4,24 +4,19 @@
 ;;;; connector/t/package.lisp
 
 (uiop:define-package #:gateway.connector/test
-  (:use
-   #:cl
-   #:alexandria
-   #:phoe-toolbox
-   #:gateway.connector/protocol
-   #:gateway.connector
-   #:gateway.cable
-   #:named-readtables)
-  (:import-from
-   #:protest/test-case
-   #:define-test-case)
-  (:import-from
-   #:protest/parachute
-   #:define-test
-   #:true #:false #:is #:isnt #:is-values #:isnt-values
-   #:protest/parachute)
-  (:export
-   #:connector))
+  (:use #:cl
+        #:alexandria
+        #:phoe-toolbox
+        #:named-readtables
+        #:gateway.connector
+        #:gateway.cable)
+  (:import-from #:protest/test-case
+                #:define-test-case)
+  (:import-from #:protest/parachute
+                #:define-test
+                #:true #:false #:is #:isnt #:is-values #:isnt-values
+                #:protest/parachute)
+  (:export #:connector))
 
 (in-package #:gateway.connector/test)
 
