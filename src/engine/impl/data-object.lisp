@@ -6,16 +6,21 @@
 (in-package #:gateway.engine/impl)
 
 (defmethod data-object ((data cons))
-  (handler-case
-      (destructuring-bind (object-type . body) data
-        (let* ((class (or (string-subclassp object-type 'gateway-object)
-                          (string-subclassp object-type 'gateway-condition))))
-          (assert (not (null class)))
-          (data-object-using-class class body)))
-    (destructuring-error (e)
-      (error (make-instance 'message-read-error
-                            :expression (expression e)
-                            :reason (reason e))))))
+  (let (found-class found-body)
+    (handler-case
+        (destructuring-bind (object-type . body) data
+          (let* ((class (or (string-subclassp object-type 'gateway-object)
+                            (string-subclassp object-type 'gateway-condition))))
+            (assert (not (null class)) ()
+                    "Object class ~S was not found." object-type)
+            (assert (not (protocol-object-p class)) ()
+                    "Object class ~S is a protocol class and can't be ~
+                     instantiated." object-type)
+            (setf found-class class
+                  found-body body)))
+      (error (e) ;; TODO object-read-error
+        (error (message-read-error 'message-read-error expression e))))
+    (data-object-using-class class body)))
 
 (defun string-subclassp (string-designator superclass)
   (when (symbolp superclass) (setf superclass (find-class superclass)))

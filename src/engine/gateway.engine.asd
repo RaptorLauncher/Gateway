@@ -40,11 +40,7 @@
                #:gateway.engine/protocol)
   :pathname "condition/"
   :components ((:file "package")
-               (:file "gateway-destructuring-error")
-               (:file "message-read-error")
-               (:file "invalid-message-id")
-               (:file "invalid-message-type")
-               (:file "invalid-message-body")))
+               (:file "message-read-error")))
 
 (asdf:defsystem #:gateway.engine/impl
   :description "Gateway game logic"
