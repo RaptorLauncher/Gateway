@@ -5,6 +5,7 @@
 
 (in-package #:gateway.engine/impl)
 
+;; TODO tests for ALL of these
 (defmethod data-message ((data cons))
   (handler-case
       (destructuring-bind (id message-type . body) data
