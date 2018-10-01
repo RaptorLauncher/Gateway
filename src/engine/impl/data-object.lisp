@@ -18,9 +18,9 @@
                      instantiated." object-type)
             (setf found-class class
                   found-body body)))
-      (error (e) ;; TODO object-read-error
-        (error (message-read-error 'message-read-error expression e))))
-    (data-object-using-class class body)))
+      (error (e)
+        (error (read-error 'object-read-error data e))))
+    (data-object-using-class found-class found-body)))
 
 (defun string-subclassp (string-designator superclass)
   (when (symbolp superclass) (setf superclass (find-class superclass)))

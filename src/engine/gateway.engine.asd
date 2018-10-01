@@ -36,11 +36,12 @@
   :depends-on (#:alexandria
                #:moptilities
                #:destructuring-bind-star
+               #:protest/base
                #:gateway.cable
                #:gateway.engine/protocol)
   :pathname "condition/"
   :components ((:file "package")
-               (:file "message-read-error")))
+               (:file "read-error")))
 
 (asdf:defsystem #:gateway.engine/impl
   :description "Gateway game logic"

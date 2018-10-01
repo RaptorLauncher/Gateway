@@ -21,7 +21,7 @@
 (defparameter *data-object-input*
   (uiop:while-collecting (collect)
     (let ((reason "a") (expression '(1 2 :foo :bar)))
-      (dolist (class '(message-read-error invalid-message-id
+      (dolist (class '(object-read-error message-read-error invalid-message-id
                        invalid-message-type invalid-message-body))
         (collect `(,(make-instance class :expression expression)
                    (,class ,expression)))

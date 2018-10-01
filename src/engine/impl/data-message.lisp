@@ -6,6 +6,7 @@
 (in-package #:gateway.engine/impl)
 
 ;; TODO tests for ALL of these
+;; TODO logging everywhere
 (defmethod data-message ((data cons))
   (handler-case
       (destructuring-bind (id message-type . body) data
@@ -16,18 +17,17 @@
           (let ((class (message-type-class message-type)))
             (data-message-using-class class id status body))))
     (error (e)
-      (message-read-error 'message-read-error data e))))
+      (read-error 'message-read-error data e))))
 
 (defun check-id-valid (id)
-  ;; TODO assertion descriptions for DATA-OBJECT as well
   (handler-case
       (destructuring-bind (owner number) id
         (assert (member owner '(:c :s) :test #'cable-equal) ()
                 "The first part of the ID should be C or S, not ~S." owner)
         (assert (typep number 'unsigned-byte) ()
                 "The second part of the ID should be a number, not ~S." number))
-    (error (e) ;; TODO logging everywhere
-      (error (message-read-error 'invalid-message-id id e)))))
+    (error (e)
+      (error (read-error 'invalid-message-id id e)))))
 
 (defun check-message-type-valid (message-type)
   (let ((type '(or symbol (cons symbol (cons symbol null)))))
@@ -41,7 +41,7 @@
                            "The message status should be OK or ERROR, not ~S."
                            status))))
       (error (e)
-        (message-read-error 'invalid-message-type message-type e)))))
+        (read-error 'invalid-message-type message-type e)))))
 
 (defun message-type-class (message-type)
   (handler-case
@@ -55,7 +55,7 @@
                  instantiated." message-type)
         class)
     (error (e)
-      (message-read-error 'invalid-message-type message-type e))))
+      (read-error 'invalid-message-type message-type e))))
 
 (defun parse-message-type (message-type)
   (cond ((atom message-type) (values message-type :request))
@@ -63,6 +63,6 @@
          (values (second message-type) :ok))
         ((cable-equal (first message-type) :error)
          (values (second message-type) :error))
-        (t (message-read-error 'invalid-message-type message-type))))
+        (t (read-error 'invalid-message-type message-type))))
 
 ;; TODO support the PROXY protocol

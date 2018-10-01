@@ -5,6 +5,7 @@
 
 (in-package #:gateway.engine/impl)
 
+;; TODO gateway.message module
 (define-protocol-class standard-message (message)
   ((%id :reader id
         :initarg :id

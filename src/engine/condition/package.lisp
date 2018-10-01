@@ -8,11 +8,14 @@
         #:alexandria
         #:moptilities
         #:gateway.engine/protocol)
+  (:import-from #:protest/base
+                #:define-protocol-condition-type)
   (:import-from #:destructuring-bind-star
                 #:destructuring-error
                 #:lambda-list #:expression #:reason)
   (:shadow #:destructuring-bind)
-  (:export #:gateway-destructuring-error #:expression #:reason
+  (:export #:read-error #:expression #:reason
+           #:object-read-error
            #:message-read-error
            #:invalid-message-id
            #:invalid-message-type
