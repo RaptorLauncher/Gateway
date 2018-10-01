@@ -61,7 +61,9 @@
                #:gateway.engine/condition)
   :pathname "impl/"
   :components ((:file "package")
-               (:file "standard-message")))
+               (:file "standard-message")
+               (:file "data-object")
+               (:file "data-message")))
 
 (asdf:defsystem #:gateway.engine/test
   :description "Tests for Gateway engine"
