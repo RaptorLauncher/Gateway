@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; connector/impl/standard-message.lisp
+;;;; connector/message/standard-message.lisp
 
 (in-package #:gateway.engine/message)
 
@@ -9,6 +9,9 @@
   ((%id :reader id
         :initarg :id
         :initform nil)
+   (%error-reason :reader error-reason
+                  :initarg :error-reason
+                  :initform nil)
    (%status :reader status
             :initarg :status
             :initform :request)))
