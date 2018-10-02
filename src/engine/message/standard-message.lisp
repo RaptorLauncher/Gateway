@@ -3,9 +3,8 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; connector/impl/standard-message.lisp
 
-(in-package #:gateway.engine/impl)
+(in-package #:gateway.engine/message)
 
-;; TODO gateway.message module
 (define-protocol-class standard-message (message)
   ((%id :reader id
         :initarg :id

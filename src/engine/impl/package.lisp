@@ -8,7 +8,6 @@
         #:alexandria
         #:phoe-toolbox
         #:moptilities
-        #:protest/base
         #:gateway.cable
         #:gateway.engine/protocol
         #:gateway.engine/condition)
@@ -17,8 +16,7 @@
                 #:destructuring-error-lambda-list
                 #:destructuring-error-expression
                 #:destructuring-error-reason)
-  (:shadow #:destructuring-bind)
-  (:export #:standard-message))
+  (:shadow #:destructuring-bind))
 
 (in-package #:gateway.engine/impl)
 
