@@ -33,3 +33,22 @@
             (let ((owner (ecase owner (:server :s) (:client :c))))
               (format stream " (~A ~A)" owner number))))
         (prin1 name stream))))
+
+#|
+(defclass message-class (standard-class)
+  ((%status :accessor status
+            :initarg :status))
+  (:default-initargs :status (error "Must provide STATUS.")))
+
+(defmethod c2mop:validate-superclass ((c message-class) (s standard-class)) t)
+
+(defmethod c2mop:validate-superclass ((c standard-class) (s message-class)) t)
+
+(defmethod print-object ((object message-class) stream)
+  (print-unreadable-object (object stream :type t :identity t)
+    (let ((status (status object))
+          (name (class-name object)))
+      (if status
+          (format stream "(~S ~S)" status name)
+          (format stream "~S" name)))))
+|#
