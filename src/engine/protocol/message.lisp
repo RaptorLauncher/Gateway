@@ -17,12 +17,14 @@ denoting an error of some sort."
      :dependencies ()
      :export t)
   (:class message () ())
+  ;; TODO list-named-class
   "A message object. See protocol MESSAGE for details."
   (:function id ((message message))
              (cons (member :client :server) (cons unsigned-byte null)))
   "Returns the ID of the message."
+  ;; TODO body
   (:function status ((message message)) (member :request :ok :error))
-  "Returns the message's statis."
+  "Returns the message's statis." ;; TODO remove
   (:function data-message (data) message)
   "Converts the provided cable data into a message.
 \
