@@ -8,40 +8,43 @@
 ;; TODO tests
 ;; TODO logging
 (defmethod data-object ((data cons))
-  (multiple-value-bind (class body extra-data) (%data-object data)
-    (handler-case
-        (apply #'data-object-using-class class body extra-data)
-      (error (e) (read-error 'invalid-message-body data e)))))
+  (flet ((parse (data &optional messagep)
+           (handler-case
+               (destructuring-bind (object-type . body) data
+                 (%data-object object-type body messagep))
+             ((and error (not read-error)) (e)
+               (error (read-error 'object-read-error data e))))))
+    (multiple-value-bind (class body extra-data) (parse data)
+      (handler-case
+          (apply #'data-object-using-class class body extra-data)
+        ((and error (not read-error)) (e)
+          (read-error 'invalid-message-body data e))))))
 
-(defun %data-object (data &optional messagep)
-  (handler-case
-      (destructuring-bind (object-type . body) data
-        (typecase object-type
-          ((cons t (cons t null))
-           (unless (and (symbolp (first object-type))
-                        (member (first object-type) '(:c :s) :test #'string=)
-                        (typep (second object-type) 'unsigned-byte))
-             (read-error 'invalid-message-id object-type))
-           (if messagep
-               (read-error 'message-read-error
-                           object-type "Duplicate message IDs")
-               (multiple-value-bind (class body) (%data-object (cdr data) t)
-                 (values class body (list :id object-type)))))
-          (symbol
-           (let* ((class (or (cable-subclass object-type 'gateway-object)
-                             (cable-subclass object-type 'gateway-condition))))
-             (unless (not (null class))
-               (read-error 'invalid-message-type object-type
-                           "Object class ~S was not found." object-type))
-             (unless (not (protocol-object-p class))
-               (read-error 'invalid-message-type object-type
-                           "Object class ~S is a protocol class and can't be ~
+(defgeneric %data-object (object-type body &optional messagep)
+  (:method ((object-type cons) body &optional messagep)
+    (when messagep
+      (read-error 'message-read-error object-type "Duplicate message IDs"))
+    (unless (and (symbolp (first object-type))
+                 (member (first object-type) '(:c :s) :test #'string=)
+                 (typep (second object-type) 'unsigned-byte))
+      (read-error 'invalid-message-id object-type))
+    (multiple-value-bind (class body) (%data-object body t)
+      (values class body (list :id object-type))))
+  (:method ((object-type symbol) body &optional messagep)
+    (declare (ignore messagep))
+    (let* ((class (or (cable-subclass object-type 'gateway-object)
+                      (cable-subclass object-type 'gateway-condition))))
+      (unless (not (null class))
+        (read-error 'invalid-message-type object-type
+                    "Object class ~S was not found." object-type))
+      (unless (not (protocol-object-p class))
+        (read-error 'invalid-message-type object-type
+                    "Object class ~S is a protocol class and can't be ~
                             instantiated." object-type))
-             (values class body nil)))
-          (t (read-error 'object-read-error data
-                         "Invalid message class: ~A" object-type))))
-    ((and error (not read-error)) (e)
-      (error (read-error 'object-read-error data e)))))
+      (values class body nil)))
+  (:method (object-type body &optional messagep)
+    (declare (ignore messagep))
+    (read-error 'invalid-message-class object-type)))
 
 (defun cable-subclass (class-name superclass)
   (when (symbolp superclass) (setf superclass (find-class superclass)))

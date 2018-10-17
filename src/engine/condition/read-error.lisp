@@ -56,5 +56,8 @@
 (define-read-error invalid-message-id (message-read-error)
   "Invalid message ID")
 
+(define-read-error invalid-message-class (message-read-error)
+  "Invalid message class")
+
 (define-read-error invalid-message-body (message-read-error)
   "Invalid message body")
