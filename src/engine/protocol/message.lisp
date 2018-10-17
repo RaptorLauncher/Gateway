@@ -9,31 +9,22 @@
     (:documentation "The MESSAGE protocol describes objects which represent ~
 internal messages in the Gateway system. Each message consists of a message ~
 ID, which is a two-element list containing either :CLIENT or :SERVER and a ~
-non-negative integer, a body, which is data transmittable by the cable ~
-protocol, and a state, which describes the context of the message body: if the ~
-message was a request, if it is a successful response, or a response ~
-denoting an error of some sort."
+non-negative integer, and the message body, which is data transmittable by the ~
+cable protocol.
+\
+The name of each message class is a two-element list, as defined by the ~
+LIST-NAMED-CLASS Lisp system. The first element is one of :REQUEST, :RESPONSE ~
+or :ERROR, and the second element is any keyword."
      :tags (:gateway :engine :message)
-     :dependencies ()
+     :dependencies (gateway-object)
      :export t)
-  (:class message () ())
-  ;; TODO list-named-class
+  (:class message (gateway-object) ())
   "A message object. See protocol MESSAGE for details."
   (:function id ((message message))
              (cons (member :client :server) (cons unsigned-byte null)))
   "Returns the ID of the message."
-  ;; TODO body
-  (:function status ((message message)) (member :request :ok :error))
-  "Returns the message's statis." ;; TODO remove
-  (:function data-message (data) message)
-  "Converts the provided cable data into a message.
-\
-This function should must call DATA-MESSAGE-USING-CLASS after performing all ~
-checks on the received data."
-  (:function data-message-using-class ((class class) id status data) message)
-  "Converts the provided cable data into a message of the provided class."
-  (:function message-data ((message message)) t)
-  "Converts the provided message into cable data."
+  (:function body ((message message)) t)
+  "Returns the message's body."
   (:condition-type message-condition (gateway-condition) ())
   "A condition type related to processing Gateway messages.")
 

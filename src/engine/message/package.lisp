@@ -4,10 +4,11 @@
 ;;;; connector/message/package.lisp
 
 (uiop:define-package #:gateway.engine/message
-  (:use #:cl
-        #:alexandria
-        #:phoe-toolbox
-        #:moptilities
-        #:protest/base
-        #:gateway.engine/protocol)
+    (:mix #:list-named-class
+          #:cl
+          #:alexandria
+          #:phoe-toolbox
+          #:moptilities
+          #:protest/base
+          #:gateway.engine/protocol)
   (:export #:standard-message))

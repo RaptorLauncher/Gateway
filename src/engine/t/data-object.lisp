@@ -17,16 +17,17 @@
 
 ;;; DATA-OBJECT test
 
-;; TODO same test for DATA-MESSAGE
 (defparameter *data-object-input*
   (uiop:while-collecting (collect)
-    (let ((reason "a") (expression '(1 2 :foo :bar)))
-      (dolist (class '(object-read-error message-read-error invalid-message-id
-                       invalid-message-type invalid-message-body))
-        (collect `(,(make-instance class :expression expression)
-                   (,class ,expression)))
-        (collect `(,(make-instance class :expression expression :reason reason)
-                   (,class ,expression ,reason)))))))
+    (let ((classes '(object-read-error message-read-error invalid-message-id
+                     invalid-message-type invalid-message-body))
+          (reason "a") (expression '(1 2 :foo :bar)))
+      (dolist (class classes)
+        (let ((fresh-class (make-symbol (symbol-name class))))
+          (collect `(,(make-instance class :expression expression)
+                     (,fresh-class ,expression)))
+          (collect `(,(make-instance class :expression expression :reason reason)
+                     (,fresh-class ,expression ,reason))))))))
 
 (defun data-object-untested-classes ()
   (let* ((subclasses (append (subclasses (find-class 'gateway-object))

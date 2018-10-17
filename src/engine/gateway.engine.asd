@@ -35,6 +35,7 @@
   :version "0.0.1"
   :serial t
   :depends-on (#:alexandria
+               #:list-named-class
                #:moptilities
                #:destructuring-bind-star
                #:protest/base
@@ -52,6 +53,7 @@
   :serial t
   :depends-on (#:alexandria
                #:phoe-toolbox
+               #:list-named-class
                #:moptilities
                #:protest/base
                #:gateway.engine/protocol)
@@ -68,13 +70,13 @@
   :depends-on (#:alexandria
                #:phoe-toolbox
                #:moptilities
+               #:protest/base
                #:gateway.cable
                #:gateway.engine/protocol
                #:gateway.engine/condition)
   :pathname "impl/"
   :components ((:file "package")
-               (:file "data-object")
-               (:file "data-message")))
+               (:file "data-object")))
 
 (asdf:defsystem #:gateway.engine/test
   :description "Tests for Gateway engine"
@@ -83,6 +85,7 @@
   :version "0.0.1"
   :serial t
   :depends-on (#:phoe-toolbox
+               #:list-named-class
                #:named-readtables
                #:moptilities
                #:protest/base

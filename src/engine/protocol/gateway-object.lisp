@@ -37,7 +37,7 @@ Despite this function being a convenience function, it is not implemented ~
 as a part of this protocol to allow for concrete conditions of subtype ~
 GATEWAY-CONDITION to be created and signaled as a part of this function's ~
 effect."
-  (:function data-object-using-class ((class class) data)
+  (:function data-object-using-class ((class class) data &key)
              (or gateway-object gateway-condition))
   "Converts the provided cable data into a Gateway object of the provided ~
 class."

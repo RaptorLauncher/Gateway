@@ -8,6 +8,7 @@
         #:alexandria
         #:phoe-toolbox
         #:moptilities
+        #:protest/base
         #:gateway.cable
         #:gateway.engine/protocol
         #:gateway.engine/condition)

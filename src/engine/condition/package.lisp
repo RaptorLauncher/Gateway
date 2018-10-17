@@ -13,6 +13,7 @@
   (:import-from #:destructuring-bind-star
                 #:destructuring-error
                 #:lambda-list #:expression #:reason)
+  (:shadowing-import-from #:list-named-class #:find-class)
   (:shadow #:destructuring-bind)
   (:export #:read-error #:expression #:reason
            #:object-read-error

@@ -4,7 +4,8 @@
 ;;;; engine/t/package.lisp
 
 (uiop:define-package #:gateway.engine/test
-  (:use #:cl
+  (:mix #:list-named-class
+        #:cl
         #:alexandria
         #:moptilities
         #:phoe-toolbox
@@ -19,7 +20,8 @@
                 #:define-test
                 #:true #:false #:is #:isnt #:is-values #:isnt-values
                 #:protest/parachute)
-  (:export #:engine))
+  (:export #:engine
+           #:data-object))
 
 (in-package #:gateway.engine/test)
 
