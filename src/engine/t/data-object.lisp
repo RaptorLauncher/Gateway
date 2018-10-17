@@ -20,7 +20,7 @@
 (defparameter *data-object-input*
   (uiop:while-collecting (collect)
     (let ((classes '(object-read-error message-read-error invalid-message-id
-                     invalid-message-type invalid-message-body))
+                     invalid-message-class invalid-message-body))
           (reason "a") (expression '(1 2 :foo :bar)))
       (dolist (class classes)
         (let ((fresh-class (make-symbol (symbol-name class))))

@@ -35,10 +35,10 @@
     (let* ((class (or (cable-subclass object-type 'gateway-object)
                       (cable-subclass object-type 'gateway-condition))))
       (unless (not (null class))
-        (read-error 'invalid-message-type object-type
+        (read-error 'invalid-message-class object-type
                     "Object class ~S was not found." object-type))
       (unless (not (protocol-object-p class))
-        (read-error 'invalid-message-type object-type
+        (read-error 'invalid-message-class object-type
                     "Object class ~S is a protocol class and can't be ~
                             instantiated." object-type))
       (values class body nil)))

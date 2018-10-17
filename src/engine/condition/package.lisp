@@ -19,7 +19,7 @@
            #:object-read-error
            #:message-read-error
            #:invalid-message-id
-           #:invalid-message-type
+           #:invalid-message-class
            #:invalid-message-body))
 
 (in-package #:gateway.engine/condition)
