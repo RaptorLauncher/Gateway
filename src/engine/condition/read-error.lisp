@@ -7,11 +7,10 @@
 
 (define-protocol-condition-type read-error
     (gateway-condition destructuring-error)
-  (;; FIXME SBCL screws up DEFINE-CONDITION with :ALLOCATION :CLASS and
-   ;; :DEFAULT-INITARGS. Use string-returning methods as a workaround for that.
-   ;; Uncomment this in SBCL 1.4.13.
-   (%format-control :reader format-control
+  ((%format-control :reader format-control
                     :initarg :format-control
+                    ;; SBCL screws up DEFINE-CONDITION with :ALLOCATION :CLASS
+                    ;; and :DEFAULT-INITARGS. TODO uncomment in SBCL 1.4.13+.
                     ;; :allocation :class
                     ))
   (:default-initargs :format-control "Error while reading")

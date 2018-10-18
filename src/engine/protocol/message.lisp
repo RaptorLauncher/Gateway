@@ -16,15 +16,17 @@ The name of each message class is a two-element list, as defined by the ~
 LIST-NAMED-CLASS Lisp system. The first element is one of :REQUEST, :RESPONSE ~
 or :ERROR, and the second element is any keyword."
      :tags (:gateway :engine :message)
-     :dependencies (gateway-object)
+     :dependencies (gateway-object) ;; TODO engine as a dependency
      :export t)
   (:class message (gateway-object) ())
   "A message object. See protocol MESSAGE for details."
   (:function id ((message message))
              (cons (member :client :server) (cons unsigned-byte null)))
   "Returns the ID of the message."
-  (:function body ((message message)) t)
-  "Returns the message's body."
+  ;; TODO move this to the engine; it's the engine's responsibility to execute
+  ;; messages.
+  (:function execute-message ((message message) (engine #|engine|# t)) (values))
+  "Executes the provided message on the given engine."
   (:condition-type message-condition (gateway-condition) ())
   "A condition type related to processing Gateway messages.")
 
