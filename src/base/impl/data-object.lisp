@@ -1,17 +1,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/impl/data-object.lisp
+;;;; base/impl/data-object.lisp
 
-(in-package #:gateway.engine/impl)
+(in-package #:gateway.base/impl)
 
-;; TODO tests
-;; TODO logging
+;; TODO unit-test this
+;; TODO logging in client classes
 (defmethod data-object ((data cons))
-  (flet ((parse (data &optional messagep)
+  (flet ((parse (data)
            (handler-case
                (destructuring-bind (object-type . body) data
-                 (%data-object object-type body messagep))
+                 (%data-object object-type body))
              ((and error (not read-error)) (e)
                (error (read-error 'object-read-error data e))))))
     (multiple-value-bind (class body extra-data) (parse data)
@@ -28,25 +28,31 @@
                  (member (first object-type) '(:c :s) :test #'string=)
                  (typep (second object-type) 'unsigned-byte))
       (read-error 'invalid-message-id object-type))
-    (multiple-value-bind (class body) (%data-object body t)
+    (multiple-value-bind (class body) (%data-object (car body) (cdr body) t)
       (values class body (list :id object-type))))
   (:method ((object-type symbol) body &optional messagep)
     (declare (ignore messagep))
     (let* ((class (or (cable-subclass object-type 'gateway-object)
                       (cable-subclass object-type 'gateway-condition))))
-      (unless (not (null class))
+      (when (null class)
         (read-error 'invalid-message-class object-type
                     "Object class ~S was not found." object-type))
-      (unless (not (protocol-object-p class))
-        (read-error 'invalid-message-class object-type
-                    "Object class ~S is a protocol class and can't be ~
-                            instantiated." object-type))
+      (when (protocol-object-p class)
+        (let* ((name (uiop:strcat "STANDARD-" (symbol-name (class-name class))))
+               (subclasses (remove-if-not #'symbolp (subclasses class)
+                                          :key #'class-name))
+               (subclass (find name subclasses :key #'class-name)))
+          (unless subclass
+            (read-error 'invalid-message-class object-type
+                        "Gateway bug: class ~A was not found." name))
+          (setf class subclass)))
       (values class body nil)))
   (:method (object-type body &optional messagep)
     (declare (ignore messagep))
     (read-error 'invalid-message-class object-type)))
 
 (defun cable-subclass (class-name superclass)
+  (check-type class-name (or class symbol))
   (when (symbolp superclass) (setf superclass (find-class superclass)))
   (find class-name (subclasses superclass) :test #'cable-equal
                                            :key #'class-name))
@@ -62,5 +68,3 @@
              (string= (first x) (first y))
              (string= (second x) (second y)))
         (equal x y))))
-
-;; TODO support the PROXY protocol in connector

@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/protocol/gateway-object.lisp
+;;;; base/protocol/gateway-object.lisp
 
-(in-package #:gateway.engine/protocol)
+(in-package #:gateway.base/protocol)
 
 (define-protocol gateway-object
     (:documentation "The GATEWAY-OBJECT protocol describes objects and ~

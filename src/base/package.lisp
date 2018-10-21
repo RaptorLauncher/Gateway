@@ -1,19 +1,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/package.lisp
+;;;; base/package.lisp
 
-(uiop:define-package #:gateway.engine
-  (:use #:gateway.engine/protocol
-        #:gateway.engine/condition
-        #:gateway.engine/impl
-        #:gateway.engine/message
-        #:gateway.engine/objects)
-  (:reexport #:gateway.engine/protocol
-             #:gateway.engine/condition
-             #:gateway.engine/impl
-             #:gateway.engine/message
-             #:gateway.engine/objects))
+(uiop:define-package #:gateway.base
+  (:use #:gateway.base/protocol
+        #:gateway.base/impl)
+  (:reexport #:gateway.base/protocol
+             #:gateway.base/impl))
 
 ;; TODO Class SENTINEL
 ;; - AUTHENTICATION authenticator connection -> T/account/NIL

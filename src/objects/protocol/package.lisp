@@ -4,7 +4,9 @@
 ;;;; engine/protocol/package.lisp
 
 (uiop:define-package #:gateway.engine/protocol
-  (:use #:cl)
+  (:use #:cl
+        #:protest/common/date)
+  (:reexport #:protest/common/date)
   (:import-from #:protest/protocol
                 #:define-protocol
                 #:execute-protocol))

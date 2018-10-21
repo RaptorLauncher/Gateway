@@ -88,3 +88,5 @@ argument.")))
     (new-value (acceptor standard-acceptor) &optional type)
   (declare (ignore type))
   (setf (slot-value acceptor '%handler) new-value))
+
+;; TODO create a new connector supporting the PROXY protocol

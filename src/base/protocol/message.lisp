@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/protocol/message.lisp
+;;;; base/protocol/message.lisp
 
-(in-package #:gateway.engine/protocol)
+(in-package #:gateway.base/protocol)
 
 (define-protocol message
     (:documentation "The MESSAGE protocol describes objects which represent ~
@@ -15,14 +15,12 @@ cable protocol.
 The name of each message class is a two-element list, as defined by the ~
 LIST-NAMED-CLASS Lisp system. The first element is one of :REQUEST, :RESPONSE ~
 or :ERROR, and the second element is any keyword."
-     :tags (:gateway :engine :message)
-     :dependencies (gateway-object) ;; TODO engine as a dependency
+     :tags (:gateway :engine :gateway-object :message)
+     :dependencies (gateway-object identifiable)
+     ;; TODO engine should have message as a dependency
      :export t)
-  (:class message (gateway-object) ())
+  (:class message (gateway-object) (identifiable))
   "A message object. See protocol MESSAGE for details."
-  (:function id ((message message))
-             (cons (member :client :server) (cons unsigned-byte null)))
-  "Returns the ID of the message."
   ;; TODO move this to the engine; it's the engine's responsibility to execute
   ;; messages.
   (:function execute-message ((message message) (engine #|engine|# t)) (values))

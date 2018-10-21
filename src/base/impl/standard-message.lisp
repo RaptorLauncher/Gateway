@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; connector/message/standard-message.lisp
+;;;; base/impl/standard-message.lisp
 
-(in-package #:gateway.engine/message)
+(in-package #:gateway.base/impl)
 
 ;;; STANDARD-MESSAGE
 

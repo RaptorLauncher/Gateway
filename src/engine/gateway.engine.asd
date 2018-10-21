@@ -11,8 +11,6 @@
   :version "0.0.1"
   :serial t
   :depends-on (#:gateway.engine/protocol
-               #:gateway.engine/condition
-               #:gateway.engine/message
                #:gateway.engine/impl)
   :components ((:file "package")))
 
@@ -25,41 +23,7 @@
   :depends-on (#:protest/protocol)
   :pathname "protocol/"
   :components ((:file "package")
-               (:file "gateway-object")
-               (:file "message")))
-
-(asdf:defsystem #:gateway.engine/condition
-  :description "Gateway game logic - conditions"
-  :author "Michał \"phoe\" Herda <phoe@disroot.org>"
-  :license  "AGPL3"
-  :version "0.0.1"
-  :serial t
-  :depends-on (#:alexandria
-               #:list-named-class
-               #:moptilities
-               #:destructuring-bind-star
-               #:protest/base
-               #:gateway.cable
-               #:gateway.engine/protocol)
-  :pathname "condition/"
-  :components ((:file "package")
-               (:file "read-error")))
-
-(asdf:defsystem #:gateway.engine/message
-  :description "Gateway game logic - messages"
-  :author "Michał \"phoe\" Herda <phoe@disroot.org>"
-  :license  "AGPL3"
-  :version "0.0.1"
-  :serial t
-  :depends-on (#:alexandria
-               #:phoe-toolbox
-               #:list-named-class
-               #:moptilities
-               #:protest/base
-               #:gateway.engine/protocol)
-  :pathname "message/"
-  :components ((:file "package")
-               (:file "standard-message")))
+               (:file "engine")))
 
 (asdf:defsystem #:gateway.engine/impl
   :description "Gateway game logic"
@@ -67,15 +31,17 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:alexandria
+  :depends-on (#:alexandria ;; TODO verify deps
                #:phoe-toolbox
                #:moptilities
+               #:list-named-class
                #:protest/base
                #:gateway.cable
-               #:gateway.engine/protocol
-               #:gateway.engine/condition)
+               #:gateway.base
+               #:gateway.engine/protocol)
   :pathname "impl/"
   :components ((:file "package")
+               (:file "standard-engine")
                (:file "data-object")))
 
 (asdf:defsystem #:gateway.engine/test

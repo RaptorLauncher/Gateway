@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/condition/read-error.lisp
+;;;; base/impl/read-error.lisp
 
-(in-package #:gateway.engine/condition)
+(in-package #:gateway.base/impl)
 
 (define-protocol-condition-type read-error
     (gateway-condition destructuring-error)

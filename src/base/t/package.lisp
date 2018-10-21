@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/t/package.lisp
+;;;; base/t/package.lisp
 
-(uiop:define-package #:gateway.engine/test
+(uiop:define-package #:gateway.base/test
   (:mix #:list-named-class
         #:cl
         #:alexandria
@@ -11,7 +11,7 @@
         #:phoe-toolbox
         #:named-readtables
         #:gateway.cable
-        #:gateway.engine)
+        #:gateway.base)
   (:import-from #:protest/base
                 #:protocol-object-p)
   (:import-from #:protest/test-case
@@ -20,13 +20,14 @@
                 #:define-test
                 #:true #:false #:is #:isnt #:is-values #:isnt-values
                 #:protest/parachute)
-  (:export #:engine
-           #:data-object))
+  (:export #:base
+           #:data-object
+           #:*data-object-input*))
 
-(in-package #:gateway.engine/test)
+(in-package #:gateway.base/test)
 
-(define-test-case engine
-    (:documentation "Test suite for Gateway engine."
-     :tags (:gateway :engine :suite)))
+(define-test-case base
+    (:documentation "Test suite for Gateway base."
+     :tags (:gateway :base :suite)))
 
-(define-test engine)
+(define-test base)
