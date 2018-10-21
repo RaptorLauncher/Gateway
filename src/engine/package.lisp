@@ -5,15 +5,9 @@
 
 (uiop:define-package #:gateway.engine
   (:use #:gateway.engine/protocol
-        #:gateway.engine/condition
-        #:gateway.engine/impl
-        #:gateway.engine/message
-        #:gateway.engine/objects)
+        #:gateway.engine/impl)
   (:reexport #:gateway.engine/protocol
-             #:gateway.engine/condition
-             #:gateway.engine/impl
-             #:gateway.engine/message
-             #:gateway.engine/objects))
+             #:gateway.engine/impl))
 
 ;; TODO Class SENTINEL
 ;; - AUTHENTICATION authenticator connection -> T/account/NIL

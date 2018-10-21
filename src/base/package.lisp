@@ -7,11 +7,4 @@
   (:use #:gateway.base/protocol
         #:gateway.base/impl)
   (:reexport #:gateway.base/protocol
-             #:gateway.base/impl))
-
-;; TODO Class SENTINEL
-;; - AUTHENTICATION authenticator connection -> T/account/NIL
-;; - (SETF AUTHENTICATION) new-value authenticator connection
-;; - AUTHORIZE authenticator connection command -> ()/!?
-;; - ENCRYPT authenticator connection command -> string/!?
-;; - DECRYPT authenticator connection string -> command/!?
+             #:gateway.base/impl)) ;; TODO documentation for BASE
