@@ -17,19 +17,7 @@
 
 ;;; DATA-OBJECT test
 
-(defvar *data-object-input*
-  `((,*package*
-     ,(uiop:while-collecting (collect)
-        (let ((classes '(object-read-error message-read-error invalid-message-id
-                         invalid-message-class invalid-message-body))
-              (reason "a") (expression '(1 2 :foo :bar)))
-          (dolist (class classes)
-            (let ((fresh-class (make-symbol (symbol-name class))))
-              (collect `(,(make-instance class :expression expression)
-                         (,fresh-class ,expression)))
-              (collect `(,(make-instance class :expression expression
-                                               :reason reason)
-                         (,fresh-class ,expression ,reason)))))))))
+(defvar *data-object-input* '()
   "A list of entries for DATA-OBJECT-ALL-OBJECTS test. Each module that creates
 concrete classes of DATA-OBJECT is required to PUSHNEW :KEY #'CAR the entry for
 the classes it creates in order to make this test pass.
@@ -39,6 +27,20 @@ identification) and a list of two-element lists. The first element of each such
 list is an instance of the subclass and the second element is a piece of cable
 data via which an equivalent instance can be created and to which the instance
 must be cable-equal, as per the DATA-OBJECT protocol.")
+
+(let ((entry (uiop:while-collecting (collect)
+               (let ((classes '(object-read-error message-read-error
+                                invalid-message-id invalid-message-class
+                                invalid-message-body))
+                     (reason "a") (expression '(1 2 :foo :bar)))
+                 (dolist (class classes)
+                   (let ((fresh-class (make-symbol (symbol-name class))))
+                     (collect `(,(make-instance class :expression expression)
+                                (,fresh-class ,expression)))
+                     (collect `(,(make-instance class :expression expression
+                                                      :reason reason)
+                                (,fresh-class ,expression ,reason)))))))))
+  (pushnew (list *package* entry) *data-object-input* :key #'car))
 
 (defun data-object-untested-classes ()
   (let* ((subclasses (append (subclasses (find-class 'gateway-object))
