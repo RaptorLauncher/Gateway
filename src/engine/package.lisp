@@ -10,8 +10,8 @@
              #:gateway.engine/impl))
 
 ;; TODO Class SENTINEL
-;; - AUTHENTICATION authenticator connection -> T/account/NIL
-;; - (SETF AUTHENTICATION) new-value authenticator connection
-;; - AUTHORIZE authenticator connection command -> ()/!?
-;; - ENCRYPT authenticator connection command -> string/!?
-;; - DECRYPT authenticator connection string -> command/!?
+;; - AUTHENTICATION connection sentinel -> T/account/NIL
+;; - (SETF AUTHENTICATION) new-value connection sentinel
+;; - AUTHORIZE sentinel connection command -> ()/!?
+;; - ENCRYPT sentinel connection command -> string/!?
+;; - DECRYPT sentinel connection string -> command/!?
