@@ -42,13 +42,15 @@
                #:lparallel
                #:cl-cpus
                #:protest/base
+               #:protest/common/killable
+               #:protest/common/named
+               #:protest/common/handling
                #:gateway.cable
                #:gateway.base
                #:gateway.engine/protocol)
   :pathname "impl/"
   :components ((:file "package")
-               ;; (:file "standard-engine")
-               ))
+               (:file "standard-engine")))
 
 (asdf:defsystem #:gateway.engine/test
   :description "Tests for Gateway engine"
@@ -67,7 +69,7 @@
                #:gateway.engine)
   :pathname "t/"
   :components ((:file "package")
-               (:file "data-object")))
+               (:file "standard-engine")))
 
 (defmethod asdf:perform ((o asdf:test-op)
                          (c (eql (asdf:find-system '#:gateway.engine))))

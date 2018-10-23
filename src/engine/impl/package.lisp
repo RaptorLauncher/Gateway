@@ -9,6 +9,7 @@
         #:protest/common/killable
         #:protest/common/named
         #:protest/common/handling
-        #:gateway.engine/protocol
-        #:gateway.base/protocol)
+        #:gateway.connector/protocol
+        #:gateway.base/protocol
+        #:gateway.engine/protocol)
   (:export #:standard-engine))

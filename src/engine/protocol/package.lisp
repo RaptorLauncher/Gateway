@@ -1,15 +1,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/protocol/package.lisp
+;;;; database/protocol/package.lisp
 
-(uiop:define-package #:gateway.engine/protocol
+(uiop:define-package #:gateway.database/protocol
   (:use #:cl
-        #:protest/common/killable
-        #:protest/common/named
-        #:protest/common/handling
-        #:gateway.connector/protocol
-        #:gateway.base/protocol)
+        #:protest/common/killable)
   (:import-from #:protest/protocol
                 #:define-protocol
                 #:execute-protocol))
