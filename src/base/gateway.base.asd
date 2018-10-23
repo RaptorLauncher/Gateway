@@ -19,7 +19,8 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:protest/protocol)
+  :depends-on (#:protest/protocol
+               #:protest/common/date)
   :pathname "protocol/"
   :components ((:file "package")
                (:file "mixin/identifiable")

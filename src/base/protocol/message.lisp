@@ -17,14 +17,9 @@ LIST-NAMED-CLASS Lisp system. The first element is one of :REQUEST, :RESPONSE ~
 or :ERROR, and the second element is any keyword."
      :tags (:gateway :engine :gateway-object :message)
      :dependencies (gateway-object identifiable)
-     ;; TODO engine should have message as a dependency
      :export t)
   (:class message (gateway-object) (identifiable))
   "A message object. See protocol MESSAGE for details."
-  ;; TODO move this to the engine; it's the engine's responsibility to execute
-  ;; messages.
-  (:function execute-message ((message message) (engine #|engine|# t)) (values))
-  "Executes the provided message on the given engine."
   (:condition-type message-condition (gateway-condition) ())
   "A condition type related to processing Gateway messages.")
 

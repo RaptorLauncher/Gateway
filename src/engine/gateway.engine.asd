@@ -20,7 +20,12 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:protest/protocol)
+  :depends-on (#:protest/protocol
+               #:protest/common/killable
+               #:protest/common/named
+               #:protest/common/handling
+               #:gateway.connector/protocol
+               #:gateway.base/protocol)
   :pathname "protocol/"
   :components ((:file "package")
                (:file "engine")))

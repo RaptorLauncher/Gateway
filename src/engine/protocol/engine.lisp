@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; engine/protocol/engine.lisp
 
-(in-package #:gateway/protocol)
+(in-package #:gateway.engine/protocol)
 
 (define-protocol engine
     (:documentation "The ENGINE protocol describes objects which are capable ~
@@ -16,9 +16,9 @@ On each enqueued message, the engine's handler function is eventually called ~
 on that message. That function is an one-argument function that expects the ~
 implementation-dependent message as its argument."
      :tags (:gateway :engine)
-     :dependencies (killable named with-handler connection message)
+     :dependencies (killable named handling connection message)
      :export t)
-  (:class engine (killable named with-handler) ())
+  (:class engine (killable named handling) ())
   "An engine object. See protocol ENGINE for details."
   (:function accept-message
              ((engine engine) (connection connection) (message message))
