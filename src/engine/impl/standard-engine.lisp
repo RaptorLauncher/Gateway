@@ -3,69 +3,73 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; engine/impl/standard-engine.lisp
 
-(in-package :gateway/impl)
+(in-package :gateway.engine/impl)
 
 (defclass standard-engine (engine)
-  ((%engine :accessor %engine)
+  ((%kernel :accessor %kernel)
    (%channel :accessor channel)
    (%cleaner :accessor cleaner)
-   (%handler :accessor handler
-             :initarg :handler
+   (%handler :initarg :handler
              :initform (error "Must provide a handler function."))
    (%name :accessor name))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class ENGINE.
 
-This engine contains a lparallel engine. The engine workers each call the ~
-handler function with the message as its argument. That function executes a ~
-single iteration of the engine's job and is not meant to loop.
+This engine contains a lparallel kernel. The kernel workers each call the ~
+handler function on the connection and message passed to the kernel. That ~
+function executes a single iteration of the engine's job and is not meant to ~
+loop.
 
 TODO these below lines belong to the framework, not the class
 
 The default implementation of the handler function is the exported function ~
-#'STANDARD-ENGINE-OPERATION.
+#'STANDARD-ENGINE-OPERATION.") ;; TODO export this function
+   ))
 
-The messages are expected to be in form (CONNECTION COMMAND . REST), where ~
-CONNECTION is a connection object from which MESSAGE came; REST is ignored ~
-and reserved for future use.")))
+(defmethod handler ((engine standard-engine) &optional type)
+  (declare (ignore type))
+  (slot-value engine '%handler))
+
+(defmethod (setf handler) (new-value (engine standard-engine) &optional type)
+  (declare (ignore type))
+  (setf (slot-value engine '%handler) new-value))
 
 (define-print (standard-engine stream)
-  (if (alivep standard-engine)
-      (format stream "(~D workers, ALIVE)"
-              (worker-count standard-engine))
-      (format stream "(DEAD)")))
+  (if (deadp standard-engine)
+      (format stream "(DEAD)")
+      (format stream "(~D workers, ALIVE)" (worker-count standard-engine))))
 
 (defun worker-count (engine)
   (check-type engine standard-engine)
-  (let ((lparallel:*engine* (%engine engine)))
-    (lparallel:engine-worker-count)))
+  (let ((lparallel:*kernel* (%kernel engine)))
+    (lparallel:kernel-worker-count)))
 
 (define-constructor (standard-engine threads)
   (let* ((threads (or threads
-                      (config :engine-threads)
+                      ;; (config :engine-threads) ;; TODO
                       (cl-cpus:get-number-of-processors)))
          (name "Gateway - Engine, ~D threads" cpus))
-    (v:trace :gateway "Standard engine starting with ~D threads." threads)
+    (v:trace '(:gateway :engine) "Standard engine starting with ~D threads." threads)
     (setf (name standard-engine) name
-          (%engine standard-engine)
-          (lparallel:make-engine threads
-                                 :name (cat name " (lparallel engine)")))
-    (let ((lparallel:*engine* (%engine standard-engine)))
+          (%kernel standard-engine)
+          (lparallel:make-kernel threads
+                                 :name (cat name " (lparallel kernel)")))
+    (let ((lparallel:*kernel* (%kernel standard-engine)))
       (setf (channel standard-engine) (lparallel:make-channel)
             (cleaner standard-engine)
-            (make-thread
+            (bt:make-thread
              (lambda ()
                (loop (lparallel:receive-result (channel standard-engine))))
              :name "Gateway - Engine cleaner thread")))))
 
 (defmethod deadp ((engine standard-engine))
-  (not (lparallel.engine::alivep (%engine engine))))
+  (not (lparallel.kernel::alivep (%kernel engine))))
 
 (defmethod kill ((engine standard-engine))
   (v:trace :gateway "Standard engine was killed.")
-  (let ((lparallel:*engine* (%engine engine)))
-    (lparallel:end-engine :wait t))
-  (destroy-thread (cleaner engine))
+  (let ((lparallel:*kernel* (%kernel engine)))
+    (lparallel:end-kernel :wait t))
+  (bt:destroy-thread (cleaner engine))
   (values))
 
 (defmethod enqueue ((engine standard-engine) message)

@@ -14,7 +14,7 @@ The message's format is implementation-dependent.
 \
 On each enqueued message, the engine's handler function is eventually called ~
 on that message. That function is an one-argument function that expects the ~
-implementation-dependent message as its argument."
+implementation-dependent message as its argument." ;; TODO fix
      :tags (:gateway :engine)
      :dependencies (killable named handling connection message)
      :export t)

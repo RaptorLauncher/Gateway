@@ -36,18 +36,19 @@
   :license  "AGPL3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:alexandria ;; TODO verify deps
+  :depends-on (#:alexandria
                #:phoe-toolbox
-               #:moptilities
-               #:list-named-class
+               #:bordeaux-threads
+               #:lparallel
+               #:cl-cpus
                #:protest/base
                #:gateway.cable
                #:gateway.base
                #:gateway.engine/protocol)
   :pathname "impl/"
   :components ((:file "package")
-               (:file "standard-engine")
-               (:file "data-object")))
+               ;; (:file "standard-engine")
+               ))
 
 (asdf:defsystem #:gateway.engine/test
   :description "Tests for Gateway engine"

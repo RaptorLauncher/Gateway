@@ -36,6 +36,8 @@
   :serial t
   :depends-on (#:alexandria
                #:list-named-class
+               #:list-named-class/protest
+               #:destructuring-bind-star
                #:phoe-toolbox
                #:moptilities
                #:protest/base
