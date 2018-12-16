@@ -3,7 +3,12 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; messages/hello.lisp
 
-(in-package #:gateway.engine/message)
+(uiop:define-package #:gateway.message
+  (:mix #:list-named-class
+        #:cl
+        #:list-named-class))
+
+(in-package #:gateway.message)
 
 (define-protocol-class (:hello) () ())
 

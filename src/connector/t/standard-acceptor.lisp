@@ -41,7 +41,7 @@
                               (usocket:socket-close x)
                               (push x connections))))
        (acceptor #1?(make-acceptor handler) (kill acceptor))
-       (server-socket (gateway.connector::socket-of acceptor))
+       (server-socket (gateway.connector/impl::socket-of acceptor))
        (host (usocket:get-local-address server-socket))
        (port (usocket:get-local-port server-socket))
        (sockets #2?(loop repeat 3 collect (usocket:socket-connect host port))

@@ -5,7 +5,7 @@
 
 (in-package #:gateway.connector/impl)
 
-(defclass standard-connector (connector/impl)
+(defclass standard-connector (connector)
   ((%acceptor :reader acceptor)
    (%listener :reader listener)
    (%writer :reader writer)
