@@ -40,6 +40,7 @@
                #:phoe-toolbox
                #:bordeaux-threads
                #:lparallel
+               #:verbose
                #:cl-cpus
                #:protest/base
                #:protest/common/killable
@@ -63,7 +64,7 @@
                #:named-readtables
                #:moptilities
                #:protest/base
-               #:protest/test
+               #:protest/test-case
                #:protest/parachute
                #:gateway.cable
                #:gateway.engine)
