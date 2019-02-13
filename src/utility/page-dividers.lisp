@@ -9,24 +9,32 @@
 (define-subwidget (fixed-qtextedit fix-context-menu-widget) (q+:make-qwidget))
 
 (define-override (fixed-qtextedit context-menu-event) (event)
+  ;; Print the number of the clicked block
+  #+(or)
+  (let* ((position (q+:pos event))
+         (cursor (q+:cursor-for-position fixed-qtextedit position))
+         (block-number (q+:block-number cursor)))
+    (print block-number)
+    (call-next-qmethod))
   (let ((position (q+:pos event)))
     ;; I have no idea why it works this way, but it seems to work.!
     (call-next-qmethod)
+    ;; Fix cursor position after the context menu disappears.
+    (let* ((cursor (q+:cursor-for-position fixed-qtextedit position)))
+      (setf (q+:text-cursor fixed-qtextedit) cursor))
     ;; Display the context menu.
     (with-finalizing ((menu (q+:create-standard-context-menu fixed-qtextedit)))
       (q+:exec menu (q+:global-pos event)))
     ;; Work around the bug.
     (q+:show fix-context-menu-widget)
     (setf (q+:focus fix-context-menu-widget) 0)
-    (q+:hide fix-context-menu-widget)
-    ;; Fix cursor position after the context menu disappears.
-    (let* ((cursor (q+:cursor-for-position fixed-qtextedit position)))
-      (setf (q+:text-cursor fixed-qtextedit) cursor))))
+    (q+:hide fix-context-menu-widget)))
 
 ;;; Test
 
 (defparameter *page-divider-pathname*
-  #p"/home/phoe/Projects/Lisp/Gateway-UI-Assets/Page-Dividers/*.svg")
+  (asdf:system-relative-pathname
+   :gateway.ui.assets #p"Page-Dividers/*.svg"))
 
 (defparameter *page-divider-namestring*
   (uiop:native-namestring
@@ -48,9 +56,9 @@
             (with-finalizing ((pixmap (svg-pixmap namestring
                                                   :renderer renderer)))
               (q+:add-resource document (q+:qtextdocument.image-resource)
-                               (q+:make-qurl url) (q+:to-image pixmap))
-              (append-at editor :center
-                         (format nil "<p><img src=\"~A\"/></p>" url))))))
+                               (q+:make-qurl url) (q+:to-image pixmap)))
+            (append-at editor :center
+                       (format nil "<p><img src=\"~A\"/></p>" url)))))
       (append-at editor :justify
                  (lorem-ipsum:paragraph :prologue prologue
                                         :word-count 60)))))
