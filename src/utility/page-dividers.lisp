@@ -30,6 +30,14 @@
     (setf (q+:focus fix-context-menu-widget) 0)
     (q+:hide fix-context-menu-widget)))
 
+;;; POST
+
+(defclass post ()
+  ((%player :accessor player :initarg :player)
+   (%persona :accessor persona :initarg :persona)
+   (%contents :accessor contents :initarg :contents)
+   (%timestamp :accessor timestamp :initarg :timestap)))
+
 ;;; Test
 
 (defparameter *page-divider-pathname*
@@ -42,29 +50,25 @@
 
 (defun test ()
   (with-main-window (editor 'fixed-qtextedit)
-    (let ((document (q+:document editor))
-          (pathnames (directory *page-divider-pathname*))
-          (prologue t))
-      (with-finalizing ((renderer (q+:make-qsvgrenderer)))
-        (dolist (pathname pathnames)
-          (let ((namestring (uiop:native-namestring pathname))
-                (url (uiop:strcat "gateway://" (pathname-name pathname))))
-            (append-at editor :justify
-                       (lorem-ipsum:paragraph :prologue prologue
-                                              :word-count 60))
-            (setf prologue nil)
-            (with-finalizing ((pixmap (svg-pixmap namestring
-                                                  :renderer renderer)))
+    (with-finalizing ((renderer (q+:make-qsvgrenderer)))
+      (let ((prologue t))
+        (dolist (pathname (directory *page-divider-pathname*))
+          (append-at editor :justify
+                     (lorem-ipsum:paragraph :prologue prologue))
+          (setf prologue nil)
+          (let ((url (uiop:strcat "gateway://" (pathname-name pathname)))
+                (document (q+:document editor)))
+            (with-finalizing
+                ((pixmap (svg-pixmap pathname :renderer renderer)))
               (q+:add-resource document (q+:qtextdocument.image-resource)
                                (q+:make-qurl url) (q+:to-image pixmap)))
             (append-at editor :center
-                       (format nil "<p><img src=\"~A\"/></p>" url)))))
-      (append-at editor :justify
-                 (lorem-ipsum:paragraph :prologue prologue
-                                        :word-count 60)))))
+                       (format nil "<p><img src=\"~A\"/></p>" url))))))
+    (append-at editor :justify
+               (lorem-ipsum:paragraph :prologue nil))))
 
-(defun append-at (editor alignment object)
-  (q+:append editor object)
+(defun append-at (editor alignment string)
+  (q+:append editor string)
   (let* ((cursor (q+:text-cursor editor))
          (block-format (q+:block-format cursor))
          (alignment (ecase alignment
@@ -75,14 +79,12 @@
     (setf (q+:alignment block-format) alignment
           (q+:block-format cursor) block-format)))
 
-(defun svg-pixmap (svg-namestring &key (scale 1) (renderer nil rendererp))
-  ;; TODO optimize: make it possible to pass a renderer to this function and do
-  ;; not finalize it in that case, instead of making a new renderer on each call
-  ;; TODO this is already optimized; use it up there
-  (if rendererp
-      (%svg-pixmap svg-namestring scale renderer)
-      (with-finalizing ((renderer (q+:make-qsvgrenderer)))
-        (%svg-pixmap svg-namestring scale renderer))))
+(defun svg-pixmap (pathname &key (scale 1) (renderer nil rendererp))
+  (let ((namestring (uiop:native-namestring pathname)))
+    (if rendererp
+        (%svg-pixmap namestring scale renderer)
+        (with-finalizing ((renderer (q+:make-qsvgrenderer)))
+          (%svg-pixmap namestring scale renderer)))))
 
 (defun %svg-pixmap (svg-namestring scale renderer)
   (q+:load renderer svg-namestring)
