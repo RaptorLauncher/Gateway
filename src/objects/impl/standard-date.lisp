@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/objects/standard-date.lisp
+;;;; objects/impl/standard-date.lisp
 
-(in-package #:gateway.engine/objects)
+(in-package #:gateway.objects/impl)
 
 (defclass standard-date (date gateway-object local-time:timestamp) ()
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~

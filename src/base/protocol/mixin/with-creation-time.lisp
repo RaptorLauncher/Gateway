@@ -14,7 +14,9 @@ system."
      :export t)
   (:class with-creation-time () ())
   "An object with creation time. See protocol WITH-CREATION-TIME for details."
-  (:function id ((object with-creation-time)) t) ;; TODO date protocol
-  "Returns the ID of the object")
+  ;; TODO actually put creation time stuff here
+  ;; (:function id ((object with-creation-time)) t) ;; TODO date protocol
+  ;; "Returns the ID of the object"
+  )
 
 (execute-protocol with-creation-time)

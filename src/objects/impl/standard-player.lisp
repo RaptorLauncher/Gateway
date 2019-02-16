@@ -1,14 +1,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; engine/objects/standard-player.lisp
+;;;; objects/impl/standard-player.lisp
 
-(in-package #:gateway.engine/objects)
+(in-package #:gateway.objects/impl)
 
 ;; TODO tests
-(defclass standard-player (player)
-  ;; TODO login -> username
-  ((%login :accessor login :initarg :login)
+(defclass standard-player (player activatable)
+  ((%username :accessor username :initarg :username)
    (%display-name :accessor display-name :initarg :display-name)
    (%id :reader id :initarg :id)
    (%email :accessor email :initarg :email)
@@ -17,7 +16,7 @@
    (%activatedp :accessor activatedp :initarg :activatedp)
    (%creation-time :reader creation-time :initarg :creation-time))
   (:default-initargs :id (error "Must provide ID.")
-                     :login (error "Must provide login.")
+                     :username (error "Must provide username.")
                      :email (error "Must provide email.")
                      :display-name nil
                      :pass-hash nil
@@ -27,9 +26,13 @@
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class PLAYER.")))
 
+;; TODO shouldn't we actually define those until we have a database?
+;; The behavior of DATA-OBJECT-USING-CLASS is going to differ based on how
+;; the characters are fetched by their username.
+
 (defmethod object-data ((player standard-player))
-  `(:player ,(login player) ,@(when (display-name player)
-                                `(:display-name ,(display-name player)))))
+  `(:player ,(username player) ,@(when (display-name player)
+                                   `(:display-name ,(display-name player)))))
 
 (defmethod data-object-using-class
     ((class (eql (find-class 'standard-player))) data &key)
@@ -39,7 +42,7 @@ class PLAYER.")))
 
 (defvar *login-scanner*
   (cl-ppcre:create-scanner
-   "^[a-zA-Z0-9]{3,}$"))
+   "^[a-zA-Z0-9]{3,64}$"))
 
 (defvar *email-scanner*
   (cl-ppcre:create-scanner

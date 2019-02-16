@@ -25,6 +25,7 @@
   :components ((:file "package")
                (:file "mixin/identifiable")
                (:file "mixin/with-creation-time")
+               (:file "mixin/activatable")
                (:file "gateway-object")
                (:file "message")))
 
