@@ -7,6 +7,24 @@
 
 (in-package #:gateway/sql)
 
+;;; Install / Uninstall
+
+(defvar *sql-base-path*
+  (asdf:system-relative-pathname :gateway.sql "yesql/"))
+
+(defun execute-file-with-transaction (filename)
+  (let* ((pathname (merge-pathnames filename *sql-base-path*)))
+    (postmodern:with-transaction ()
+      (execute-file pathname))))
+
+(defun uninstall ()
+  (execute-file-with-transaction "uninstall.sql"))
+
+(defun install ()
+  (execute-file-with-transaction "install.sql"))
+
+;;; CL-YESQL functions
+
 (overlord:set-package-base "yesql/" :gateway.sql)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -28,17 +46,3 @@
     t))
 
 (import-all)
-
-(defvar *sql-base-path*
-  (asdf:system-relative-pathname :gateway.sql "yesql/"))
-
-(defun execute-file-with-transaction (filename)
-  (let* ((pathname (merge-pathnames filename *sql-base-path*)))
-    (postmodern:with-transaction ()
-      (execute-file pathname))))
-
-(defun uninstall ()
-  (execute-file-with-transaction "uninstall.sql"))
-
-(defun install ()
-  (execute-file-with-transaction "install.sql"))
