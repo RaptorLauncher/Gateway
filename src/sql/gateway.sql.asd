@@ -12,6 +12,7 @@
                #:phoe-toolbox
                #:cl+ssl
                #:cl-yesql/postmodern
+               #:postmodern-execute-file
                ;; #:gateway.utils
                ;; #:gateway.protocol
                #:gateway.config

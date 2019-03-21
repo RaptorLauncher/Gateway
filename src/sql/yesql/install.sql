@@ -184,15 +184,13 @@ CREATE UNIQUE INDEX timeline_permission_player_group_index
 
 -- name: set-initial-data @execute
 -- Fills the database with the initial data.
-BEGIN;
-    INSERT INTO player(player_id, login, email, display_name, pass_hash, pass_salt)
-        VALUES (1, 'narrator', 'narrator@gateway.localhost', 'Narrator', ''::bytea, ''::bytea);
-    INSERT INTO persona(persona_id, persona_name)
-        VALUES (1, 'Narrator');
-    INSERT INTO player_group(player_group_id, player_group_name)
-        VALUES (1, 'Everyone');
-    INSERT INTO players_groups(player_id, player_group_id)
-        VALUES (1, 1);
-    INSERT INTO owners_borrowers(player_id, persona_id, is_owner)
-        VALUES (1, 1, TRUE);
-COMMIT;
+INSERT INTO player(player_id, login, email, display_name, pass_hash, pass_salt)
+    VALUES (1, 'narrator', 'narrator@gateway.localhost', 'Narrator', ''::bytea, ''::bytea);
+INSERT INTO persona(persona_id, persona_name)
+    VALUES (1, 'Narrator');
+INSERT INTO player_group(player_group_id, player_group_name)
+    VALUES (1, 'Everyone');
+INSERT INTO players_groups(player_id, player_group_id)
+    VALUES (1, 1);
+INSERT INTO owners_borrowers(player_id, persona_id, is_owner)
+    VALUES (1, 1, TRUE);

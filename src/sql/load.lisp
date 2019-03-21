@@ -32,14 +32,13 @@
 (defvar *sql-base-path*
   (asdf:system-relative-pathname :gateway.sql "yesql/"))
 
-(defun execute-sql-with-transaction (filename)
-  (let* ((pathname (merge-pathnames filename *sql-base-path*))
-         (query (read-file-into-string pathname)))
+(defun execute-file-with-transaction (filename)
+  (let* ((pathname (merge-pathnames filename *sql-base-path*)))
     (postmodern:with-transaction ()
-      (cl-postgres:exec-query postmodern:*database* query))))
+      (execute-file pathname))))
 
 (defun uninstall ()
-  (execute-sql-with-transaction "uninstall.sql"))
+  (execute-file-with-transaction "uninstall.sql"))
 
 (defun install ()
-  (execute-sql-with-transaction "install.sql"))
+  (execute-file-with-transaction "install.sql"))
