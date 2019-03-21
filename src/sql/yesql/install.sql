@@ -158,13 +158,13 @@ CREATE UNIQUE INDEX timeline_permission_player_group_index
     WHERE player_group_id IS NOT NULL;
 
 -- Fills the database with the initial data.
-INSERT INTO player(login, email, display_name, pass_hash, pass_salt)
-    VALUES ('narrator', 'narrator@gateway.localhost', 'Narrator', ''::bytea, ''::bytea);
-INSERT INTO persona(persona_name)
-    VALUES ('Narrator');
+INSERT INTO player(player_id, login, email, display_name, pass_hash, pass_salt)
+    VALUES (0, 'narrator', 'narrator@gateway.localhost', 'Narrator', ''::bytea, ''::bytea);
+INSERT INTO persona(persona_id, persona_name)
+    VALUES (0, 'Narrator');
 INSERT INTO player_group(player_group_id, player_group_name)
-    VALUES (1, 'Everyone');
+    VALUES (0, 'Everyone');
 INSERT INTO players_groups(player_id, player_group_id)
-    VALUES (1, 1);
+    VALUES (0, 0);
 INSERT INTO owners_borrowers(player_id, persona_id, is_owner)
-    VALUES (1, 1, TRUE);
+    VALUES (0, 0, TRUE);
