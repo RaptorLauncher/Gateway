@@ -15,4 +15,5 @@
   (:export #:with-db
            #:with-test-db
            #:install
-           #:uninstall))
+           #:uninstall
+           #:reinstall))

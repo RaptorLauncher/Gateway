@@ -23,17 +23,19 @@
 (defun install ()
   (execute-file-with-transaction "install.sql"))
 
+(defun reinstall ()
+  (uninstall)
+  (reinstall))
+
 ;;; CL-YESQL functions
 
 (overlord:set-package-base "yesql/" :gateway.sql)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *sql-imports*
-    '(;; (install . "install.sql")
-      ;; (player . "player.sql")
-      )))
+    '((player . "player.sql"))))
 
-(defun import-all ()
+(defun rebuild ()
   (let ((*package* (find-package :gateway/sql)))
     (loop for (name . sql) in *sql-imports*
           with *package* = (find-package :gateway/sql)
@@ -42,7 +44,7 @@
                       :as :cl-yesql/postmodern
                       :binding :all-as-functions
                       :export-bindings t)))
-    (apply #'overlord:build (mapcar #'car *sql-imports*))
+    (funcall #'overlord:build (mapcar #'car *sql-imports*))
     t))
 
-(import-all)
+(rebuild)
