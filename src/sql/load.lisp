@@ -19,7 +19,8 @@
   (execute-file-with-transaction "uninstall.sql"))
 
 (defun install ()
-  (execute-file-with-transaction "install.sql"))
+  (execute-file-with-transaction "install.sql")
+  (execute-file-with-transaction "install-triggers.sql"))
 
 (defun reinstall ()
   (uninstall)
@@ -36,7 +37,6 @@
 (defun rebuild ()
   (let ((*package* (find-package :gateway/sql)))
     (loop for (name . sql) in *sql-imports*
-          with *package* = (find-package :gateway/sql)
           do (eval `(yesql:import ,name
                       :from ,sql
                       :as :cl-yesql/postmodern
