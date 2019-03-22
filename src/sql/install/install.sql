@@ -92,16 +92,24 @@ CREATE TABLE persona (
 
 -- Creates the players and personas table.
 CREATE TABLE players_personas (
-  player_id  integer NOT NULL DEFAULT 0 REFERENCES player(id)
-                     ON UPDATE CASCADE ON DELETE SET DEFAULT,
+  player_id  integer NULL REFERENCES player(id)
+                     ON UPDATE CASCADE ON DELETE SET NULL,
   persona_id integer NOT NULL REFERENCES persona(id)
                      ON UPDATE CASCADE ON DELETE CASCADE,
   ------------
   is_owner   boolean NOT NULL DEFAULT FALSE,
-  CONSTRAINT players_personas_primary_key
-  PRIMARY KEY (player_id, persona_id),
   CONSTRAINT players_personas_narrator_not_borrower
-  CHECK (NOT (player_id = 1 AND is_owner IS FALSE)));
+  CHECK (NOT (player_id IS NULL AND is_owner IS FALSE)));
+
+-- Unique partial indices to ensure uniqueness in the players-personas table.
+CREATE UNIQUE INDEX players_personas_index
+  ON players_personas (player_id, persona_id)
+  WHERE player_id IS NOT NULL;
+
+CREATE UNIQUE INDEX players_personas_narrator_index
+  ON players_personas (persona_id)
+  WHERE player_id IS NULL;
+
 
 
 
@@ -119,7 +127,7 @@ CREATE TABLE timeline (
 CREATE TABLE chapter (
   name           text      NOT NULL,
   timeline_id    integer   NOT NULL REFERENCES timeline(id)
-                                   ON UPDATE CASCADE ON DELETE CASCADE,
+                           ON UPDATE CASCADE ON DELETE CASCADE,
   ------------
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now(),
@@ -130,10 +138,10 @@ CREATE TABLE chapter (
 -- Creates the post table
 CREATE TABLE post (
   contents       text      NOT NULL,
-  player_id      integer   NOT NULL DEFAULT 0 REFERENCES player(id)
-                           ON UPDATE CASCADE ON DELETE SET DEFAULT,
-  persona_id     integer   NOT NULL DEFAULT 0 REFERENCES persona(id)
-                           ON UPDATE CASCADE ON DELETE SET DEFAULT,
+  player_id      integer   NULL REFERENCES player(id)
+                           ON UPDATE CASCADE ON DELETE SET NULL,
+  persona_id     integer   NULL REFERENCES persona(id)
+                           ON UPDATE CASCADE ON DELETE SET NULL,
   chapter_id     integer   NOT NULL REFERENCES chapter(id)
                            ON UPDATE CASCADE ON DELETE CASCADE,
   ------------
@@ -165,8 +173,7 @@ CREATE TABLE chapter_permission (
   chapter_id       integer                 NOT NULL REFERENCES chapter(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT chapter_permission_player_or_group
-  CHECK ((player_id IS NULL     AND player_group_id IS NOT NULL) OR
-         (player_id IS NOT NULL AND player_group_id IS NULL)));
+  CHECK (NOT (player_id IS NOT NULL AND player_group_id IS NOT NULL)));
 
 -- Unique partial indices to ensure uniqueness in the chapter permission table.
 CREATE UNIQUE INDEX chapter_permission_player_index
@@ -176,6 +183,10 @@ CREATE UNIQUE INDEX chapter_permission_player_index
 CREATE UNIQUE INDEX chapter_permission_player_group_index
   ON chapter_permission (player_group_id, permission, chapter_id)
   WHERE player_group_id IS NOT NULL;
+
+CREATE UNIQUE INDEX chapter_permission_global_index
+  ON chapter_permission ( permission, chapter_id)
+  WHERE player_id IS NULL AND player_group_id IS NULL;
 
 
 
@@ -200,3 +211,7 @@ CREATE UNIQUE INDEX timeline_permission_player_index
 CREATE UNIQUE INDEX timeline_permission_player_group_index
   ON timeline_permission (player_group_id, permission, timeline_id)
   WHERE player_group_id IS NOT NULL;
+
+CREATE UNIQUE INDEX timeline_permission_global_index
+  ON timeline_permission (permission, timeline_id)
+  WHERE player_id IS NULL AND player_group_id IS NULL;
