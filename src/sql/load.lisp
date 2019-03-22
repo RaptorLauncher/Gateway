@@ -7,11 +7,11 @@
 
 ;;; Install / Uninstall
 
-(defvar *sql-base-path*
-  (asdf:system-relative-pathname :gateway.sql "yesql/"))
+(defvar *install-sql-base-path*
+  (asdf:system-relative-pathname :gateway.sql "install/"))
 
 (defun execute-file-with-transaction (filename)
-  (let* ((pathname (merge-pathnames filename *sql-base-path*)))
+  (let* ((pathname (merge-pathnames filename *install-sql-base-path*)))
     (postmodern:with-transaction ()
       (execute-file pathname))))
 
