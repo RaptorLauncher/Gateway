@@ -192,6 +192,7 @@ CREATE TABLE timeline_permission (
   CHECK ((player_id IS NULL     AND player_group_id IS NOT NULL) OR
          (player_id IS NOT NULL AND player_group_id IS NULL)));
 
+-- Unique partial indices to ensure uniqueness in the timeline permission table.
 CREATE UNIQUE INDEX timeline_permission_player_index
   ON timeline_permission (player_id, permission, timeline_id)
   WHERE player_id IS NOT NULL;

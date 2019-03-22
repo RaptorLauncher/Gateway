@@ -28,7 +28,7 @@ CREATE FUNCTION player_ensure_narrator() RETURNS trigger AS $$
     IF OLD.id = 0 THEN
       RAISE EXCEPTION 'Cannot modify the default Narrator player.' USING ERRCODE = 'GW001';
     END IF;
-    RETURN OLD;
+    RETURN NEW;
   END;
 $$ LANGUAGE plpgsql;
 
@@ -41,7 +41,7 @@ CREATE TRIGGER player_ensure_narrator BEFORE UPDATE OR DELETE ON player
 CREATE FUNCTION player_group_insert_into_everyone() RETURNS trigger AS $$
   BEGIN
     INSERT INTO players_groups(player_id, player_group_id)
-      VALUES(NEW.player_id, 0);
+      VALUES(NEW.id, 0);
     RETURN NEW;
   END;
 $$ LANGUAGE plpgsql;
