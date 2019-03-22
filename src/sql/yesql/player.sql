@@ -25,8 +25,8 @@ SELECT * from player
 -- name: select-players-by-display-name
 -- Retrieves all players whose display name is similar to the argument.
 -- TODO https://www.rdegges.com/2013/easy-fuzzy-text-searching-with-postgresql/
-SELECT * from player
-  WHERE display_name ~ ?;
+SELECT *, display_name <-> ? AS distance FROM player
+  ORDER BY distance LIMIT 10;
 
 
 

@@ -13,8 +13,8 @@ SELECT * from player_group
 -- name: select-player-groups-by-name
 -- Selects player groups whose name is similar to the argument.
 -- TODO https://www.rdegges.com/2013/easy-fuzzy-text-searching-with-postgresql/
-SELECT * from player_group
-  WHERE name ~ ?;
+SELECT *, name <-> ? AS distance FROM player_group
+  ORDER BY distance LIMIT 10;
 
 
 
