@@ -32,7 +32,8 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *sql-imports*
-    '((player . "player.sql"))))
+    '((player . "player.sql")
+      (player-group . "player-group.sql"))))
 
 (defun rebuild ()
   (let ((*package* (find-package :gateway/sql)))
