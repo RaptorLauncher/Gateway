@@ -16,9 +16,9 @@
                ;; #:gateway.utils
                ;; #:gateway.protocol
                #:gateway.config
-               )
+               #:cl-postgres+local-time)
   :serial t
   :components ((:file "package")
                (:file "connections")
-               ;; (:file "load")
+               (:file "load")
                ))

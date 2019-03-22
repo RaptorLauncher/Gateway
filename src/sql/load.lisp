@@ -1,9 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Gateway
+;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2017
 ;;;; sql/load.lisp
-
-;;; TODO unify ;;;; GATEWAY and ;;;; Gateway
 
 (in-package #:gateway/sql)
 
@@ -25,7 +23,7 @@
 
 (defun reinstall ()
   (uninstall)
-  (reinstall))
+  (install))
 
 ;;; CL-YESQL functions
 

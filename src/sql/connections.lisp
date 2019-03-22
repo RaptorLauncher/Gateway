@@ -17,12 +17,17 @@ database."
               :test-db-port :test-db-use-ssl)
      ,@body))
 
+(defvar *sql-readtable* (cl-postgres:copy-sql-readtable))
+
+(local-time:set-local-time-cl-postgres-readers *sql-readtable*)
+
 (defmacro %with-db
     ((name-var user-var pass-var host-var port-var ssl-var) &body body)
   (with-gensyms (name user pass host port ssl)
     `(let* ((,name (config ,name-var)) (,user (config ,user-var))
             (,pass (config ,pass-var)) (,host (config ,host-var))
-            (,port (config ,port-var)) (,ssl (config ,ssl-var)))
+            (,port (config ,port-var)) (,ssl (config ,ssl-var))
+            (cl-postgres:*sql-readtable* *sql-readtable*))
        (postmodern:with-connection (list ,name ,user ,pass ,host
                                          :port ,port :use-ssl ,ssl :pooled-p t)
          ,@body))))
