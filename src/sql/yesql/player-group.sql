@@ -11,8 +11,7 @@ SELECT * from player_group
   WHERE id = ?;
 
 -- name: select-player-groups-by-name
--- Selects player groups whose name is similar to the argument.
--- TODO https://www.rdegges.com/2013/easy-fuzzy-text-searching-with-postgresql/
+-- Selects an ordered list of player groups whose name is similar to the argument.
 SELECT *, name <-> ? AS distance FROM player_group
   ORDER BY distance LIMIT 10;
 

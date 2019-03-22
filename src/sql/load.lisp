@@ -19,8 +19,7 @@
   (execute-file-with-transaction "uninstall.sql"))
 
 (defun install ()
-  (execute-file-with-transaction "install.sql")
-  (execute-file-with-transaction "install-triggers.sql"))
+  (execute-file-with-transaction "install.sql"))
 
 (defun reinstall ()
   (uninstall)

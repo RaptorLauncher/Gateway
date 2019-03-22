@@ -8,23 +8,22 @@ INSERT INTO player (login, email, display_name, pass_hash, pass_salt)
 
 
 -- name: select-player-by-id @row
--- Retrieves a player whose ID matches the argument.
+-- Selects a player whose ID matches the argument.
 SELECT * from player
   WHERE id = ?;
 
 -- name: select-player-by-login @row
--- Retrieves a player whose login matches the argument.
+-- Selects a player whose login matches the argument.
 SELECT * from player
   WHERE login = ?;
 
 -- name: select-player-by-email @row
--- Retrieves a player whose email matches the argument.
+-- Selects a player whose email matches the argument.
 SELECT * from player
   WHERE email = lower(?);
 
 -- name: select-players-by-display-name
--- Retrieves all players whose display name is similar to the argument.
--- TODO https://www.rdegges.com/2013/easy-fuzzy-text-searching-with-postgresql/
+-- Selects an ordered list of players whose display name is similar to the argument.
 SELECT *, display_name <-> ? AS distance FROM player
   ORDER BY distance LIMIT 10;
 
