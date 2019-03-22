@@ -168,6 +168,7 @@ CREATE TABLE chapter_permission (
   CHECK ((player_id IS NULL     AND player_group_id IS NOT NULL) OR
          (player_id IS NOT NULL AND player_group_id IS NULL)));
 
+-- Unique partial indices to ensure uniqueness in the chapter permission table.
 CREATE UNIQUE INDEX chapter_permission_player_index
   ON chapter_permission (player_id, permission, chapter_id)
   WHERE player_id IS NOT NULL;
