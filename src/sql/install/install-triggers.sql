@@ -71,7 +71,7 @@ CREATE TRIGGER players_groups_never_remove_everyone AFTER UPDATE OR DELETE ON pl
 INSERT INTO persona(id, name)
   VALUES (0, 'Narrator');
 
-INSERT INTO owners_borrowers(player_id, persona_id, is_owner)
+INSERT INTO players_personas(player_id, persona_id, is_owner)
   VALUES (0, 0, TRUE);
 
 CREATE FUNCTION persona_ensure_narrator() RETURNS trigger AS $$

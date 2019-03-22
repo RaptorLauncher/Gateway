@@ -90,17 +90,17 @@ CREATE TABLE persona (
 
 
 
--- Creates the owners and borrowers table.
-CREATE TABLE owners_borrowers (
+-- Creates the players and personas table.
+CREATE TABLE players_personas (
   player_id  integer NOT NULL DEFAULT 0 REFERENCES player(id)
                      ON UPDATE CASCADE ON DELETE SET DEFAULT,
   persona_id integer NOT NULL REFERENCES persona(id)
                      ON UPDATE CASCADE ON DELETE CASCADE,
   ------------
   is_owner   boolean NOT NULL DEFAULT FALSE,
-  CONSTRAINT owners_borrowers_primary_key
+  CONSTRAINT players_personas_primary_key
   PRIMARY KEY (player_id, persona_id),
-  CONSTRAINT owners_borrowers_narrator_not_borrower
+  CONSTRAINT players_personas_narrator_not_borrower
   CHECK (NOT (player_id = 1 AND is_owner IS FALSE)));
 
 
