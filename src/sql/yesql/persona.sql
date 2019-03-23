@@ -11,7 +11,7 @@ INSERT INTO persona (name, description)
 SELECT id, name, description, creation_time, last_edit_time FROM persona
   WHERE id = ? LIMIT 1;
 
--- name: select-personas-by-name @row
+-- name: select-personas-by-name
 -- Selects an ordered list of personas whose name matches the argument.
 -- At most :LIMIT players are returned.
 SELECT id, name, description, creation_time, last_edit_time FROM persona

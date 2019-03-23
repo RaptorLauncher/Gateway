@@ -35,7 +35,9 @@
   (defparameter *sql-imports*
     '((player . "player.sql")
       (player-group . "player-group.sql")
-      (players-groups . "players-groups.sql"))))
+      (players-groups . "players-groups.sql")
+      (persona . "persona.sql")
+      (players-personas . "players-personas.sql"))))
 
 (defun rebuild ()
   (let ((*package* (find-package :gateway/sql)))
