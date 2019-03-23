@@ -118,6 +118,7 @@ CREATE TABLE timeline (
   id             serial    NOT NULL PRIMARY KEY,
   ------------
   name           text      NOT NULL,
+  description    text      NOT NULL DEFAULT '',
   ------------
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now());
@@ -128,16 +129,17 @@ CREATE TABLE timeline (
 CREATE TABLE chapter (
   id             serial    NOT NULL PRIMARY KEY,
   ------------
-  name           text      NOT NULL,
   timeline_id    integer   NOT NULL REFERENCES timeline(id)
                            ON UPDATE CASCADE ON DELETE CASCADE,
+  name           text      NOT NULL,
+  description    text      NOT NULL DEFAULT '',
   ------------
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now());
 
 
 
--- Creates the post table
+-- Creates the post table.
 CREATE TABLE post (
   id             serial    NOT NULL PRIMARY KEY,
   ------------

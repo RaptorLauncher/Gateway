@@ -1,7 +1,7 @@
 -- name: add-player-into-player-group @execute
 -- Adds a player to a player group.
-INSERT INTO players_groups (player_id, player_group_id)
-  VALUES(?, ?);
+INSERT INTO players_groups (player_id, player_group_id, is_owner)
+  VALUES(?, ?, ?);
 
 
 
