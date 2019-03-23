@@ -9,23 +9,28 @@ INSERT INTO player (login, email, display_name, pass_hash, pass_salt)
 
 -- name: select-player-by-id @row
 -- Selects a player whose ID matches the argument.
-SELECT * from player
-  WHERE id = ?;
+SELECT id, login, email, display_name, pass_hash, pass_salt,
+       activatedp, creation_time, last_edit_time FROM player
+  WHERE id = ? LIMIT 1;
 
 -- name: select-player-by-login @row
 -- Selects a player whose login matches the argument.
-SELECT * from player
-  WHERE login = ?;
+SELECT id, login, email, display_name, pass_hash, pass_salt,
+       activatedp, creation_time, last_edit_time FROM player
+  WHERE login = ? LIMIT 1;
 
 -- name: select-player-by-email @row
 -- Selects a player whose email matches the argument.
-SELECT * from player
-  WHERE email = lower(?);
+SELECT id, login, email, display_name, pass_hash, pass_salt,
+       activatedp, creation_time, last_edit_time FROM player
+  WHERE email = lower(?) LIMIT 1;
 
 -- name: select-players-by-display-name
 -- Selects an ordered list of players whose display name is similar to the argument.
-SELECT *, display_name <-> ? AS distance FROM player
-  ORDER BY distance LIMIT 10;
+-- At most :LIMIT players are returned.
+SELECT id, login, email, display_name, pass_hash, pass_salt,
+       activatedp, creation_time, last_edit_time FROM player
+  ORDER BY display_name <-> ? LIMIT :limit;
 
 
 

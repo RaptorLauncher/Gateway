@@ -36,6 +36,8 @@ CREATE TYPE timeline_permission_type AS ENUM (
 
 -- Creates the player table.
 CREATE TABLE player (
+  id             serial    NOT NULL PRIMARY KEY,
+  ------------
   login          text      NOT NULL UNIQUE,
   email          text      NOT NULL UNIQUE,
   display_name   text      NOT NULL,
@@ -45,7 +47,6 @@ CREATE TABLE player (
   activatedp     boolean   NOT NULL DEFAULT FALSE,
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now(),
-  id             serial    NOT NULL PRIMARY KEY,
   CONSTRAINT player_name_valid
   CHECK (login ~ '^[a-zA-Z0-9]{3,}$'),
   CONSTRAINT player_display_name_not_empty
@@ -57,10 +58,11 @@ CREATE TABLE player (
 
 -- Creates the player group table.
 CREATE TABLE player_group (
+  id          serial NOT NULL PRIMARY KEY,
+  ------------
   name        text   NOT NULL,
   ------------
-  description text   NOT NULL DEFAULT '',
-  id          serial NOT NULL PRIMARY KEY);
+  description text   NOT NULL DEFAULT '');
 
 
 
@@ -79,12 +81,13 @@ CREATE TABLE players_groups (
 
 -- Creates the persona table.
 CREATE TABLE persona (
+  id             serial    NOT NULL PRIMARY KEY,
+  ------------
   name           text      NOT NULL,
   ------------
   description    text      NOT NULL DEFAULT '',
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now(),
-  id             serial    NOT NULL PRIMARY KEY,
   CONSTRAINT persona_name_not_empty
   CHECK (name <> ''));
 
@@ -115,39 +118,42 @@ CREATE UNIQUE INDEX players_personas_narrator_index
 
 -- Creates the timeline table.
 CREATE TABLE timeline (
+  id             serial    NOT NULL PRIMARY KEY,
+  ------------
   name           text      NOT NULL,
   ------------
   creation_time  timestamp NOT NULL DEFAULT now(),
-  last_edit_time timestamp NOT NULL DEFAULT now(),
-  id             serial    NOT NULL PRIMARY KEY);
+  last_edit_time timestamp NOT NULL DEFAULT now());
 
 
 
 -- Creates the chapter table.
 CREATE TABLE chapter (
+  id             serial    NOT NULL PRIMARY KEY,
+  ------------
   name           text      NOT NULL,
   timeline_id    integer   NOT NULL REFERENCES timeline(id)
                            ON UPDATE CASCADE ON DELETE CASCADE,
   ------------
   creation_time  timestamp NOT NULL DEFAULT now(),
-  last_edit_time timestamp NOT NULL DEFAULT now(),
-  id             serial    NOT NULL PRIMARY KEY);
+  last_edit_time timestamp NOT NULL DEFAULT now());
 
 
 
 -- Creates the post table
 CREATE TABLE post (
-  contents       text      NOT NULL,
+  id             serial    NOT NULL PRIMARY KEY,
+  ------------
   player_id      integer   NULL REFERENCES player(id)
                            ON UPDATE CASCADE ON DELETE SET NULL,
   persona_id     integer   NULL REFERENCES persona(id)
                            ON UPDATE CASCADE ON DELETE SET NULL,
   chapter_id     integer   NOT NULL REFERENCES chapter(id)
                            ON UPDATE CASCADE ON DELETE CASCADE,
+  contents       text      NOT NULL,
   ------------
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now(),
-  id             serial    NOT NULL PRIMARY KEY,
   chapter_order  serial    NOT NULL);
 
 
@@ -165,9 +171,9 @@ CREATE TABLE chapter_link (
 
 -- Creates the chapter permission table.
 CREATE TABLE chapter_permission (
-  player_id        integer                 REFERENCES player(id)
+  player_id        integer                 NULL REFERENCES player(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
-  player_group_id  integer                 REFERENCES player_group(id)
+  player_group_id  integer                 NULL REFERENCES player_group(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
   permission       chapter_permission_type NOT NULL,
   chapter_id       integer                 NOT NULL REFERENCES chapter(id)
@@ -192,9 +198,9 @@ CREATE UNIQUE INDEX chapter_permission_global_index
 
 -- Creates the timeline permission table.
 CREATE TABLE timeline_permission (
-  player_id       integer                  REFERENCES player(id)
+  player_id       integer                  NULL REFERENCES player(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
-  player_group_id integer                  REFERENCES player_group(id)
+  player_group_id integer                  NULL REFERENCES player_group(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
   permission      timeline_permission_type NOT NULL,
   timeline_id     integer                  NOT NULL REFERENCES timeline(id)
