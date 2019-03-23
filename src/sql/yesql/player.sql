@@ -1,36 +1,36 @@
 -- name: insert-player @single
 -- Inserts a new player into the database.
-INSERT INTO player (login, email, display_name, pass_hash, pass_salt)
-  VALUES(:login, lower(:email), :display_name,
+INSERT INTO player (login, email, name, pass_hash, pass_salt)
+  VALUES(:login, lower(:email), :name,
          decode(:hash, 'hex'), decode(:salt, 'hex'))
   RETURNING id;
 
 
 
 -- name: select-player-by-id @row
--- Selects a player whose ID matches the argument.
-SELECT id, login, email, display_name, pass_hash, pass_salt,
+-- Returns a player whose ID matches the argument.
+SELECT id, login, email, name, pass_hash, pass_salt,
        activatedp, creation_time, last_edit_time FROM player
   WHERE id = ? LIMIT 1;
 
 -- name: select-player-by-login @row
--- Selects a player whose login matches the argument.
-SELECT id, login, email, display_name, pass_hash, pass_salt,
+-- Returns a player whose login matches the argument.
+SELECT id, login, email, name, pass_hash, pass_salt,
        activatedp, creation_time, last_edit_time FROM player
   WHERE login = ? LIMIT 1;
 
 -- name: select-player-by-email @row
--- Selects a player whose email matches the argument.
-SELECT id, login, email, display_name, pass_hash, pass_salt,
+-- Returns a player whose email matches the argument.
+SELECT id, login, email, name, pass_hash, pass_salt,
        activatedp, creation_time, last_edit_time FROM player
   WHERE email = lower(?) LIMIT 1;
 
--- name: select-players-by-display-name
--- Selects an ordered list of players whose display name is similar to the argument.
+-- name: select-players-by-name
+-- Returns an ordered list of players whose name is similar to the argument.
 -- At most :LIMIT players are returned.
-SELECT id, login, email, display_name, pass_hash, pass_salt,
+SELECT id, login, email, name, pass_hash, pass_salt,
        activatedp, creation_time, last_edit_time FROM player
-  ORDER BY display_name <-> ? LIMIT :limit;
+  ORDER BY name <-> ? LIMIT :limit;
 
 
 
@@ -44,9 +44,9 @@ UPDATE player SET login = ?, last_edit_time = now()
 UPDATE player SET email = ?, last_edit_time = now()
   WHERE id = ?;
 
--- name: update-player-display-name-by-id @execute
--- Sets the display name of the player with the provided ID.
-UPDATE player SET display_name = ?, last_edit_time = now()
+-- name: update-player-name-by-id @execute
+-- Sets the name of the player with the provided ID.
+UPDATE player SET name = ?, last_edit_time = now()
   WHERE id = ?;
 
 -- name: update-player-password-by-id @execute

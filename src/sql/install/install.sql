@@ -40,17 +40,17 @@ CREATE TABLE player (
   ------------
   login          text      NOT NULL UNIQUE,
   email          text      NOT NULL UNIQUE,
-  display_name   text      NOT NULL,
-  pass_hash      bytea     NOT NULL,
-  pass_salt      bytea     NOT NULL,
+  name           text      NOT NULL,
   ------------
+  pass_hash      bytea     NOT NULL DEFAULT ''::bytea,
+  pass_salt      bytea     NOT NULL DEFAULT ''::bytea,
   activatedp     boolean   NOT NULL DEFAULT FALSE,
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now(),
-  CONSTRAINT player_name_valid
+  CONSTRAINT player_login_valid
   CHECK (login ~ '^[a-zA-Z0-9]{3,}$'),
-  CONSTRAINT player_display_name_not_empty
-  CHECK (display_name <> ''),
+  CONSTRAINT player_name_not_empty
+  CHECK (name <> ''),
   CONSTRAINT player_email_valid
   CHECK (email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'));
 
@@ -62,11 +62,13 @@ CREATE TABLE player_group (
   ------------
   name        text   NOT NULL,
   ------------
-  description text   NOT NULL DEFAULT '');
+  description text   NOT NULL DEFAULT '',
+  CONSTRAINT player_group_name_not_empty
+  CHECK (name <> ''));
 
 
 
--- Creates the table bindings players to player groups.
+-- Creates the table binding players to player groups.
 CREATE TABLE players_groups (
   player_id       integer NOT NULL REFERENCES player(id)
                           ON UPDATE CASCADE ON DELETE CASCADE,
@@ -93,26 +95,21 @@ CREATE TABLE persona (
 
 
 
--- Creates the players and personas table.
+-- Creates the table binding players to personas.
 CREATE TABLE players_personas (
-  player_id  integer NULL REFERENCES player(id)
-                     ON UPDATE CASCADE ON DELETE SET NULL,
+  player_id  integer NOT NULL REFERENCES player(id)
+                     ON UPDATE CASCADE ON DELETE CASCADE,
   persona_id integer NOT NULL REFERENCES persona(id)
                      ON UPDATE CASCADE ON DELETE CASCADE,
   ------------
   is_owner   boolean NOT NULL DEFAULT FALSE,
-  CONSTRAINT players_personas_narrator_not_borrower
-  CHECK (NOT (player_id IS NULL AND is_owner IS FALSE)));
+  CONSTRAINT players_personas_primary_key
+  PRIMARY KEY (player_id, persona_id));
 
--- Unique partial indices to ensure uniqueness in the players-personas table.
-CREATE UNIQUE INDEX players_personas_index
-  ON players_personas (player_id, persona_id)
-  WHERE player_id IS NOT NULL;
-
-CREATE UNIQUE INDEX players_personas_narrator_index
+-- Assure there may be only one owner of any persona.
+CREATE UNIQUE INDEX players_personas_only_one_owner
   ON players_personas (persona_id)
-  WHERE player_id IS NULL;
-
+  WHERE is_owner = TRUE;
 
 
 

@@ -6,12 +6,12 @@ INSERT INTO player_group (name)
 
 
 -- name: select-player-group-by-id @row
--- Selects a player group whose ID matches the argument.
+-- Returns a player group whose ID matches the argument.
 SELECT id, name, description FROM player_group
   WHERE id = ?;
 
 -- name: select-player-groups-by-name
--- Selects an ordered list of player groups whose name is similar to the argument.
+-- Returns an ordered list of player groups whose name is similar to the argument.
 -- At most :LIMIT player groups are returned.
 SELECT id, name, description FROM player_group
   ORDER BY name <-> ? LIMIT :limit;

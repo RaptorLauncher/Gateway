@@ -18,12 +18,14 @@
 (defun uninstall ()
   (execute-file-with-transaction "uninstall.sql"))
 
-(defun install ()
-  (execute-file-with-transaction "install.sql"))
+(defun install (&optional dummy-data-p)
+  (execute-file-with-transaction "install.sql")
+  (when dummy-data-p
+    (execute-file-with-transaction "dummy-data.sql")))
 
-(defun reinstall ()
+(defun reinstall (&optional dummy-data-p)
   (uninstall)
-  (install))
+  (install dummy-data-p))
 
 ;;; CL-YESQL functions
 
@@ -32,7 +34,8 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *sql-imports*
     '((player . "player.sql")
-      (player-group . "player-group.sql"))))
+      (player-group . "player-group.sql")
+      (players-groups . "players-groups.sql"))))
 
 (defun rebuild ()
   (let ((*package* (find-package :gateway/sql)))
