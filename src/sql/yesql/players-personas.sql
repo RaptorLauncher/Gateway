@@ -29,3 +29,17 @@ SELECT p.id, p.login, p.email, p.name, p.pass_hash, p.pass_salt,
 SELECT p.id, p.name, p.description, p.creation_time, p.last_edit_time, g.is_owner
   FROM persona as p, players_personas AS g
   WHERE p.id = g.persona_id AND g.player_id = ?;
+
+
+
+-- name: update-persona-owner @execute
+-- Sets whether the provided player is the owner of the provided persona.
+UPDATE players_personas SET is_owner = ?
+  WHERE player_id = ? AND persona_id = ?;
+
+
+
+-- name: remove-persona-from-player @execute
+-- Removes a persona from a given player.
+DELETE FROM players_personas
+  WHERE player_id = ? AND persona_id = ?;
