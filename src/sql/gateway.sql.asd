@@ -43,4 +43,9 @@
   :serial t
   :pathname "t/" ;; TODO implement everywhere
   :components ((:file "package")
-               (:file "tests")))
+               (:file "framework")
+               (:file "player")
+               (:file "player-group")
+               (:file "players-groups")
+               (:file "persona")
+               (:file "players-personas")))
