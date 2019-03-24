@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; sql/package.lisp
+;;;; sql/src/package.lisp
 
-(uiop:define-package #:gateway/sql
+(uiop:define-package #:gateway.sql
   (:use #:common-lisp
         #:alexandria
         #:cl-yesql

@@ -1,7 +1,7 @@
 -- name: insert-player-group @single
 -- Inserts a new player group into the database.
-INSERT INTO player_group (name)
-  VALUES(:name) RETURNING id;
+INSERT INTO player_group (name, description)
+  VALUES(:name, :description) RETURNING id;
 
 
 

@@ -45,5 +45,5 @@ value was not found."
 (default-config "gateway" :test-db-pass)
 (default-config "localhost" :test-db-host)
 (default-config 5432 :test-db-port)
-(default-config "gateway-test" :test-db-name)
+(default-config "gateway_test" :test-db-name)
 (default-config :yes :test-db-use-ssl)

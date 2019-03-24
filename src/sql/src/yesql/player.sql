@@ -1,8 +1,8 @@
 -- name: insert-player @single
 -- Inserts a new player into the database.
-INSERT INTO player (login, email, name, pass_hash, pass_salt)
+INSERT INTO player (login, email, name, pass_hash, pass_salt, activatedp)
   VALUES(:login, lower(:email), :name,
-         decode(:hash, 'hex'), decode(:salt, 'hex'))
+         decode(:hash, 'hex'), decode(:salt, 'hex'), :activatedp)
   RETURNING id;
 
 
@@ -51,7 +51,8 @@ UPDATE player SET name = ?, last_edit_time = now()
 
 -- name: update-player-password-by-id @execute
 -- Sets the password hash and salt of the player with the provided ID.
-UPDATE player SET pass_hash = ?, pass_salt = ?, last_edit_time = now()
+UPDATE player SET pass_hash = decode(?, 'hex'), pass_salt = decode(?, 'hex'),
+                  last_edit_time = now()
   WHERE id = ?;
 
 -- name: update-player-activatedp-by-id @execute

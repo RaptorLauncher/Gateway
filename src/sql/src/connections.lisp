@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2017
-;;;; sql/connections.lisp
+;;;; sql/src/connections.lisp
 
-(in-package #:gateway/sql)
+(in-package #:gateway.sql)
 
 (defvar *sql-readtable* (cl-postgres:copy-sql-readtable))
 

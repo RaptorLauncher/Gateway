@@ -48,7 +48,7 @@ CREATE TABLE player (
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now(),
   CONSTRAINT player_login_valid
-  CHECK (login ~ '^[a-zA-Z0-9]{3,}$'),
+  CHECK (login ~ '^[a-zA-Z0-9._-]{3,}$'),
   CONSTRAINT player_name_not_empty
   CHECK (name <> ''),
   CONSTRAINT player_email_valid
