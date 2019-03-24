@@ -6,16 +6,78 @@
 (in-package #:gateway.sql/test)
 (in-readtable protest/parachute)
 
+;; TODO factor into multiple files
+
+(defvar *checked-exports*)
+(defvar *exports*)
+
+(defparameter *warn-on-untested-symbols* t)
+
+(defun compute-exports ()
+  (let ((exports (loop with package = (find-package '#:gateway.sql)
+                       for x being the external-symbols of package
+                       collect x))
+        (ignored '(install uninstall reinstall with-db with-test-db)))
+    (set-difference exports ignored)))
+
+;;; FIXME: Most of this hack should go away when Shinmera implements running
+;;; code around tests in a test suite.
+
+(defmacro define-test (name &body arguments-and-body)
+  `(protest/parachute:define-test ,name
+     ,@arguments-and-body
+     (flet ((walk (x)
+              (when (and (symbolp x)
+                         (boundp '*checked-exports*)
+                         (boundp '*exports*)
+                         (member x *exports*))
+                (pushnew x *checked-exports*))))
+       (serapeum:walk-tree #'walk ',arguments-and-body))))
+
+(defun test (&rest args)
+  (let ((*checked-exports* '())
+        (*exports* (compute-exports)))
+    (apply #'protest/parachute:test args)
+    (when *warn-on-untested-symbols*
+      (when-let ((diff (set-difference *exports* *checked-exports*)))
+        (warn "~D/~D symbols untested.~{~%~S~}"
+              (length diff) (length *exports*) diff)))))
+
 ;;; TODO reader tests on dummy data
+;;; TODO constraint and correctness tests
+
+(defvar *test-tables-empty-query*
+  "SELECT table_name,
+          (xpath('/row/count/text()',
+           query_to_xml('select count(*) from '||format('%I.%I', table_schema, table_name),
+                        true, true, '')))[1]::text::int AS row_count
+    FROM information_schema.tables
+    WHERE table_schema = 'public';")
+
+(defun test-tables-empty ()
+  (loop with result = (pomo:query *test-tables-empty-query*)
+        for (name count) in result
+        unless (= 0 count)
+          do (error "Cleanup failure: table ~S has ~D entries after the test.
+~S" name count (pomo:query "SELECT * FROM $1" name))))
+
+(defun table-empty-p (name)
+  (= 0 (pomo:query (uiop:strcat "SELECT COUNT(1) FROM " name) :single)))
 
 (defmacro with-sql-test (() &body body)
-  `(with-test-db ()
-     (handler-bind ((error (lambda (e) (declare (ignore e)) (reinstall))))
-       ,@body)))
+  (with-gensyms (errorp e)
+    `(let ((,errorp nil))
+       (handler-bind ((error (lambda (,e) (setf ,errorp ,e))))
+         (unwind-protect
+              (with-test-db ()
+                ,@body
+                (test-tables-empty))
+           (when ,errorp (with-test-db () (reinstall))))))))
 
 ;;; Player tests
 
 (define-test-case player
+    ;; TODO this is a positive scenario, add negative tests
     (:documentation "Test suite for the player table."
      :tags (:gateway :sql :suite :player)))
 
@@ -118,3 +180,66 @@
         (false (select-player-group-by-id inserted-id))
         (false (first (select-player-groups-by-name (getf test-data :name)
                                                     :limit 1)))))))
+
+(define-test-case players-groups
+    (:documentation "Test suite for the table mapping players to player groups."
+     :tags (:gateway :sql :suite :player :player-group :players-groups)))
+
+(define-test players-groups
+  :parent sql
+  (with-sql-test ()
+    (let* ((player-1 '(:login "gateway-01-test"
+                       :email "gateway01@te.st"
+                       :name "Gateway 01 Test"))
+           (player-2 '(:login "gateway-02-test"
+                       :email "gateway02@te.st"
+                       :name "Gateway 02 Test"))
+           (player-3 '(:login "gateway-03-test"
+                       :email "gateway03@te.st"
+                       :name "Gateway 03 Test"))
+           (group-1 '(:name "Test Player Group 01"))
+           (group-2 '(:name "Test Player Group 02")))
+      (destructuring-bind (pid1 pid2 pid3)
+          (mapcar (curry #'apply #'insert-player
+                         :hash "" :salt "" :activatedp t)
+                  (list player-1 player-2 player-3))
+        (destructuring-bind (gid1 gid2)
+            (mapcar (curry #'apply #'insert-player-group :description "")
+                    (list group-1 group-2))
+          (add-player-into-player-group pid1 gid1 t)
+          (add-player-into-player-group pid2 gid1 nil)
+          (add-player-into-player-group pid1 gid2 t)
+          (is eq t (select-player-owner-of-group-p pid1 gid1))
+          (is eq nil (select-player-owner-of-group-p pid2 gid1))
+          (is eq :null (select-player-owner-of-group-p pid3 gid1))
+          (is eq t (select-player-owner-of-group-p pid1 gid2))
+          (is eq :null (select-player-owner-of-group-p pid2 gid2))
+          (is eq :null (select-player-owner-of-group-p pid3 gid2))
+          (flet ((verify (gid result)
+                   (let* ((fn (lambda (x) (list (first x) (tenth x))))
+                          (results (select-players-belonging-to-group gid))
+                          (results (mapcar fn results)))
+                     (true (set-equal results result :test #'equal)))))
+            (verify gid1 `((,pid1 t) (,pid2 nil)))
+            (verify gid2 `((,pid1 t))))
+          (flet ((verify (pid result)
+                   (let* ((fn (lambda (x) (list (first x) (fourth x))))
+                          (results (select-groups-player-belongs-to pid))
+                          (results (mapcar fn results)))
+                     (true (set-equal results result :test #'equal)))))
+            (verify pid1 `((,gid1 t) (,gid2 t)))
+            (verify pid2 `((,gid1 nil)))
+            (verify pid3 '()))
+          (update-player-group-owner t pid2 gid1)
+          (is eq t (select-player-owner-of-group-p pid2 gid1))
+          (update-player-group-owner nil pid2 gid1)
+          (is eq nil (select-player-owner-of-group-p pid2 gid1))
+          (remove-player-from-player-group pid1 gid1)
+          (is eq :null (select-player-owner-of-group-p pid1 gid1))
+          (remove-player-from-player-group pid3 gid1)
+          (is eq :null (select-player-owner-of-group-p pid3 gid1))
+          (remove-player-from-player-group pid1 gid2)
+          (is eq :null (select-player-owner-of-group-p pid1 gid2))
+          (true (table-empty-p "players_personas"))
+          (mapc #'delete-player-by-id (list pid1 pid2 pid3))
+          (mapc #'delete-player-group-by-id (list gid1 gid2)))))))

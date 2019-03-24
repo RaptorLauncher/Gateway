@@ -14,14 +14,18 @@ SELECT COALESCE
 
 -- name: select-players-belonging-to-group
 -- Returns all players belonging to the group with the provided ID.
+-- One additional column is returned stating whether that player is
+-- an owner of that group.
 SELECT p.id, p.login, p.email, p.name, p.pass_hash, p.pass_salt,
-       p.activatedp, p.creation_time, p.last_edit_time
+       p.activatedp, p.creation_time, p.last_edit_time, g.is_owner
   FROM player AS p, players_groups AS g
   WHERE g.player_group_id = ? AND g.player_id = p.id;
 
 -- name: select-groups-player-belongs-to
 -- Returns all groups the player with the provided ID belongs to.
-SELECT p.id, p.name, p.description
+-- One additional column is returned stating whether that player is
+-- an owner of that group.
+SELECT p.id, p.name, p.description, g.is_owner
   FROM player_group AS p, players_groups AS g
   WHERE g.player_id = ? AND g.player_group_id = p.id;
 
