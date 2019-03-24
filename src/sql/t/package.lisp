@@ -15,13 +15,4 @@
   (:import-from #:protest/parachute
                 #:true #:false #:is #:isnt #:is-values #:isnt-values :fail
                 #:protest/parachute)
-  (:export #:sql))
-
-(in-package #:gateway.sql/test)
-
-(define-test-case sql
-    (:documentation "Test suite for Gateway SQL layer."
-     :tags (:gateway :sql :suite)))
-
-(define-test sql)
-
+  (:export #:sql #:sql-positive #:sql-negative))

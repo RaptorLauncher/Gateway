@@ -44,6 +44,7 @@
   :pathname "t/" ;; TODO implement everywhere
   :components ((:file "package")
                (:file "framework")
+               (:file "suites")
                (:file "player")
                (:file "player-group")
                (:file "players-groups")

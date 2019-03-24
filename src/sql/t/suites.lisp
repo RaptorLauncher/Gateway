@@ -11,6 +11,12 @@
 ;;; TODO reader tests on dummy data
 ;;; TODO constraint and correctness tests
 
+(define-test-case sql
+    (:documentation "Test suite for Gateway SQL layer."
+     :tags (:gateway :sql :suite)))
+
+(define-test sql)
+
 (define-test-case sql-positive
     (:documentation "Test suite for positive SQL scenarios."
      :tags (:gateway :sql :suite :positive)))
