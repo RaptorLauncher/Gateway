@@ -1,8 +1,7 @@
 -- name: insert-player @single
 -- Inserts a new player into the database.
 INSERT INTO player (login, email, name, pass_hash, pass_salt, activatedp)
-  VALUES(:login, lower(:email), :name,
-         decode(:hash, 'hex'), decode(:salt, 'hex'), :activatedp)
+  VALUES(:login, lower(:email), :name, :hash, :salt, :activatedp)
   RETURNING id;
 
 

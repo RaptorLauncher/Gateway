@@ -10,6 +10,8 @@
         #:local-time
         #:named-readtables
         #:gateway.sql)
+  (:import-from #:serapeum
+                #:vector=)
   (:import-from #:protest/test-case
                 #:define-test-case)
   (:import-from #:protest/parachute

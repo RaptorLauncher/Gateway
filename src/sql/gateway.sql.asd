@@ -37,6 +37,7 @@
                #:phoe-toolbox
                #:local-time
                #:ironclad
+               #:serapeum
                #:named-readtables
                #:protest/test-case
                #:protest/parachute)

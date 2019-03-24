@@ -52,7 +52,11 @@ CREATE TABLE player (
   CONSTRAINT player_name_not_empty
   CHECK (name <> ''),
   CONSTRAINT player_email_valid
-  CHECK (email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'));
+  CHECK (email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'),
+  CONSTRAINT player_pass_hash_length
+  CHECK (length(pass_hash) <= 256),
+  CONSTRAINT player_pass_salt_length
+  CHECK (length(pass_salt) <= 256));
 
 
 
