@@ -50,8 +50,7 @@ UPDATE player SET name = ?, last_edit_time = now()
 
 -- name: update-player-password-by-id @execute
 -- Sets the password hash and salt of the player with the provided ID.
-UPDATE player SET pass_hash = decode(?, 'hex'), pass_salt = decode(?, 'hex'),
-                  last_edit_time = now()
+UPDATE player SET pass_hash = ?, pass_salt = ?, last_edit_time = now()
   WHERE id = ?;
 
 -- name: update-player-activatedp-by-id @execute

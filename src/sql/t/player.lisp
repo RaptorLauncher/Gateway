@@ -13,18 +13,12 @@
 (define-test player
   :parent sql-positive
   (with-sql-test ()
-    (let* ((test-data '(:login "gateway-01-test"
+    (let* ((test-data `(:login "gateway-01-test"
                         :email "gateway01@te.st"
                         :name "Gateway 01 Test"
-                        :hash (ironclad:hex-string-to-byte-array "01234567")
-                        :salt (ironclad:hex-string-to-byte-array "89abcdef")
+                        :hash ,(ironclad:hex-string-to-byte-array "01234567")
+                        :salt ,(ironclad:hex-string-to-byte-array "89abcdef")
                         :activatedp nil))
-           (mdf-test-data '(:login "gateway-02-test"
-                            :email "gateway02@te.st"
-                            :name "Gateway 02 Test"
-                            :hash (ironclad:hex-string-to-byte-array "76543210")
-                            :salt (ironclad:hex-string-to-byte-array "fedcba98")
-                            :activatedp t))
            (inserted-id (apply #'insert-player test-data)))
       (flet ((verify (selected-value)
                (destructuring-bind
@@ -35,10 +29,8 @@
                  (is string= login (getf test-data :login))
                  (is string= email (getf test-data :email))
                  (is string= name (getf test-data :name))
-                 (is vector= (ironclad:byte-array-to-hex-string hash)
-                     (getf test-data :hash))
-                 (is vector= (ironclad:byte-array-to-hex-string salt)
-                     (getf test-data :salt))
+                 (is vector= hash (getf test-data :hash))
+                 (is vector= salt (getf test-data :salt))
                  (true (eql (getf test-data :activatedp) activatedp))
                  (true (typep creation-time 'local-time:timestamp))
                  (true (typep last-edit-time 'local-time:timestamp)))))
@@ -47,35 +39,39 @@
         (verify (select-player-by-email (getf test-data :email)))
         (verify (first (select-players-by-name (getf test-data :name)
                                                :limit 1))))
-      (update-player-login-by-id (getf mdf-test-data :login) inserted-id)
-      (update-player-email-by-id (getf mdf-test-data :email) inserted-id)
-      (update-player-name-by-id (getf mdf-test-data :name) inserted-id)
-      (update-player-password-by-id (getf mdf-test-data :hash)
-                                    (getf mdf-test-data :salt)
-                                    inserted-id)
-      (update-player-activatedp-by-id (getf mdf-test-data :activatedp)
+      (let ((mdf-data `(:login "gateway-02-test"
+                        :email "gateway02@te.st"
+                        :name "Gateway 02 Test"
+                        :hash ,(ironclad:hex-string-to-byte-array "76543210")
+                        :salt ,(ironclad:hex-string-to-byte-array "fedcba98")
+                        :activatedp t)))
+        (update-player-login-by-id (getf mdf-data :login) inserted-id)
+        (update-player-email-by-id (getf mdf-data :email) inserted-id)
+        (update-player-name-by-id (getf mdf-data :name) inserted-id)
+        (update-player-password-by-id (getf mdf-data :hash)
+                                      (getf mdf-data :salt)
                                       inserted-id)
-      (destructuring-bind
-          (id login email name hash salt activatedp
-           creation-time last-edit-time)
-          (select-player-by-id inserted-id)
-        (is = id inserted-id)
-        (is string= login (getf mdf-test-data :login))
-        (is string= email (getf mdf-test-data :email))
-        (is string= name (getf mdf-test-data :name))
-        (is vector= (ironclad:byte-array-to-hex-string hash)
-            (getf mdf-test-data :hash))
-        (is vector= (ironclad:byte-array-to-hex-string salt)
-            (getf mdf-test-data :salt))
-        (true (eql (getf mdf-test-data :activatedp) activatedp))
-        (true (typep creation-time 'local-time:timestamp))
-        (true (typep last-edit-time 'local-time:timestamp)))
-      (delete-player-by-id inserted-id)
-      (false (select-player-by-id inserted-id))
-      (false (select-player-by-login (getf test-data :login)))
-      (false (select-player-by-email (getf test-data :email)))
-      (false (first (select-players-by-name (getf test-data :name)
-                                            :limit 1))))))
+        (update-player-activatedp-by-id (getf mdf-data :activatedp)
+                                        inserted-id)
+        (destructuring-bind
+            (id login email name hash salt activatedp
+             creation-time last-edit-time)
+            (select-player-by-id inserted-id)
+          (is = id inserted-id)
+          (is string= login (getf mdf-data :login))
+          (is string= email (getf mdf-data :email))
+          (is string= name (getf mdf-data :name))
+          (is vector= hash (getf mdf-data :hash))
+          (is vector= salt (getf mdf-data :salt))
+          (true (eql (getf mdf-data :activatedp) activatedp))
+          (true (typep creation-time 'local-time:timestamp))
+          (true (typep last-edit-time 'local-time:timestamp)))
+        (delete-player-by-id inserted-id)
+        (false (select-player-by-id inserted-id))
+        (false (select-player-by-login (getf test-data :login)))
+        (false (select-player-by-email (getf test-data :email)))
+        (false (first (select-players-by-name (getf test-data :name)
+                                              :limit 1)))))))
 
 (define-test-case player-negative
     (:documentation "Negative test suite for the player table."
@@ -90,6 +86,7 @@
   7 "Trying to update a non-existent player should affect no rows."
   8 "Trying to delete a non-existent player should affect no rows.")
 
+;; TODO factor this further
 (define-test player-negative
   :parent sql-negative
   (with-sql-test ()
