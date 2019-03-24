@@ -13,7 +13,7 @@
   (:import-from #:protest/test-case
                 #:define-test-case)
   (:import-from #:protest/parachute
-                #:true #:false #:is #:isnt #:is-values #:isnt-values
+                #:true #:false #:is #:isnt #:is-values #:isnt-values :fail
                 #:protest/parachute)
   (:export #:sql))
 
