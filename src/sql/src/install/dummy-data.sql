@@ -1,13 +1,31 @@
 -- Inserts dummy data into the database.
-INSERT INTO player (login, email, name, activatedp)
-  VALUES ('player1', 'player1@gate.way', 'Player 1', TRUE),
-         ('player2', 'player2@gate.way', 'Player 2', FALSE),
-         ('player3', 'player3@gate.way', 'Player 3', TRUE),
-         ('player4', 'player4@gate.way', 'Player 4', FALSE),
-         ('player5', 'player5@gate.way', 'Player 5', TRUE),
-         ('player6', 'player6@gate.way', 'Player 6', FALSE),
-         ('player7', 'player7@gate.way', 'Player 7', TRUE),
-         ('player8', 'player8@gate.way', 'Player 8', FALSE);
+INSERT INTO player (login, email, name,
+                    activatedp, pass_hash, pass_salt,
+                    creation_time, last_edit_time)
+  VALUES ('player1', 'player1@gate.way', 'Player 1',
+          TRUE,  decode('0001', 'hex'), decode('0001', 'hex'),
+          now() - INTERVAL '1 HOUR', now()),
+         ('player2', 'player2@gate.way', 'Player 2',
+          FALSE, decode('0002', 'hex'), decode('0002', 'hex'),
+          now() - INTERVAL '1 HOUR', now()),
+         ('player3', 'player3@gate.way', 'Player 3',
+          TRUE,  decode('0003', 'hex'), decode('0003', 'hex'),
+          now() - INTERVAL '1 HOUR', now()),
+         ('player4', 'player4@gate.way', 'Player 4',
+          FALSE, decode('0004', 'hex'), decode('0004', 'hex'),
+          now() - INTERVAL '1 HOUR', now()),
+         ('player5', 'player5@gate.way', 'Player 5',
+          TRUE,  decode('0005', 'hex'), decode('0005', 'hex'),
+          now() - INTERVAL '1 HOUR', now()),
+         ('player6', 'player6@gate.way', 'Player 6',
+          FALSE, decode('0006', 'hex'), decode('0006', 'hex'),
+          now() - INTERVAL '1 HOUR', now()),
+         ('player7', 'player7@gate.way', 'Player 7',
+          TRUE,  decode('0007', 'hex'), decode('0007', 'hex'),
+          now() - INTERVAL '1 HOUR', now()),
+         ('player8', 'player8@gate.way', 'Player 8',
+          FALSE, decode('0008', 'hex'), decode('0008', 'hex'),
+          now() - INTERVAL '1 HOUR', now());
 
 INSERT INTO player_group (name, description)
   VALUES ('Group 1', 'Group 1 (1234) (1)'),
