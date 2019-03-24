@@ -36,17 +36,17 @@ CREATE TYPE timeline_permission_type AS ENUM (
 
 -- Creates the player table.
 CREATE TABLE player (
-  id             serial    NOT NULL PRIMARY KEY,
+  id             serial       NOT NULL PRIMARY KEY,
   ------------
-  login          text      NOT NULL UNIQUE,
-  email          text      NOT NULL UNIQUE,
-  name           text      NOT NULL,
+  login          varchar(64)  NOT NULL UNIQUE,
+  email          varchar(256) NOT NULL UNIQUE,
+  name           varchar(256) NOT NULL,
   ------------
-  pass_hash      bytea     NOT NULL DEFAULT ''::bytea,
-  pass_salt      bytea     NOT NULL DEFAULT ''::bytea,
-  activatedp     boolean   NOT NULL DEFAULT FALSE,
-  creation_time  timestamp NOT NULL DEFAULT now(),
-  last_edit_time timestamp NOT NULL DEFAULT now(),
+  pass_hash      bytea        NOT NULL DEFAULT ''::bytea,
+  pass_salt      bytea        NOT NULL DEFAULT ''::bytea,
+  activatedp     boolean      NOT NULL DEFAULT FALSE,
+  creation_time  timestamp    NOT NULL DEFAULT now(),
+  last_edit_time timestamp    NOT NULL DEFAULT now(),
   CONSTRAINT player_login_valid
   CHECK (login ~ '^[a-zA-Z0-9._-]{3,}$'),
   CONSTRAINT player_name_not_empty

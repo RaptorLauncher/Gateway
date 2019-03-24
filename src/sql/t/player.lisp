@@ -76,3 +76,38 @@
         (false (select-player-by-email (getf test-data :email)))
         (false (first (select-players-by-name (getf test-data :name)
                                               :limit 1)))))))
+
+(define-test-case player-negative
+    (:documentation "Negative test suite for the player table."
+     :tags (:gateway :sql :suite :negative :player))
+  :assert
+  1 "Players must have different IDs."
+  2 "A player's login must be valid."
+  3 "A player's name must be valid."
+  4 "A player's email must be valid.")
+
+(define-test player-negative
+  :parent sql-negative
+  (with-sql-test ()
+    (flet ((long-string (n) (make-string n :initial-element #\a)))
+      (let ((query (sql-template '(:insert-into 'player :set
+                                   :id $$ :login "gateway01"
+                                   :email "ga1@te.way" :name "Test User 1"))))
+        (pomo:query (funcall query 1))
+        #1?(fail (pomo:query (funcall query 1)))
+        (pomo:query (:delete-from 'player)))
+      (flet ((insert (login)
+               (insert-player :login login :email "ga@te.way" :name "User"
+                              :hash "" :salt "" :activatedp t)))
+        #2?(db-fail (insert ""))
+        #2?(db-fail (insert "aa"))
+        #2?(db-fail (insert "!@#$%"))
+        #2?(db-fail (insert (long-string 65)))
+        #2?(db-fail (insert (coerce '(#\Newline) 'string))))
+      (flet ((insert (&key (email "") (name ""))
+               (insert-player :login "GatewayTest1" :email email
+                              :name name :hash "" :salt "" :activatedp t)))
+        #3?(db-fail (insert :email "ga@te.way"))
+        #3?(db-fail (insert :email (uiop:strcat "ga@te." (long-string 251))))
+        #4?(db-fail (insert :name "Test User 1"))
+        #4?(db-fail (insert :name (long-string 257)))))))

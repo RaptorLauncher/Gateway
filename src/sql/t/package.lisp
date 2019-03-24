@@ -15,4 +15,6 @@
   (:import-from #:protest/parachute
                 #:true #:false #:is #:isnt #:is-values #:isnt-values :fail
                 #:protest/parachute)
+  (:import-from #:s-sql
+                #:sql-template #:$$)
   (:export #:sql #:sql-positive #:sql-negative))

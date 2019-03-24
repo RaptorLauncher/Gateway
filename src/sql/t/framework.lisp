@@ -45,7 +45,7 @@
                 (pushnew x *checked-exports*))))
        (serapeum:walk-tree #'walk ',arguments-and-body))))
 
-(defparameter *warn-on-untested-symbols* t)
+(defparameter *warn-on-untested-symbols* nil)
 
 (defun test (&rest args)
   (let ((*checked-exports* '())
@@ -65,3 +65,18 @@
                 ,@body
                 (test-tables-empty))
            (when ,errorp (with-test-db () (reinstall))))))))
+
+(defmacro db-fail (form &optional description &rest format-args)
+  (let ((type 'cl-postgres:database-error))
+    `(parachute:eval-in-context
+      parachute:*context*
+      (make-instance
+       'protest/for-parachute:test-case-comparison-result
+       :expression '(db-fail ,form)
+       :value-form '(capture-error ,form)
+       :body (lambda () (parachute::capture-error
+                            ,form ,(parachute::maybe-unquote type)))
+       :expected ',(parachute::maybe-unquote type)
+       :comparison 'typep
+       ,@(when description
+           `(:description (format NIL ,description ,@format-args)))))))
