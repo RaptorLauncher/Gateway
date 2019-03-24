@@ -12,7 +12,12 @@
 ;;; TODO constraint and correctness tests
 
 (define-test-case sql
-    (:documentation "Test suite for Gateway SQL layer."
+    (:documentation "Test suite for Gateway SQL layer.
+\
+Each test in the test suite should use the WITH-SQL-TEST macro for ensuring that
+the database is reinstalled after each unhandled error in test body. The
+WITH-SQL-TEST macro also connects to the test DB and ensures that, after each
+test, all tables in the test database are empty."
      :tags (:gateway :sql :suite)))
 
 (define-test sql)
