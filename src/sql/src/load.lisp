@@ -18,14 +18,11 @@
 (defun uninstall ()
   (execute-file-with-transaction "uninstall.sql"))
 
-(defun install (&optional dummy-data-p)
-  (execute-file-with-transaction "install.sql")
-  (when dummy-data-p
-    (execute-file-with-transaction "dummy-data.sql")))
+(defun install ()
+  (execute-file-with-transaction "install.sql"))
 
-(defun reinstall (&optional dummy-data-p)
-  (uninstall)
-  (install dummy-data-p))
+(defun install-dummy-data ()
+  (execute-file-with-transaction "dummy-data.sql"))
 
 ;;; CL-YESQL functions
 

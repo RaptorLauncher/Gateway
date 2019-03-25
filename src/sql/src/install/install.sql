@@ -56,7 +56,9 @@ CREATE TABLE player (
   CONSTRAINT player_pass_hash_length
   CHECK (length(pass_hash) <= 256),
   CONSTRAINT player_pass_salt_length
-  CHECK (length(pass_salt) <= 256));
+  CHECK (length(pass_salt) <= 256),
+  CONSTRAINT player_last_edit_not_before_creation
+  CHECK (creation_time <= last_edit_time));
 
 
 

@@ -16,4 +16,4 @@
            #:with-test-db
            #:install
            #:uninstall
-           #:reinstall))
+           #:install-dummy-data))

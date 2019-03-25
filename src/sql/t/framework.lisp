@@ -23,6 +23,7 @@
 
 (defvar *checked-exports*)
 (defvar *exports*)
+(defvar *dummy-data* nil)
 
 (defun compute-exports ()
   (let ((exports (loop with package = (find-package '#:gateway.sql)
@@ -63,8 +64,10 @@
          (unwind-protect
               (with-test-db ()
                 ,@body
-                (test-tables-empty))
-           (when ,errorp (with-test-db () (reinstall))))))))
+                (unless *dummy-data* (test-tables-empty)))
+           (when ,errorp
+             (with-test-db () (uninstall) (install)
+               (when *dummy-data* (install-dummy-data)))))))))
 
 (defmacro db-fail (form &optional description &rest format-args)
   (let ((type 'cl-postgres:database-error))

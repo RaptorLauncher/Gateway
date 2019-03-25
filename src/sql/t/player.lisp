@@ -6,6 +6,30 @@
 (in-package #:gateway.sql/test)
 (in-readtable protest/parachute)
 
+(define-test-case player-select-dummy
+    (:documentation "Dummy select test suite for the player table."
+     :tags (:gateway :sql :suite :select-dummy :player)))
+
+(define-test player-select-dummy
+  :parent sql-select-dummy
+  (with-sql-test ()
+    (uninstall) (install) (install-dummy-data)
+    (loop for i from 1 to 8
+          for result = (select-player-by-id i)
+          for (id login email name hash salt activatedp
+                  creation-time last-edit-time)
+            = result
+          do (is = id i)
+             (is string= login (format nil "player~D" i))
+             (is string= email (format nil "player~D@gate.way" i))
+             (is string= name (format nil "Player ~D" i))
+             (is vector= hash (vector i))
+             (is vector= salt (vector i))
+             (is eq activatedp (oddp i))
+             (true (typep creation-time 'local-time:timestamp))
+             (true (typep last-edit-time 'local-time:timestamp)))
+    (uninstall) (install)))
+
 (define-test-case player
     (:documentation "Positive test suite for the player table."
      :tags (:gateway :sql :suite :positive :player)))
@@ -82,7 +106,8 @@
   5 "A player's password hash and salt must be no more than 256 bytes long."
   6 "Trying to return a non-existent player returns nothing."
   7 "Trying to update a non-existent player should affect no rows."
-  8 "Trying to delete a non-existent player should affect no rows.")
+  8 "Trying to delete a non-existent player should affect no rows."
+  9 "Last edit time must not be earlier than creation time.")
 
 ;; TODO factor this further
 (define-test player-negative
@@ -126,4 +151,11 @@
       #7?(is = 0 (nth-value 1 (update-player-name-by-id "Use Tester 1" 1)))
       #7?(is = 0 (nth-value 1 (update-player-password-by-id (ub8 0) (ub8 0) 1)))
       #7?(is = 0 (nth-value 1 (update-player-activatedp-by-id t 1)))
-      #8?(is = 0 (nth-value 1 (delete-player-by-id 1))))))
+      #8?(is = 0 (nth-value 1 (delete-player-by-id 1)))
+      (let* ((query (sql-template '(:insert-into 'player :set
+                                    :id 1 :login "gateway01"
+                                    :email "ga1@te.way" :name "Test User 1"
+                                    :creation-time $$ :last-edit-time $$)))
+             (now (local-time:now))
+             (day-before-now (local-time:timestamp- now 1 :day)))
+        #9?(db-fail (pomo:query (funcall query now day-before-now)))))))
