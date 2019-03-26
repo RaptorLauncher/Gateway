@@ -6,6 +6,7 @@
 (in-package #:gateway.engine/test)
 (in-readtable protest/parachute)
 
+;; TODO add a parent for all Gateway test cases
 (define-test-case standard-engine
     (:documentation "Test suite for STANDARD-ENGINE."
      :tags (:gateway :engine :standard-engine :suite)))
