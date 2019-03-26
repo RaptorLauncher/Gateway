@@ -48,7 +48,7 @@ INSERT INTO persona (id, name, description, creation_time, last_edit_time)
          (8, 'Persona 8', 'Persona 8', now() - INTERVAL '1 HOUR', now());
 
 INSERT INTO players_personas (player_id, persona_id, is_owner)
-  VALUES (1, 1, TRUE), (1, 2, TRUE), (1, 3, TRUE), (1, 4, FALSE),
-         (2, 4, TRUE), (2, 5, TRUE), (2, 6, TRUE),
+  VALUES (1, 1, TRUE),  (1, 2, TRUE),  (1, 3, TRUE), (1, 4, FALSE),
+         (2, 4, TRUE),  (2, 5, TRUE),  (2, 6, TRUE),
          (3, 1, FALSE), (3, 2, FALSE),
          (4, 1, FALSE);

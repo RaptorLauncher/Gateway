@@ -6,6 +6,47 @@
 (in-package #:gateway.sql/test)
 (in-readtable protest/parachute)
 
+(define-test-case players-groups-select-dummy
+    (:documentation
+     "Dummy select test suite for the table binding players to groups."
+     :tags (:gateway :sql :suite :select-dummy :player :player-group
+            :players-groups)))
+
+(define-test players-groups-select-dummy
+  :parent sql-select-dummy
+  (with-sql-test ()
+    (uninstall) (install) (install-dummy-data)
+    (let ((test-data '((1 1 t) (2 1 nil) (3 1 nil) (4 1 nil)
+                       (3 2 t) (4 2 t)   (5 2 t)
+                       (2 3 t) (4 3 nil) (6 3 nil) (8 3 nil))))
+      (dolist (player (iota 8 :start 1))
+        (dolist (group (iota 3 :start 1))
+          (flet ((ownerp (x) (and (eql (first x) player)
+                                  (eql (second x) group))))
+            (let* ((result (select-player-owner-of-group-p player group))
+                   (match (find-if #'ownerp test-data))
+                   (match (if match (third match) :null)))
+              (is eq result match)))))
+      (dolist (group (iota 3 :start 1))
+        (let* ((result (select-players-belonging-to-group group))
+               (result (mapcar (lambda (x) (list (first x) (tenth x))) result)))
+          (dolist (cell result)
+            (destructuring-bind (player ownerp) cell
+              (flet ((find-data (x) (and (eql (first x) player)
+                                         (eql (second x) group)
+                                         (eql (third x) ownerp))))
+                (true (find-if #'find-data test-data)))))))
+      (dolist (player (iota 8 :start 1))
+        (let* ((result (select-groups-player-belongs-to player))
+               (result (mapcar (lambda (x) (list (first x) (fourth x))) result)))
+          (dolist (cell result)
+            (destructuring-bind (group ownerp) cell
+              (flet ((find-data (x) (and (eql (first x) player)
+                                         (eql (second x) group)
+                                         (eql (third x) ownerp))))
+                (true (find-if #'find-data test-data))))))))
+    (uninstall) (install)))
+
 (define-test-case players-groups-positive
     (:documentation
      "Positive est suite for the table mapping players to player groups."
