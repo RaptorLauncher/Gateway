@@ -18,7 +18,6 @@
                #:phoe-toolbox
                #:cl+ssl
                #:cl-yesql/postmodern
-               #:postmodern-execute-file
                #:gateway.config
                #:cl-postgres+local-time)
   :serial t

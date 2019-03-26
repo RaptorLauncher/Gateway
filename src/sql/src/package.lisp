@@ -8,10 +8,11 @@
         #:alexandria
         #:cl-yesql
         #:phoe-toolbox
-        #:postmodern/execute-file
         #:gateway/config)
   (:shadowing-import-from #:cl-yesql
                           #:import)
+  (:shadowing-import-from #:postmodern
+                          #:execute-file)
   (:export #:with-db
            #:with-test-db
            #:install
