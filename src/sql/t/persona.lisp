@@ -6,11 +6,11 @@
 (in-package #:gateway.sql/test)
 (in-readtable protest/parachute)
 
-(define-test-case persona
+(define-test-case persona-positive
     (:documentation "Positive test suite for the persona table."
      :tags (:gateway :sql :suite :positive :persona)))
 
-(define-test persona
+(define-test persona-positive
   :parent sql-positive
   (with-sql-test ()
     (let* ((test-data '(:name "Test Persona 01"

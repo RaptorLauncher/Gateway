@@ -6,13 +6,13 @@
 (in-package #:gateway.sql/test)
 (in-readtable protest/parachute)
 
-(define-test-case players-personas
+(define-test-case players-personas-positive
     (:documentation
      "Positive test suite for the table mapping players to player personas."
      :tags (:gateway :sql :suite :positive :player :player-persona
             :players-personas)))
 
-(define-test players-personas
+(define-test players-personas-positive
   :parent sql-positive
   (with-sql-test ()
     (let* ((player-1 '(:login "gateway-01-test"

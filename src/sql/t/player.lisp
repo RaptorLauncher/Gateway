@@ -27,14 +27,15 @@
              (is vector= salt (vector i))
              (is eq activatedp (oddp i))
              (true (typep creation-time 'local-time:timestamp))
-             (true (typep last-edit-time 'local-time:timestamp)))
+             (true (typep last-edit-time 'local-time:timestamp))
+             (true (timestamp<= creation-time last-edit-time)))
     (uninstall) (install)))
 
-(define-test-case player
+(define-test-case player-positive
     (:documentation "Positive test suite for the player table."
      :tags (:gateway :sql :suite :positive :player)))
 
-(define-test player
+(define-test player-positive
   :parent sql-positive
   (with-sql-test ()
     (let* ((data `(:login "gateway-01-test"
