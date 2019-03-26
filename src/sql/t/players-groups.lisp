@@ -49,7 +49,7 @@
 
 (define-test-case players-groups-positive
     (:documentation
-     "Positive est suite for the table mapping players to player groups."
+     "Positive test suite for the table mapping players to player groups."
      :tags (:gateway :sql :suite :positive :player :player-group
             :players-groups)))
 
@@ -111,3 +111,46 @@
           (true (table-empty-p "players_personas"))
           (mapc #'delete-player-by-id (list pid1 pid2 pid3))
           (mapc #'delete-player-group-by-id (list gid1 gid2)))))))
+
+(define-test-case players-groups-negative
+    (:documentation
+     "Negative test suite for the table mapping players to player groups."
+     :tags (:gateway :sql :suite :negative :player :player-group
+            :players-groups))
+  :assert
+  1  "It is impossible to add a non-existent player to a group."
+  2  "It is impossible to add a player to a non-existent group."
+  3  "Trying to check if a nonexistent player is an owner of a group should ~
+return null."
+  4  "Trying to check if a player is an owner of a nonexistent group should ~
+return null."
+  5  "Selecting players belonging to a nonexistent group should return no rows."
+  6  "Selecting groups a nonexistent player belongs go should return no rows."
+  7  "Updating group ownership status of a nonexistent player should affect no ~
+rows."
+  8  "Updating group ownership status of a nonexistent group should affect no ~
+rows."
+  9  "Removing players from a nonexistent group should affect no rows."
+  10 "Removing nonexistent players from a group should affect no rows.")
+
+(define-test players-groups-negative
+  :parent sql-negative
+  (with-sql-test ()
+    (flet ((ub8 (n) (make-array n :element-type '(unsigned-byte 8))))
+      (let ((group (insert-player-group :name "Player Group" :description "")))
+        #1?(db-fail (add-player-into-player-group 0 group t))
+
+        #3?(is eq :null (select-player-owner-of-group-p 0 group))
+        #7?(is = 0 (nth-value 1 (update-player-group-owner t 0 group)))
+        #9?(is = 0 (nth-value 1 (remove-player-from-player-group 0 group)))
+        (delete-player-group-by-id group))
+      (let ((player (insert-player :login "gateway01" :email "ga1@te.way"
+                                   :name "Player" :hash (ub8 0) :salt (ub8 0)
+                                   :activatedp nil)))
+        #2?(db-fail (add-player-into-player-group player 0 t))
+        #4?(is eq :null (select-player-owner-of-group-p player 0))
+        #8?(is = 0 (nth-value 1 (update-player-group-owner t player 0)))
+        #10?(is = 0 (nth-value 1 (remove-player-from-player-group player 0)))
+        (delete-player-by-id player)))
+    #5?(is = 0 (nth-value 1 (select-players-belonging-to-group 0)))
+    #6?(is = 0 (nth-value 1 (select-groups-player-belongs-to 0)))))
