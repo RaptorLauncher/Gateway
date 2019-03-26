@@ -110,12 +110,10 @@
   8 "Trying to delete a non-existent player should affect no rows."
   9 "Last edit time must not be earlier than creation time.")
 
-;; TODO factor this further
 (define-test player-negative
   :parent sql-negative
   (with-sql-test ()
-    (flet ((long-string (n) (make-string n :initial-element #\a))
-           (ub8 (n) (make-array n :element-type '(unsigned-byte 8))))
+    (flet ((ub8 (n) (make-array n :element-type '(unsigned-byte 8))))
       (let* ((query (sql-template '(:insert-into 'player :set
                                     :id $$ :login "gateway01"
                                     :email "ga1@te.way" :name "Test User 1"))))
@@ -136,6 +134,8 @@
         #3?(db-fail (insert :email "ga@te.way"))
         #3?(db-fail (insert :email (uiop:strcat "ga@te." (long-string 251))))
         #4?(db-fail (insert :name "Test User 1"))
+        #4?(db-fail (insert :name (coerce '(#\a #\b #\Newline #\c #\d)
+                                          'string)))
         #4?(db-fail (insert :name (long-string 257))))
       (flet ((insert (&key (hash (ub8 0)) (salt (ub8 0)))
                (insert-player :login "GatewayTest1" :email "ga@te.way"

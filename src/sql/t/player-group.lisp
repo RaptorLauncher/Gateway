@@ -54,3 +54,37 @@
         (false (select-player-group-by-id inserted-id))
         (false (first (select-player-groups-by-name (getf test-data :name)
                                                     :limit 1)))))))
+
+(define-test-case player-group-negative
+    (:documentation "Negative test suite for the player group table."
+     :tags (:gateway :sql :suite :negative :player-group))
+  :assert
+  1 "Player groups must have different IDs."
+  2 "A player group's name must be valid."
+  3 "A player group's description must be valid."
+  4 "Trying to return a non-existent player group returns nothing."
+  5 "Trying to update a non-existent player group should affect no rows."
+  6 "Trying to delete a non-existent player group should affect no rows.")
+
+(define-test player-group-negative
+  :parent sql-negative
+  (with-sql-test ()
+    (let* ((query (sql-template '(:insert-into 'player-group :set
+                                  :id $$ :name "Test Group 1"
+                                  :description "Test Group 1"))))
+      (pomo:query (funcall query 1))
+      #1?(fail (pomo:query (funcall query 1)))
+      (pomo:query (:delete-from 'player-group)))
+    (flet ((insert (name)
+             (insert-player-group :name name :description "Test Group")))
+      #2?(db-fail (insert ""))
+      #2?(db-fail (insert (long-string 65)))
+      #2?(db-fail (insert (coerce '(#\a #\b #\Newline #\c #\d) 'string))))
+    (flet ((insert (description)
+             (insert-player-group :description description :name "Test Group")))
+      #3?(db-fail (insert (long-string 8193))))
+    #4?(is = 0 (nth-value 1 (select-player-group-by-id 1)))
+    #4?(is = 0 (nth-value 1 (select-player-groups-by-name "Group" :limit 1)))
+    #5?(is = 0 (nth-value 1 (update-player-group-name-by-id "Group" 1)))
+    #5?(is = 0 (nth-value 1 (update-player-group-description-by-id "Group" 1)))
+    #6?(is = 0 (nth-value 1 (delete-player-group-by-id 1)))))

@@ -51,6 +51,8 @@ CREATE TABLE player (
   CHECK (login ~ '^[a-zA-Z0-9._-]{3,}$'),
   CONSTRAINT player_name_not_empty
   CHECK (name <> ''),
+  CONSTRAINT player_name_no_newlines
+  CHECK (NOT (name ~ E'\n')),
   CONSTRAINT player_email_valid
   CHECK (email ~ '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$'),
   CONSTRAINT player_pass_hash_length
@@ -64,13 +66,15 @@ CREATE TABLE player (
 
 -- Creates the player group table.
 CREATE TABLE player_group (
-  id          serial NOT NULL PRIMARY KEY,
+  id          serial        NOT NULL PRIMARY KEY,
   ------------
-  name        text   NOT NULL,
+  name        varchar(64)   NOT NULL,
   ------------
-  description text   NOT NULL DEFAULT '',
+  description varchar(8192) NOT NULL DEFAULT '',
   CONSTRAINT player_group_name_not_empty
-  CHECK (name <> ''));
+  CHECK (name <> ''),
+  CONSTRAINT player_group_name_no_newlines
+  CHECK (NOT (name ~ E'\n')));
 
 
 

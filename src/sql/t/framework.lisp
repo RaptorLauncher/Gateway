@@ -83,3 +83,5 @@
        :comparison 'typep
        ,@(when description
            `(:description (format NIL ,description ,@format-args)))))))
+
+(defun long-string (n) (make-string n :initial-element #\a))
