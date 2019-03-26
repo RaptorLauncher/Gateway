@@ -33,16 +33,17 @@ Tests in this suite are forbidden from modifying the database state."
 
 (define-test sql-select-dummy :parent sql)
 
-(defmethod parachute:eval-in-context :around
-    (context (test (eql (parachute:find-test 'sql-select-dummy))))
-  (call-next-method)
-  (quote ;; TODO unquote when Shinmera fixes it
-   (progn (print "Installing dummy data.")
-          (with-test-db () (uninstall) (install) (install-dummy-data))
-          (let ((*dummy-data* t))
-            (call-next-method))
-          (print "Cleanup.")
-          (with-test-db () (uninstall) (install)))))
+;; (defmethod parachute:eval-in-context :around
+;;     (context (test (eql (parachute:find-test 'sql-select-dummy))))
+;;   (call-next-method)
+;;   ;; TODO unquote when Shinmera fixes it
+;;   (quote
+;;    (progn (print "Installing dummy data.")
+;;           (with-test-db () (uninstall) (install) (install-dummy-data))
+;;           (let ((*dummy-data* t))
+;;             (call-next-method))
+;;           (print "Cleanup.")
+;;           (with-test-db () (uninstall) (install)))))
 
 ;;; SQL-POSITIVE
 
