@@ -49,7 +49,8 @@
 (defparameter *warn-on-untested-symbols* nil)
 
 (defun test (&rest args)
-  (let ((*checked-exports* '())
+  (let ((args (or args '(sql)))
+        (*checked-exports* '())
         (*exports* (compute-exports)))
     (apply #'protest/parachute:test args)
     (when *warn-on-untested-symbols*

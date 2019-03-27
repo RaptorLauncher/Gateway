@@ -19,4 +19,4 @@
                 #:protest/parachute)
   (:import-from #:s-sql
                 #:sql-template #:$$)
-  (:export #:sql #:sql-positive #:sql-negative))
+  (:export #:test #:sql #:sql-positive #:sql-negative))

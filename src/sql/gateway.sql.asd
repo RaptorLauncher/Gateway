@@ -50,3 +50,8 @@
                (:file "players-groups")
                (:file "persona")
                (:file "players-personas")))
+
+(defmethod asdf:perform ((o asdf:test-op)
+                         (c (eql (asdf:find-system '#:gateway.sql))))
+  (asdf:operate 'asdf:load-op '#:gateway.sql/test)
+  (uiop:symbol-call '#:gateway.sql/test '#:test))
