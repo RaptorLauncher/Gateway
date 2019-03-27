@@ -147,7 +147,7 @@
                #:named-readtables
                #:moptilities
                #:protest/base
-               #:protest/test
+               #:protest/test-case
                #:protest/parachute
                #:gateway.cable
                #:gateway.base)

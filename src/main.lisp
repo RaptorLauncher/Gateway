@@ -8,11 +8,12 @@
 
 (in-package #:gateway-user)
 
-(defvar *systems*
+(defparameter *systems*
   '(:gateway.base
     :gateway.cable
     :gateway.connector
-    :gateway.engine))
+    :gateway.engine
+    :gateway.sql))
 
 (defun test-gateway ()
   (dolist (system *systems*)

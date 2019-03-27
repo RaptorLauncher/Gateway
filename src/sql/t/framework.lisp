@@ -52,11 +52,11 @@
   (let ((args (or args '(sql)))
         (*checked-exports* '())
         (*exports* (compute-exports)))
-    (apply #'protest/parachute:test args)
-    (when *warn-on-untested-symbols*
-      (when-let ((diff (set-difference *exports* *checked-exports*)))
-        (warn "~D/~D symbols untested.~{~%~S~}"
-              (length diff) (length *exports*) diff)))))
+    (prog1 (apply #'protest/parachute:test args)
+      (when *warn-on-untested-symbols*
+        (when-let ((diff (set-difference *exports* *checked-exports*)))
+          (warn "~D/~D symbols untested.~{~%~S~}"
+                (length diff) (length *exports*) diff))))))
 
 (defmacro with-sql-test (() &body body)
   (with-gensyms (errorp e)
