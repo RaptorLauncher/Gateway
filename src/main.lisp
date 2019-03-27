@@ -16,6 +16,8 @@
     :gateway.sql))
 
 (defun test-gateway ()
+  ;; TODO use (parachute:results-with-status :failed (test-status)) to detect
+  ;; failed tests in each system
   (dolist (system *systems*)
     (asdf:test-system system)))
 
