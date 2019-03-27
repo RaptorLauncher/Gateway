@@ -1,0 +1,14 @@
+image: daewok/lisp-devel:base
+
+stages:
+  - build
+
+services:
+  - postgres:latest
+
+build:
+  stage: build
+  script:
+    - echo "hello world!"
+  only:
+    - master
