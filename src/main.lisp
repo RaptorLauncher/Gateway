@@ -4,7 +4,7 @@
 ;;;; main.lisp
 
 (defpackage #:gateway-user
-  (:use #:cl)
+  (:use #:cl #:alexandria)
   (:export #:test-gateway))
 
 (in-package #:gateway-user)
@@ -20,7 +20,8 @@
 (defun test-gateway ()
   (mapc #'asdf:load-system *systems*)
   (let ((result (protest/parachute:test 'gateway.init:gateway-full-test)))
-    (when (parachute:results-with-status :failed result)
-      (error "There are test failures."))))
+    (when-let ((failed (parachute:results-with-status :failed result)))
+      (cerror "Continue." "There are test failures: ~{~%~A~}" failed))
+    result))
 
 ;; TODO make sure that we deprecate MAKE-CONDITION and instead use MAKE-INSTANCE
