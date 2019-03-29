@@ -5,8 +5,6 @@
 
 (in-package #:gateway.base/impl)
 
-;; TODO unit-test this
-;; TODO logging in client classes
 (defmethod data-object ((data cons))
   (flet ((parse (data)
            (handler-case

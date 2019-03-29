@@ -9,10 +9,7 @@
     (gateway-condition destructuring-error)
   ((%format-control :reader format-control
                     :initarg :format-control
-                    ;; SBCL screws up DEFINE-CONDITION with :ALLOCATION :CLASS
-                    ;; and :DEFAULT-INITARGS. TODO uncomment in SBCL 1.4.13+.
-                    ;; :allocation :class
-                    ))
+                    :allocation :class))
   (:default-initargs :format-control "Error while reading")
   (:report (lambda (c s)
              (format s "~A ~S~:[.~;:~%~:*~A~]"

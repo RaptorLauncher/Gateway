@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; base/protocol/with-creation-time.lisp
+;;;; objects/protocol/with-creation-time.lisp
 
 (in-package #:gateway.base/protocol)
 
@@ -15,8 +15,9 @@ system."
   (:class with-creation-time () ())
   "An object with creation time. See protocol WITH-CREATION-TIME for details."
   ;; TODO actually put creation time stuff here
-  ;; (:function id ((object with-creation-time)) t) ;; TODO date protocol
-  ;; "Returns the ID of the object"
+  ;; (:function creation-time ((object with-creation-time)) t)
+  ;; TODO date protocol
+  ;; "Returns the creation time of the object"
   )
 
 (execute-protocol with-creation-time)

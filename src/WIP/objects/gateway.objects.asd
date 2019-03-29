@@ -24,6 +24,7 @@
                #:gateway.base)
   :pathname "protocol/"
   :components ((:file "package")
+               (:file "mixin/with-creation-time")
                (:file "player")))
 
 (asdf:defsystem #:gateway.objects/impl
