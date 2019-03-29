@@ -93,15 +93,19 @@ CREATE TABLE players_groups (
 
 -- Creates the persona table.
 CREATE TABLE persona (
-  id             serial    NOT NULL PRIMARY KEY,
+  id             serial        NOT NULL PRIMARY KEY,
   ------------
-  name           text      NOT NULL,
+  name           varchar(64)   NOT NULL,
   ------------
-  description    text      NOT NULL DEFAULT '',
-  creation_time  timestamp NOT NULL DEFAULT now(),
-  last_edit_time timestamp NOT NULL DEFAULT now(),
+  description    varchar(8192) NOT NULL DEFAULT '',
+  creation_time  timestamp     NOT NULL DEFAULT now(),
+  last_edit_time timestamp     NOT NULL DEFAULT now(),
   CONSTRAINT persona_name_not_empty
-  CHECK (name <> ''));
+  CHECK (name <> ''),
+  CONSTRAINT persona_name_no_newlines
+  CHECK (NOT (name ~ E'\n')),
+  CONSTRAINT persona_last_edit_not_before_creation
+  CHECK (creation_time <= last_edit_time));
 
 
 

@@ -13,21 +13,35 @@
 (define-test player-select-dummy
   :parent sql-select-dummy
   (with-sql-test ()
-    (loop for i from 1 to 8
-          for result = (select-player-by-id i)
-          for (id login email name hash salt activatedp
-                  creation-time last-edit-time)
-            = result
-          do (is = id i)
-             (is string= login (format nil "player~D" i))
-             (is string= email (format nil "player~D@gate.way" i))
-             (is string= name (format nil "Player ~D" i))
-             (is vector= hash (vector i))
-             (is vector= salt (vector i))
-             (is eq activatedp (oddp i))
-             (true (typep creation-time 'local-time:timestamp))
-             (true (typep last-edit-time 'local-time:timestamp))
-             (true (timestamp<= creation-time last-edit-time)))))
+    (flet ((check (result i)
+             (destructuring-bind (id login email name hash salt activatedp
+                                  creation-time last-edit-time)
+                 result
+               (is = id i)
+               (is string= login (format nil "player~D" i))
+               (is string= email (format nil "player~D@gate.way" i))
+               (is string= name (format nil "Player ~D" i))
+               (is vector= hash (vector i))
+               (is vector= salt (vector i))
+               (is eq activatedp (oddp i))
+               (true (typep creation-time 'local-time:timestamp))
+               (true (typep last-edit-time 'local-time:timestamp))
+               (true (timestamp<= creation-time last-edit-time)))))
+      (loop for i from 1 to 8
+            for result = (select-player-by-id i)
+            do (check result i))
+      (loop for i from 1 to 8
+            for login = (format nil "player~D" i)
+            for result = (select-player-by-login login)
+            do (check result i))
+      (loop for i from 1 to 8
+            for email = (format nil "player~D@gate.way" i)
+            for result = (select-player-by-email email)
+            do (check result i))
+      (loop for i from 1 to 8
+            for name = (format nil "Player ~D" i)
+            for result = (first (select-players-by-name name :limit 1))
+            do (check result i)))))
 
 (define-test-case player-positive
     (:documentation "Positive test suite for the player table."
@@ -112,9 +126,9 @@
   :parent sql-negative
   (with-sql-test ()
     (flet ((ub8 (n) (make-array n :element-type '(unsigned-byte 8))))
-      (let* ((query (sql-template '(:insert-into 'player :set
-                                    :id $$ :login "gateway01"
-                                    :email "ga1@te.way" :name "Test User 1"))))
+      (let ((query (sql-template '(:insert-into 'player :set
+                                   :id $$ :login "gateway01"
+                                   :email "ga1@te.way" :name "Test User 1"))))
         (pomo:query (funcall query 1))
         #1?(fail (pomo:query (funcall query 1)))
         (pomo:query (:delete-from 'player)))
