@@ -18,6 +18,9 @@
 (defun test-gateway ()
   ;; TODO use (parachute:results-with-status :failed (test-status)) to detect
   ;; failed tests in each system
+  ;; TODO parachute everywhere
+  ;; TODO create a gateway/init system that exports the parent test suite for
+  ;; other tests
   (dolist (system *systems*)
     (asdf:test-system system)))
 
