@@ -29,7 +29,8 @@
   (let ((exports (loop with package = (find-package '#:gateway.sql)
                        for x being the external-symbols of package
                        collect x))
-        (ignored '(install uninstall reinstall with-db with-test-db)))
+        (ignored '(install uninstall reinstall install-dummy-data
+                   with-db with-test-db)))
     (set-difference exports ignored)))
 
 ;;; FIXME: Most of this hack should go away when Shinmera implements running

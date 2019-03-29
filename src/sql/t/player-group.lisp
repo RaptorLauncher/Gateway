@@ -13,12 +13,18 @@
 (define-test player-group-select-dummy
   :parent sql-select-dummy
   (with-sql-test ()
-    (loop for i from 1 to 3
-          for result = (select-player-group-by-id i)
-          for (id name description) = result
-          do (is = id i)
-             (is string= name (format nil "Group ~D" i))
-             (true (search (format nil "Group ~D" i) description)))))
+    (flet ((check (result i)
+             (destructuring-bind (id name description) result
+               (is = id i)
+               (is string= name (format nil "Group ~D" i))
+               (true (search (format nil "Group ~D" i) description)))))
+      (loop for i from 1 to 3
+            for result = (select-player-group-by-id i)
+            do (check result i))
+      (loop for i from 1 to 3
+            for name = (format nil "Group ~D" i)
+            for result = (first (select-player-groups-by-name name :limit 1))
+            do (check result i)))))
 
 (define-test-case player-group-positive
     (:documentation "Positive test suite for the player group table."

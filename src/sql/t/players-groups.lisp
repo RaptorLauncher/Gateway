@@ -6,16 +6,16 @@
 (in-package #:gateway.sql/test)
 (in-readtable protest/parachute)
 
+(defparameter *players-groups-select-dummy-data*
+  '((1 1 t) (2 1 nil) (3 1 nil) (4 1 nil)
+    (3 2 t) (4 2 t)   (5 2 t)
+    (2 3 t) (4 3 nil) (6 3 nil) (8 3 nil)))
+
 (define-test-case players-groups-select-dummy
     (:documentation
      "Dummy select test suite for the table binding players to groups."
      :tags (:gateway :sql :suite :select-dummy :player :player-group
             :players-groups)))
-
-(defparameter *players-groups-select-dummy-data*
-  '((1 1 t) (2 1 nil) (3 1 nil) (4 1 nil)
-    (3 2 t) (4 2 t)   (5 2 t)
-    (2 3 t) (4 3 nil) (6 3 nil) (8 3 nil)))
 
 (define-test players-groups-select-dummy
   :parent sql-select-dummy)
