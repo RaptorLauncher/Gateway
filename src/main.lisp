@@ -11,11 +11,11 @@
 
 (defparameter *systems*
   '(:gateway.init
-    :gateway.base
-    :gateway.cable
-    :gateway.connector
-    :gateway.engine
-    :gateway.sql))
+    :gateway.base/test
+    :gateway.cable/test
+    :gateway.connector/test
+    :gateway.engine/test
+    :gateway.sql/test))
 
 (defun test-gateway ()
   (mapc #'asdf:load-system *systems*)
