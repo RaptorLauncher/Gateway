@@ -24,4 +24,5 @@
     (:documentation "Test suite for Gateway connector."
      :tags (:gateway :connector :suite)))
 
-(define-test connector)
+(define-test connector
+  :parent (#:gateway.init #:gateway-full-test))

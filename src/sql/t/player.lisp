@@ -13,7 +13,6 @@
 (define-test player-select-dummy
   :parent sql-select-dummy
   (with-sql-test ()
-    (uninstall) (install) (install-dummy-data)
     (loop for i from 1 to 8
           for result = (select-player-by-id i)
           for (id login email name hash salt activatedp
@@ -28,8 +27,7 @@
              (is eq activatedp (oddp i))
              (true (typep creation-time 'local-time:timestamp))
              (true (typep last-edit-time 'local-time:timestamp))
-             (true (timestamp<= creation-time last-edit-time)))
-    (uninstall) (install)))
+             (true (timestamp<= creation-time last-edit-time)))))
 
 (define-test-case player-positive
     (:documentation "Positive test suite for the player table."

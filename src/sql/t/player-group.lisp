@@ -13,14 +13,12 @@
 (define-test player-group-select-dummy
   :parent sql-select-dummy
   (with-sql-test ()
-    (uninstall) (install) (install-dummy-data)
     (loop for i from 1 to 3
           for result = (select-player-group-by-id i)
           for (id name description) = result
           do (is = id i)
              (is string= name (format nil "Group ~D" i))
-             (true (search (format nil "Group ~D" i) description)))
-    (uninstall) (install)))
+             (true (search (format nil "Group ~D" i) description)))))
 
 (define-test-case player-group-positive
     (:documentation "Positive test suite for the player group table."

@@ -67,7 +67,8 @@
                #:protest/test-case
                #:protest/parachute
                #:gateway.cable
-               #:gateway.engine)
+               #:gateway.engine
+               #:gateway.init)
   :pathname "t/"
   :components ((:file "package")
                (:file "standard-engine")))

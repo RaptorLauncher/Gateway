@@ -67,6 +67,7 @@
                #:named-readtables
                #:protest/test-case
                #:protest/parachute
+               #:gateway.init
                #:gateway.connector)
   :pathname "t/"
   :components ((:file "package")

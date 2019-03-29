@@ -20,7 +20,8 @@ WITH-SQL-TEST macro also connects to the test DB and ensures that, after each
 test, all tables in the test database are empty or contain dummy data."
      :tags (:gateway :sql :suite)))
 
-(define-test sql)
+(define-test sql
+  :parent (#:gateway.init #:gateway-full-test))
 
 ;;; SQL-SELECT-DUMMY
 
@@ -33,17 +34,12 @@ Tests in this suite are forbidden from modifying the database state."
 
 (define-test sql-select-dummy :parent sql)
 
-;; (defmethod parachute:eval-in-context :around
-;;     (context (test (eql (parachute:find-test 'sql-select-dummy))))
-;;   (call-next-method)
-;;   ;; TODO unquote when Shinmera fixes it
-;;   (quote
-;;    (progn (print "Installing dummy data.")
-;;           (with-test-db () (uninstall) (install) (install-dummy-data))
-;;           (let ((*dummy-data* t))
-;;             (call-next-method))
-;;           (print "Cleanup.")
-;;           (with-test-db () (uninstall) (install)))))
+(defmethod parachute:eval-in-context :around
+    (context (test (eql (parachute:find-test 'sql-select-dummy))))
+  (with-test-db () (uninstall) (install) (install-dummy-data))
+  (let ((*dummy-data* t))
+    (call-next-method))
+  (with-test-db () (uninstall) (install)))
 
 ;;; SQL-POSITIVE
 

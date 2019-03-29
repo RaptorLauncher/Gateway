@@ -26,4 +26,5 @@
     (:documentation "Test suite for Gateway engine."
      :tags (:gateway :engine :suite)))
 
-(define-test engine)
+(define-test engine
+  :parent (#:gateway.init #:gateway-full-test))

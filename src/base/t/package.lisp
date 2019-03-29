@@ -30,4 +30,5 @@
     (:documentation "Test suite for Gateway base."
      :tags (:gateway :base :suite)))
 
-(define-test base)
+(define-test base
+  :parent (#:gateway.init #:gateway-full-test))

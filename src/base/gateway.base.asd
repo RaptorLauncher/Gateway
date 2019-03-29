@@ -64,7 +64,8 @@
                #:protest/test-case
                #:protest/parachute
                #:gateway.cable
-               #:gateway.base)
+               #:gateway.base
+               #:gateway.init)
   :pathname "t/"
   :components ((:file "package")
                (:file "data-object")))

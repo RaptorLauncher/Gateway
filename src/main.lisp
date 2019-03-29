@@ -4,24 +4,23 @@
 ;;;; main.lisp
 
 (defpackage #:gateway-user
-  (:use :cl))
+  (:use #:cl)
+  (:export #:test-gateway))
 
 (in-package #:gateway-user)
 
 (defparameter *systems*
-  '(:gateway.base
+  '(:gateway.init
+    :gateway.base
     :gateway.cable
     :gateway.connector
     :gateway.engine
     :gateway.sql))
 
 (defun test-gateway ()
-  ;; TODO use (parachute:results-with-status :failed (test-status)) to detect
-  ;; failed tests in each system
-  ;; TODO parachute everywhere
-  ;; TODO create a gateway/init system that exports the parent test suite for
-  ;; other tests
-  (dolist (system *systems*)
-    (asdf:test-system system)))
+  (mapc #'asdf:load-system *systems*)
+  (let ((result (protest/parachute:test 'gateway.init:gateway-full-test)))
+    (when (parachute:results-with-status :failed result)
+      (error "There are test failures."))))
 
 ;; TODO make sure that we deprecate MAKE-CONDITION and instead use MAKE-INSTANCE

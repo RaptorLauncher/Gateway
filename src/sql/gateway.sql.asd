@@ -31,6 +31,7 @@
   :author "Michał \"phoe\" Herda"
   :license "AGPL3"
   :depends-on (#:gateway.sql
+               #:gateway.init
                #:alexandria
                #:serapeum
                #:phoe-toolbox
