@@ -30,21 +30,23 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *sql-imports*
-    '((player . "player.sql")
-      (player-group . "player-group.sql")
-      (players-groups . "players-groups.sql")
-      (persona . "persona.sql")
-      (players-personas . "players-personas.sql"))))
+    '(simple/player
+      simple/player-group
+      simple/players-groups
+      simple/persona
+      simple/players-personas)))
 
 (defun rebuild ()
   (let ((*package* (find-package :gateway.sql)))
-    (loop for (name . sql) in *sql-imports*
+    (loop for name in *sql-imports*
+          for path = (string-downcase (symbol-name name))
+          for sql = (uiop:strcat path ".sql")
           do (eval `(yesql:import ,name
                       :from ,sql
                       :as :cl-yesql/postmodern
                       :binding :all-as-functions
                       :export-bindings t)))
-    (funcall (rcurry #'overlord:build) (mapcar #'car *sql-imports*))
+    (funcall (rcurry #'overlord:build) *sql-imports*)
     t))
 
 (rebuild)
