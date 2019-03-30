@@ -131,15 +131,16 @@
           (is eq t (select-player-owner-of-group-p pid2 gid1))
           (is = 1 (nth-value 1 (update-player-group-owner nil pid2 gid1)))
           (is eq nil (select-player-owner-of-group-p pid2 gid1))
-          (is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
-                                t pid3 gid1 pid2 gid1)))
-          (is = 1 (nth-value 1 (upsert-player-group-owner-when-owner
-                                t pid3 gid1 pid1 gid1)))
-          (is eq t (select-player-owner-of-group-p pid3 gid1))
+          ;; TODO move these to a separate test suite
+          ;; (is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
+          ;;                       t pid3 gid1 pid2 gid1)))
+          ;; (is = 1 (nth-value 1 (upsert-player-group-owner-when-owner
+          ;;                       t pid3 gid1 pid1 gid1)))
+          ;; (is eq t (select-player-owner-of-group-p pid3 gid1))
           (is = 1 (nth-value 1 (remove-player-from-player-group pid1 gid1)))
           (is eq :null (select-player-owner-of-group-p pid1 gid1))
-          (is = 1 (nth-value 1 (remove-player-from-player-group pid3 gid1)))
-          (is eq :null (select-player-owner-of-group-p pid3 gid1))
+          ;; (is = 1 (nth-value 1 (remove-player-from-player-group pid3 gid1)))
+          ;; (is eq :null (select-player-owner-of-group-p pid3 gid1))
           (is = 1 (nth-value 1 (remove-player-from-player-group pid1 gid2)))
           (is eq :null (select-player-owner-of-group-p pid1 gid2))
           (true (table-empty-p "players_personas"))
@@ -196,25 +197,26 @@ not an owner of the group.")
         #8?(is = 0 (nth-value 1 (update-player-group-owner t player 0)))
         #10?(is = 0 (nth-value 1 (remove-player-from-player-group player 0)))
         (delete-player-by-id player))
-      (let ((player (insert-player :login "gateway01" :email "ga1@te.way"
-                                   :name "Player" :hash (ub8 0) :salt (ub8 0)
-                                   :activatedp nil))
-            (group (insert-player-group :name "Player Group" :description "")))
-        (add-player-into-player-group player group t)
-        #11?(db-fail (upsert-player-group-owner-when-owner
-                      t 0 group player group))
-        #12?(db-fail (upsert-player-group-owner-when-owner
-                      t player 0 player group))
-        #13?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
-                                  t player group 0 group)))
-        #14?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
-                                  t player group player 0)))
-        (update-player-group-owner nil player group)
-        #15?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
-                                  t player group player group)))
-        #15?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
-                                  nil player group player group)))
-        (delete-player-by-id player)
-        (delete-player-group-by-id group)))
+      ;; (let ((player (insert-player :login "gateway01" :email "ga1@te.way"
+      ;;                              :name "Player" :hash (ub8 0) :salt (ub8 0)
+      ;;                              :activatedp nil))
+      ;;       (group (insert-player-group :name "Player Group" :description "")))
+      ;;   (add-player-into-player-group player group t)
+      ;;   #11?(db-fail (upsert-player-group-owner-when-owner
+      ;;                 t 0 group player group))
+      ;;   #12?(db-fail (upsert-player-group-owner-when-owner
+      ;;                 t player 0 player group))
+      ;;   #13?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
+      ;;                             t player group 0 group)))
+      ;;   #14?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
+      ;;                             t player group player 0)))
+      ;;   (update-player-group-owner nil player group)
+      ;;   #15?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
+      ;;                             t player group player group)))
+      ;;   #15?(is = 0 (nth-value 1 (upsert-player-group-owner-when-owner
+      ;;                             nil player group player group)))
+      ;;   (delete-player-by-id player)
+      ;;   (delete-player-group-by-id group))
+      )
     #5?(is = 0 (nth-value 1 (select-players-belonging-to-group 0)))
     #6?(is = 0 (nth-value 1 (select-groups-player-belongs-to 0)))))

@@ -55,9 +55,10 @@
                                                 :limit 1))))
       (let ((mdf-test-data '(:name "Test Persona 02"
                              :description "Description 02")))
-        (update-persona-name-by-id (getf mdf-test-data :name) inserted-id)
-        (update-persona-description-by-id (getf mdf-test-data :description)
-                                          inserted-id)
+        (is = 1 (nth-value 1 (update-persona-name-by-id
+                              (getf mdf-test-data :name) inserted-id)))
+        (is = 1 (nth-value 1 (update-persona-description-by-id
+                              (getf mdf-test-data :description) inserted-id)))
         (destructuring-bind
             (id name description creation-time last-edit-time)
             (select-persona-by-id inserted-id)
@@ -66,10 +67,10 @@
           (is string= description (getf mdf-test-data :description))
           (true (typep creation-time 'local-time:timestamp))
           (true (typep last-edit-time 'local-time:timestamp)))
-        (delete-persona-by-id inserted-id)
-        (false (select-persona-by-id inserted-id))
-        (false (first (select-personas-by-name (getf test-data :name)
-                                               :limit 1)))))))
+        (is = 1 (nth-value 1 (delete-persona-by-id inserted-id)))
+        (is = 0 (nth-value 1 (select-persona-by-id inserted-id)))
+        (is = 0 (nth-value 1 (select-personas-by-name (getf test-data :name)
+                                                      :limit 1)))))))
 
 (define-test-case persona-negative
     (:documentation "Negative test suite for the persona table."

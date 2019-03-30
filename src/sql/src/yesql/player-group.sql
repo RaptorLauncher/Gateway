@@ -20,16 +20,13 @@ SELECT id, name, description FROM player_group
 
 -- name: update-player-group-name-by-id @execute
 -- Sets the name of the player group with the provided ID.
--- TODO update-player-group-name-by-id-when-owner
 UPDATE player_group SET name = ?
   WHERE id = ?;
 
 -- name: update-player-group-description-by-id @execute
 -- Sets the description of the player group with the provided ID.
--- TODO update-player-group-description-by-id-when-owner
 UPDATE player_group SET description = ?
   WHERE id = ?;
-
 
 
 

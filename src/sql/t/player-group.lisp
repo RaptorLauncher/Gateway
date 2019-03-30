@@ -46,18 +46,19 @@
                                                      :limit 1))))
       (let ((mdf-test-data '(:name "Test Player Group 02"
                              :description "Description 02")))
-        (update-player-group-name-by-id (getf mdf-test-data :name) inserted-id)
-        (update-player-group-description-by-id (getf mdf-test-data :description)
-                                               inserted-id)
+        (is = 1 (nth-value 1 (update-player-group-name-by-id
+                              (getf mdf-test-data :name) inserted-id)))
+        (is = 1 (nth-value 1 (update-player-group-description-by-id
+                              (getf mdf-test-data :description) inserted-id)))
         (destructuring-bind (id name description)
             (select-player-group-by-id inserted-id)
           (is = id inserted-id)
           (is string= name (getf mdf-test-data :name))
           (is string= description (getf mdf-test-data :description)))
-        (delete-player-group-by-id inserted-id)
-        (false (select-player-group-by-id inserted-id))
-        (false (first (select-player-groups-by-name (getf test-data :name)
-                                                    :limit 1)))))))
+        (is = 1 (nth-value 1 (delete-player-group-by-id inserted-id)))
+        (is = 0 (nth-value 1 (select-player-group-by-id inserted-id)))
+        (is = 0 (nth-value 1 (select-player-groups-by-name
+                              (getf test-data :name) :limit 1)))))))
 
 (define-test-case player-group-negative
     (:documentation "Negative test suite for the player group table."
