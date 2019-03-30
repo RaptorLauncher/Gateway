@@ -9,31 +9,6 @@ $$;
 
 
 
--- Creates the chapter_permission enum type.
-CREATE TYPE chapter_permission_type AS ENUM (
-  'administer',
-  'change_permissions',
-  'change_name',
-  'view',
-  'post_create',
-  'post_edit',
-  'post_delete',
-  'post_rearrange');
-
-
-
--- Creates the timeline_permission enum type.
-CREATE TYPE timeline_permission_type AS ENUM (
-  'administer',
-  'change_permissions',
-  'change_name'
-  'view',
-  'link_within',
-  'link_from',
-  'link_to');
-
-
-
 -- Creates the player table.
 CREATE TABLE player (
   id             serial       NOT NULL PRIMARY KEY,
@@ -139,6 +114,45 @@ CREATE TABLE timeline (
 
 
 
+-- Creates the timeline_permission enum type.
+CREATE TYPE timeline_permission_type AS ENUM (
+  'administer',
+  'change_permissions',
+  'change_name',
+  'view',
+  'link_within',
+  'link_from',
+  'link_to');
+
+
+
+-- Creates the timeline permission table.
+CREATE TABLE timeline_permission (
+  player_id       integer                  NULL REFERENCES player(id)
+                                           ON UPDATE CASCADE ON DELETE CASCADE,
+  player_group_id integer                  NULL REFERENCES player_group(id)
+                                           ON UPDATE CASCADE ON DELETE CASCADE,
+  permission      timeline_permission_type NOT NULL,
+  timeline_id     integer                  NOT NULL REFERENCES timeline(id)
+                                           ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT timeline_permission_player_or_group
+  CHECK ((player_id IS NULL OR player_group_id IS NULL)));
+
+-- Unique partial indices to ensure uniqueness in the timeline permission table.
+CREATE UNIQUE INDEX timeline_permission_player_index
+  ON timeline_permission (player_id, permission, timeline_id)
+  WHERE player_id IS NOT NULL;
+
+CREATE UNIQUE INDEX timeline_permission_player_group_index
+  ON timeline_permission (player_group_id, permission, timeline_id)
+  WHERE player_group_id IS NOT NULL;
+
+CREATE UNIQUE INDEX timeline_permission_global_index
+  ON timeline_permission (permission, timeline_id)
+  WHERE player_id IS NULL AND player_group_id IS NULL;
+
+
+
 -- Creates the chapter table.
 CREATE TABLE chapter (
   id             serial    NOT NULL PRIMARY KEY,
@@ -150,6 +164,57 @@ CREATE TABLE chapter (
   ------------
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now());
+
+
+
+-- Creates the chapter_permission enum type.
+CREATE TYPE chapter_permission_type AS ENUM (
+  'administer',
+  'change_permissions',
+  'change_name',
+  'view',
+  'post_create',
+  'post_edit',
+  'post_delete',
+  'post_rearrange');
+
+
+
+-- Creates the chapter permission table.
+CREATE TABLE chapter_permission (
+  player_id        integer                 NULL REFERENCES player(id)
+                                           ON UPDATE CASCADE ON DELETE CASCADE,
+  player_group_id  integer                 NULL REFERENCES player_group(id)
+                                           ON UPDATE CASCADE ON DELETE CASCADE,
+  permission       chapter_permission_type NOT NULL,
+  chapter_id       integer                 NOT NULL REFERENCES chapter(id)
+                                           ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT chapter_permission_player_or_group
+  CHECK ((player_id IS NULL OR player_group_id IS NULL)));
+
+-- Unique partial indices to ensure uniqueness in the chapter permission table.
+CREATE UNIQUE INDEX chapter_permission_player_index
+  ON chapter_permission (player_id, permission, chapter_id)
+  WHERE player_id IS NOT NULL;
+
+CREATE UNIQUE INDEX chapter_permission_player_group_index
+  ON chapter_permission (player_group_id, permission, chapter_id)
+  WHERE player_group_id IS NOT NULL;
+
+CREATE UNIQUE INDEX chapter_permission_global_index
+  ON chapter_permission ( permission, chapter_id)
+  WHERE player_id IS NULL AND player_group_id IS NULL;
+
+
+
+-- Creates the chapter link table.
+CREATE TABLE chapter_link (
+  link_from integer NOT NULL REFERENCES chapter(id)
+                    ON UPDATE CASCADE ON DELETE CASCADE,
+  link_to   integer NOT NULL REFERENCES chapter(id)
+                    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT chapter_link_primary_key
+  PRIMARY KEY (link_from, link_to));
 
 
 
@@ -168,69 +233,3 @@ CREATE TABLE post (
   creation_time  timestamp NOT NULL DEFAULT now(),
   last_edit_time timestamp NOT NULL DEFAULT now(),
   chapter_order  serial    NOT NULL);
-
-
-
--- Creates the chapter link table.
-CREATE TABLE chapter_link (
-  link_from integer NOT NULL REFERENCES chapter(id)
-                    ON UPDATE CASCADE ON DELETE CASCADE,
-  link_to   integer NOT NULL REFERENCES chapter(id)
-                    ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT chapter_link_primary_key
-  PRIMARY KEY (link_from, link_to));
-
-
-
--- Creates the chapter permission table.
-CREATE TABLE chapter_permission (
-  player_id        integer                 NULL REFERENCES player(id)
-                                           ON UPDATE CASCADE ON DELETE CASCADE,
-  player_group_id  integer                 NULL REFERENCES player_group(id)
-                                           ON UPDATE CASCADE ON DELETE CASCADE,
-  permission       chapter_permission_type NOT NULL,
-  chapter_id       integer                 NOT NULL REFERENCES chapter(id)
-                                           ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT chapter_permission_player_or_group
-  CHECK (NOT (player_id IS NOT NULL AND player_group_id IS NOT NULL)));
-
--- Unique partial indices to ensure uniqueness in the chapter permission table.
-CREATE UNIQUE INDEX chapter_permission_player_index
-  ON chapter_permission (player_id, permission, chapter_id)
-  WHERE player_id IS NOT NULL;
-
-CREATE UNIQUE INDEX chapter_permission_player_group_index
-  ON chapter_permission (player_group_id, permission, chapter_id)
-  WHERE player_group_id IS NOT NULL;
-
-CREATE UNIQUE INDEX chapter_permission_global_index
-  ON chapter_permission ( permission, chapter_id)
-  WHERE player_id IS NULL AND player_group_id IS NULL;
-
-
-
--- Creates the timeline permission table.
-CREATE TABLE timeline_permission (
-  player_id       integer                  NULL REFERENCES player(id)
-                                           ON UPDATE CASCADE ON DELETE CASCADE,
-  player_group_id integer                  NULL REFERENCES player_group(id)
-                                           ON UPDATE CASCADE ON DELETE CASCADE,
-  permission      timeline_permission_type NOT NULL,
-  timeline_id     integer                  NOT NULL REFERENCES timeline(id)
-                                           ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT timeline_permission_player_or_group
-  CHECK ((player_id IS NULL     AND player_group_id IS NOT NULL) OR
-         (player_id IS NOT NULL AND player_group_id IS NULL)));
-
--- Unique partial indices to ensure uniqueness in the timeline permission table.
-CREATE UNIQUE INDEX timeline_permission_player_index
-  ON timeline_permission (player_id, permission, timeline_id)
-  WHERE player_id IS NOT NULL;
-
-CREATE UNIQUE INDEX timeline_permission_player_group_index
-  ON timeline_permission (player_group_id, permission, timeline_id)
-  WHERE player_group_id IS NOT NULL;
-
-CREATE UNIQUE INDEX timeline_permission_global_index
-  ON timeline_permission (permission, timeline_id)
-  WHERE player_id IS NULL AND player_group_id IS NULL;

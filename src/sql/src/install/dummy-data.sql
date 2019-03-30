@@ -52,3 +52,32 @@ INSERT INTO players_personas (player_id, persona_id, is_owner)
          (2, 4, TRUE),  (2, 5, TRUE),  (2, 6, TRUE),
          (3, 1, FALSE), (3, 2, FALSE),
          (4, 1, FALSE);
+
+INSERT INTO timeline (id, name, description, creation_time, last_edit_time)
+  VALUES (1, 'Timeline 1', 'Timeline 1',  now() - INTERVAL '1 HOUR', now()),
+         (2, 'Timeline 2', 'Timeline 2',  now() - INTERVAL '1 HOUR', now()),
+         (3, 'Timeline 3', 'Timeline 3',  now() - INTERVAL '1 HOUR', now()),
+         (4, 'Timeline 4', 'Timeline 4',  now() - INTERVAL '1 HOUR', now()),
+         (5, 'Timeline 5', 'Timeline 5',  now() - INTERVAL '1 HOUR', now()),
+         (6, 'Timeline 6', 'Timeline 6',  now() - INTERVAL '1 HOUR', now());
+
+INSERT INTO timeline_permission (player_id, timeline_id, permission)
+  VALUES (1, 1, 'administer'),
+         (2, 2, 'change_permissions'),
+         (3, 2, 'change_name'),
+         (4, 2, 'view'),
+         (5, 2, 'link_within'),
+         (6, 2, 'link_from'),
+         (7, 2, 'link_to');
+
+INSERT INTO timeline_permission (player_group_id, timeline_id, permission)
+  VALUES (1, 3, 'administer'),
+         (2, 4, 'change_permissions'),
+         (2, 4, 'change_name'),
+         (2, 4, 'view'),
+         (2, 4, 'link_within'),
+         (2, 4, 'link_from'),
+         (2, 4, 'link_to');
+
+INSERT INTO timeline_permission (timeline_id, permission)
+  VALUES (5, 'view');
