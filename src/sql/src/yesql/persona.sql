@@ -21,11 +21,13 @@ SELECT id, name, description, creation_time, last_edit_time FROM persona
 
 -- name: update-persona-name-by-id @execute
 -- Sets the name of the persona with the provided ID.
+-- TODO update-persona-name-by-id-when-owner
 UPDATE persona SET name = ?, last_edit_time = now()
   WHERE id = ?;
 
 -- name: update-persona-description-by-id @execute
 -- Sets the description of the persona with the provided ID.
+-- TODO update-persona-description-by-id-when-owner
 UPDATE persona SET description = ?, last_edit_time = now()
   WHERE id = ?;
 

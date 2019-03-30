@@ -33,8 +33,27 @@ SELECT p.id, p.name, p.description, g.is_owner
 
 -- name: update-player-group-owner @execute
 -- Sets whether the provided player is the owner of the provided player group.
+-- TODO ?foo argument names for functions
 UPDATE players_groups SET is_owner = ?
   WHERE player_id = ? AND player_group_id = ?;
+
+
+
+-- name: upsert-player-group-owner-when-owner
+-- Sets whether the provided player is the owner of the provided player group
+-- if the second provided player is the owner of the second provided group.
+-- TODO the third and fifth argument MUST be the same
+WITH is_owner AS (SELECT ?::boolean AS p),
+     player_id AS (SELECT ?::integer AS p),
+     player_group_id AS (SELECT ?::integer AS p)
+INSERT INTO players_groups (is_owner, player_id, player_group_id)
+  SELECT is_owner.p, player_id.p, player_group_id.p
+  FROM is_owner, player_id, player_group_id
+  WHERE EXISTS (SELECT 1 FROM players_groups
+                WHERE player_id = ? AND player_group_id = ?
+                AND is_owner = TRUE)
+  ON CONFLICT (player_id, player_group_id) DO UPDATE
+  SET is_owner = (SELECT p FROM is_owner);
 
 
 

@@ -11,7 +11,7 @@
                    :gateway.sql "t/sql/test-tables-empty.sql")))
     (read-file-into-string pathname)))
 
-(defun test-tables-empty ()
+(defun check-tables-empty ()
   (loop with result = (pomo:query *test-tables-empty-query*)
         for (name count) in result
         unless (= 0 count)
@@ -64,9 +64,8 @@
     `(let ((,errorp nil))
        (handler-bind ((error (lambda (,e) (setf ,errorp ,e))))
          (unwind-protect
-              (with-test-db ()
-                ,@body
-                (unless *dummy-data* (test-tables-empty)))
+              (with-test-db () ,@body
+                (unless *dummy-data* (check-tables-empty)))
            (when ,errorp
              (with-test-db () (uninstall) (install)
                (when *dummy-data* (install-dummy-data)))))))))

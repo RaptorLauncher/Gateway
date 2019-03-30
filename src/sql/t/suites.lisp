@@ -36,7 +36,7 @@ Tests in this suite are forbidden from modifying the database state."
 
 (defmethod parachute:eval-in-context :around
     (context (test (eql (parachute:find-test 'sql-select-dummy))))
-  (with-test-db () (uninstall) (install) (install-dummy-data))
+  (with-test-db () (install-dummy-data))
   (let ((*dummy-data* t))
     (call-next-method))
   (with-test-db () (uninstall) (install)))
