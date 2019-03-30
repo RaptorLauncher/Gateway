@@ -1,11 +1,3 @@
--- name: insert-persona @single
--- Inserts a new persona into the database.
-INSERT INTO persona (name, description)
-  VALUES(:name, :description)
-  RETURNING id;
-
-
-
 -- name: select-persona-by-id @row
 -- Selects a persona whose ID matches the argument.
 SELECT id, name, description, creation_time, last_edit_time FROM persona
@@ -16,6 +8,14 @@ SELECT id, name, description, creation_time, last_edit_time FROM persona
 -- At most :LIMIT players are returned.
 SELECT id, name, description, creation_time, last_edit_time FROM persona
   ORDER BY name <-> ? LIMIT :limit;
+
+
+
+-- name: insert-persona @single
+-- Inserts a new persona into the database.
+INSERT INTO persona (name, description)
+  VALUES(:name, :description)
+  RETURNING id;
 
 
 

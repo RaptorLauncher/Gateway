@@ -1,11 +1,3 @@
--- name: insert-player @single
--- Inserts a new player into the database.
-INSERT INTO player (login, email, name, pass_hash, pass_salt, activatedp)
-  VALUES(:login, lower(:email), :name, :hash, :salt, :activatedp)
-  RETURNING id;
-
-
-
 -- name: select-player-by-id @row
 -- Returns a player whose ID matches the argument.
 SELECT id, login, email, name, pass_hash, pass_salt,
@@ -30,6 +22,14 @@ SELECT id, login, email, name, pass_hash, pass_salt,
 SELECT id, login, email, name, pass_hash, pass_salt,
        activatedp, creation_time, last_edit_time FROM player
   ORDER BY name <-> ? LIMIT :limit;
+
+
+
+-- name: insert-player @single
+-- Inserts a new player into the database.
+INSERT INTO player (login, email, name, pass_hash, pass_salt, activatedp)
+  VALUES(:login, lower(:email), :name, :hash, :salt, :activatedp)
+  RETURNING id;
 
 
 

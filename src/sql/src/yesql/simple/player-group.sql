@@ -1,10 +1,3 @@
--- name: insert-player-group @single
--- Inserts a new player group into the database.
-INSERT INTO player_group (name, description)
-  VALUES(:name, :description) RETURNING id;
-
-
-
 -- name: select-player-group-by-id @row
 -- Returns a player group whose ID matches the argument.
 SELECT id, name, description FROM player_group
@@ -15,6 +8,13 @@ SELECT id, name, description FROM player_group
 -- At most :LIMIT player groups are returned.
 SELECT id, name, description FROM player_group
   ORDER BY name <-> ? LIMIT :limit;
+
+
+
+-- name: insert-player-group @single
+-- Inserts a new player group into the database.
+INSERT INTO player_group (name, description)
+  VALUES(:name, :description) RETURNING id;
 
 
 
