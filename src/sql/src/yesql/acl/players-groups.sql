@@ -1,4 +1,4 @@
--- name: add-player-into-player-group-when-owner @execute
+-- name: add-player-into-player-group/acl @execute
 -- Adds a player to a player group if the provided player is the owner of that group.
 WITH player_id AS (SELECT ?::integer AS p),
      player_group_id AS (SELECT ?::integer AS p),
@@ -14,31 +14,7 @@ INSERT INTO players_groups (player_id, player_group_id, is_owner)
 
 
 
--- name: update-player-group-name-by-id-when-owner
--- Sets the name of the player group with the provided ID if the provided player
--- is the owner of that group.
-WITH name AS (SELECT ?::text AS p),
-     player_group_id AS (select ?::integer AS p) -- TODO test
-UPDATE player_group SET name = (SELECT p FROM name)
-  WHERE id = (SELECT p FROM player_group_id)
-  AND EXISTS (SELECT 1 FROM players_groups
-              WHERE player_id = ?
-              AND player_group_id = (SELECT p FROM player_group_id)
-              AND is_owner = TRUE);
-
--- name: update-player-group-description-by-id-when-owner
--- Sets the description of the player group with the provided ID if the provided player
--- is the owner of that group.
-WITH description AS (SELECT ?::text AS p),
-     player_group_id AS (select ?::integer AS p) -- TODO test
-UPDATE player_group SET description = (SELECT p FROM description)
-  WHERE id = (SELECT p FROM player_group_id)
-  AND EXISTS (SELECT 1 FROM players_groups
-              WHERE player_id = ?
-              AND player_group_id = (SELECT p FROM player_group_id)
-              AND is_owner = TRUE);
-
--- name: update-player-group-ownerp-by-id-when-owner
+-- name: update-player-group-ownerp-by-id/acl @execute
 -- Sets the owner status of the player group with the provided ID if the provided player
 -- is the owner of that group.
 WITH is_owner AS (SELECT ?::boolean AS p),
@@ -52,11 +28,31 @@ UPDATE player_group SET is_owner = (SELECT p FROM is_owner)
 
 
 
--- name: upsert-player-group-owner-when-owner
+-- name: remove-player-from-player-group/acl @execute
+-- Removes a player from a player group if the provided player is the owner of that group.
+WITH player_id AS (select ?::integer AS p),
+     player_group_id AS (select ?::integer AS p),
+     owner_id AS (select ?::integer AS p)
+DELETE FROM players_groups
+  WHERE player_id = ? AND player_group_id = ?
+  AND EXISTS (SELECT 1 from players_groups
+              WHERE player_id = (SELECT p FROM owner_id)
+              AND player_group_id = (SELECT p FROM player_group_id)
+              AND is_owner = true);
+
+
+
+
+
+
+
+
+
+-- name: upsert-player-group-owner/acl
 -- Sets whether the provided player is the owner of the provided player group
 -- if the second provided player is the owner of the second provided group.
--- TODO the third and fifth argument MUST be the same
--- TODO move upsert tests into separate test suite
+-- TODO the third and fifth argument MUST be the same, fix it
+-- TODO move ACL tests into separate test suite
 WITH is_owner AS (SELECT ?::boolean AS p),
      player_id AS (SELECT ?::integer AS p),
      -- TODO remove casts when postmodern fixes #194
