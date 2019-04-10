@@ -3,6 +3,8 @@
 ;;;; © Michał "phoe" Herda 2016-2018
 ;;;; main.lisp
 
+;; (ql:quickload '(:alexandria :protest/parachute :gateway.init))
+
 (defpackage #:gateway-user
   (:use #:cl #:alexandria)
   (:import-from #:protest/parachute #:test)
