@@ -5,6 +5,9 @@
 
 (defpackage #:gateway-user
   (:use #:cl #:alexandria)
+  (:import-from #:protest/parachute #:test)
+  (:import-from #:parachute #:results-with-status)
+  (:import-from #:gateway.init #:gateway-full-test)
   (:export #:test-gateway))
 
 (in-package #:gateway-user)
@@ -19,8 +22,8 @@
 
 (defun test-gateway ()
   (mapc #'asdf:load-system *systems*)
-  (let ((result (protest/parachute:test 'gateway.init:gateway-full-test)))
-    (when-let ((failed (parachute:results-with-status :failed result)))
+  (let ((result (test 'gateway.init:gateway-full-test)))
+    (when-let ((failed (results-with-status :failed result)))
       (cerror "Continue." "There are test failures: ~{~%~A~}" failed))
     result))
 
