@@ -20,8 +20,8 @@ CREATE TABLE player (
   pass_hash      bytea        NOT NULL DEFAULT ''::bytea,
   pass_salt      bytea        NOT NULL DEFAULT ''::bytea,
   activatedp     boolean      NOT NULL DEFAULT FALSE,
-  creation_time  timestamp    NOT NULL DEFAULT now(),
-  last_edit_time timestamp    NOT NULL DEFAULT now(),
+  creation_time  timestamptz  NOT NULL DEFAULT now(),
+  last_edit_time timestamptz  NOT NULL DEFAULT now(),
   CONSTRAINT player_login_valid
   CHECK (login ~ '^[a-zA-Z0-9._-]{3,}$'),
   CONSTRAINT player_name_not_empty
@@ -73,8 +73,8 @@ CREATE TABLE persona (
   name           varchar(64)   NOT NULL,
   ------------
   description    varchar(8192) NOT NULL DEFAULT '',
-  creation_time  timestamp     NOT NULL DEFAULT now(),
-  last_edit_time timestamp     NOT NULL DEFAULT now(),
+  creation_time  timestamptz   NOT NULL DEFAULT now(),
+  last_edit_time timestamptz   NOT NULL DEFAULT now(),
   CONSTRAINT persona_name_not_empty
   CHECK (name <> ''),
   CONSTRAINT persona_name_no_newlines
@@ -104,13 +104,13 @@ CREATE UNIQUE INDEX players_personas_only_one_owner
 
 -- Creates the timeline table.
 CREATE TABLE timeline (
-  id             serial    NOT NULL PRIMARY KEY,
+  id             serial      NOT NULL PRIMARY KEY,
   ------------
-  name           text      NOT NULL,
-  description    text      NOT NULL DEFAULT '',
+  name           text        NOT NULL,
+  description    text        NOT NULL DEFAULT '',
   ------------
-  creation_time  timestamp NOT NULL DEFAULT now(),
-  last_edit_time timestamp NOT NULL DEFAULT now());
+  creation_time  timestamptz NOT NULL DEFAULT now(),
+  last_edit_time timestamptz NOT NULL DEFAULT now());
 
 
 
@@ -155,15 +155,15 @@ CREATE UNIQUE INDEX timelines_permissions_global_index
 
 -- Creates the chapter table.
 CREATE TABLE chapter (
-  id             serial    NOT NULL PRIMARY KEY,
+  id             serial      NOT NULL PRIMARY KEY,
   ------------
-  timeline_id    integer   NOT NULL REFERENCES timeline(id)
-                           ON UPDATE CASCADE ON DELETE CASCADE,
-  name           text      NOT NULL,
-  description    text      NOT NULL DEFAULT '',
+  timeline_id    integer     NOT NULL REFERENCES timeline(id)
+                             ON UPDATE CASCADE ON DELETE CASCADE,
+  name           text        NOT NULL,
+  description    text        NOT NULL DEFAULT '',
   ------------
-  creation_time  timestamp NOT NULL DEFAULT now(),
-  last_edit_time timestamp NOT NULL DEFAULT now());
+  creation_time  timestamptz NOT NULL DEFAULT now(),
+  last_edit_time timestamptz NOT NULL DEFAULT now());
 
 
 
@@ -202,7 +202,7 @@ CREATE UNIQUE INDEX chapters_permissions_player_group_index
   WHERE player_group_id IS NOT NULL;
 
 CREATE UNIQUE INDEX chapters_permissions_global_index
-  ON chapters_permissions ( permission, chapter_id)
+  ON chapters_permissions (permission, chapter_id)
   WHERE player_id IS NULL AND player_group_id IS NULL;
 
 
@@ -220,16 +220,16 @@ CREATE TABLE chapter_links (
 
 -- Creates the post table.
 CREATE TABLE post (
-  id             serial    NOT NULL PRIMARY KEY,
+  id             serial      NOT NULL PRIMARY KEY,
   ------------
-  player_id      integer   NULL REFERENCES player(id)
-                           ON UPDATE CASCADE ON DELETE SET NULL,
-  persona_id     integer   NULL REFERENCES persona(id)
-                           ON UPDATE CASCADE ON DELETE SET NULL,
-  chapter_id     integer   NOT NULL REFERENCES chapter(id)
-                           ON UPDATE CASCADE ON DELETE CASCADE,
-  contents       text      NOT NULL,
+  player_id      integer     NULL REFERENCES player(id)
+                             ON UPDATE CASCADE ON DELETE SET NULL,
+  persona_id     integer     NULL REFERENCES persona(id)
+                             ON UPDATE CASCADE ON DELETE SET NULL,
+  chapter_id     integer     NOT NULL REFERENCES chapter(id)
+                             ON UPDATE CASCADE ON DELETE CASCADE,
+  contents       text        NOT NULL,
   ------------
-  creation_time  timestamp NOT NULL DEFAULT now(),
-  last_edit_time timestamp NOT NULL DEFAULT now(),
-  chapter_order  serial    NOT NULL);
+  creation_time  timestamptz NOT NULL DEFAULT now(),
+  last_edit_time timestamptz NOT NULL DEFAULT now(),
+  chapter_order  serial      NOT NULL);

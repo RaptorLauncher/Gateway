@@ -13,7 +13,6 @@ UPDATE player_group SET name = (SELECT p FROM name)
 -- name: update-player-group-description-by-id/acl
 -- Sets the description of the player group with the provided ID if the provided player
 -- is the owner of that group.
--- TODO timestamptz instead of timestamp
 WITH description AS (SELECT ?::text AS p),
      player_group_id AS (select ?::integer AS p) -- TODO test
 UPDATE player_group SET description = (SELECT p FROM description)
