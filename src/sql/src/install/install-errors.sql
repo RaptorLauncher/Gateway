@@ -3,11 +3,11 @@
 
 CREATE OR REPLACE FUNCTION base36_encode(IN digits bigint, IN min_width int = 0)
   RETURNS varchar AS $$
-    DECLARE
-      chars char[];
-      ret varchar;
-      val bigint;
-    BEGIN
+  DECLARE
+    chars char[];
+    ret varchar;
+    val bigint;
+  BEGIN
     chars := ARRAY['0','1','2','3','4','5','6','7','8','9'
       ,'A','B','C','D','E','F','G','H','I','J','K','L','M'
       ,'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
@@ -24,18 +24,18 @@ CREATE OR REPLACE FUNCTION base36_encode(IN digits bigint, IN min_width int = 0)
       ret := lpad(ret, min_width, '0');
     END IF;
     RETURN ret;
-END;
+  END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
   RETURNS bigint AS $$
-    DECLARE
-      a char[];
-      ret bigint;
-      i int;
-      val int;
-      chars varchar;
-    BEGIN
+  DECLARE
+    a char[];
+    ret bigint;
+    i int;
+    val int;
+    chars varchar;
+  BEGIN
     chars := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     FOR i IN REVERSE char_length(base36)..1 LOOP
       a := a || substring(upper(base36) FROM i FOR 1)::char;
@@ -48,15 +48,13 @@ CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
       i := i + 1;
     END LOOP;
     RETURN ret;
-END;
+  END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 
 
 -- Creates the Gateway error table sequence.
 CREATE SEQUENCE gateway_error_id START 1;
-
-
 
 -- Creates the Gateway error table.
 CREATE TABLE gateway_error (
@@ -74,8 +72,47 @@ CREATE TABLE gateway_error (
   CONSTRAINT gateway_error_reason_not_empty
   CHECK (reason <> ''));
 
-
-
 -- Inserts error data into the database.
 INSERT INTO gateway_error (name, argcount, reason)
-  VALUES ('general_error', 0, 'A general Gateway database error has been signaled.');
+  VALUES
+  ('general_error', 0,
+   'A general Gateway database error has been signaled.'),
+  ------------
+  ('gateway_error_not_found', 1,
+   'Database function gateway_error called with unknown error %I.'),
+  ------------
+  ('gateway_error_argcount_invalid', 2,
+   'Database function gateway_error called with invalid argument count %I ' ||
+   'for error name %I.'),
+  ------------
+  ('user_does_not_exist', 1,
+   'No user with the login %I exists in the system.');
+
+-- Creates the function signaling Gateway errors.
+CREATE OR REPLACE FUNCTION raise_error(IN message text, IN id text)
+  RETURNS void AS $$
+  BEGIN
+    RAISE EXCEPTION USING MESSAGE = message, ERRCODE = id;
+  END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Creates the function signaling Gateway errors.
+CREATE OR REPLACE FUNCTION gateway_error(IN error_name text, VARIADIC format_args text[])
+  RETURNS void AS $$
+  SELECT
+    CASE
+      WHEN NOT EXISTS (SELECT 1 FROM gateway_error e
+                       WHERE e.name = error_name)
+        THEN gateway_error('gateway_error_not_found', VARIADIC ARRAY [error_name])
+      WHEN array_upper(format_args, 1) <>
+                       (SELECT argcount FROM gateway_error e WHERE e.name = error_name)
+        THEN gateway_error('gateway_error_argcount_invalid',
+                         VARIADIC ARRAY
+                         [error_name, (SELECT argcount FROM gateway_error e
+                                       WHERE e.name = error_name)::text])
+      ELSE
+        raise_error(format((SELECT reason FROM gateway_error e WHERE e.name = error_name),
+                           VARIADIC format_args),
+                    (SELECT id FROM gateway_error e WHERE e.name = error_name)::text)
+    END;
+$$ LANGUAGE sql STABLE;
