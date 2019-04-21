@@ -19,7 +19,8 @@
   (execute-file-with-transaction "uninstall.sql"))
 
 (defun install ()
-  (execute-file-with-transaction "install.sql"))
+  (execute-file-with-transaction "install.sql")
+  (execute-file-with-transaction "install-errors.sql"))
 
 (defun install-dummy-data ()
   (execute-file-with-transaction "dummy-data.sql"))
@@ -30,11 +31,11 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *sql-imports*
-    '(simple/player
-      simple/player-group
-      simple/players-groups
-      simple/persona
-      simple/players-personas)))
+    '(system/player
+      system/player-group
+      system/players-groups
+      system/persona
+      system/players-personas)))
 
 (defun rebuild ()
   (let ((*package* (find-package :gateway.sql)))

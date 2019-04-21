@@ -127,7 +127,7 @@ CREATE TYPE timeline_permission_type AS ENUM (
 
 
 -- Creates the timeline permission table.
-CREATE TABLE timeline_permission (
+CREATE TABLE timelines_permissions (
   player_id       integer                  NULL REFERENCES player(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
   player_group_id integer                  NULL REFERENCES player_group(id)
@@ -135,20 +135,20 @@ CREATE TABLE timeline_permission (
   permission      timeline_permission_type NOT NULL,
   timeline_id     integer                  NOT NULL REFERENCES timeline(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT timeline_permission_player_or_group
+  CONSTRAINT timelines_permissions_player_or_group
   CHECK ((player_id IS NULL OR player_group_id IS NULL)));
 
 -- Unique partial indices to ensure uniqueness in the timeline permission table.
-CREATE UNIQUE INDEX timeline_permission_player_index
-  ON timeline_permission (player_id, permission, timeline_id)
+CREATE UNIQUE INDEX timelines_permissions_player_index
+  ON timelines_permissions (player_id, permission, timeline_id)
   WHERE player_id IS NOT NULL;
 
-CREATE UNIQUE INDEX timeline_permission_player_group_index
-  ON timeline_permission (player_group_id, permission, timeline_id)
+CREATE UNIQUE INDEX timelines_permissions_player_group_index
+  ON timelines_permissions (player_group_id, permission, timeline_id)
   WHERE player_group_id IS NOT NULL;
 
-CREATE UNIQUE INDEX timeline_permission_global_index
-  ON timeline_permission (permission, timeline_id)
+CREATE UNIQUE INDEX timelines_permissions_global_index
+  ON timelines_permissions (permission, timeline_id)
   WHERE player_id IS NULL AND player_group_id IS NULL;
 
 
@@ -181,7 +181,7 @@ CREATE TYPE chapter_permission_type AS ENUM (
 
 
 -- Creates the chapter permission table.
-CREATE TABLE chapter_permission (
+CREATE TABLE chapters_permissions (
   player_id        integer                 NULL REFERENCES player(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
   player_group_id  integer                 NULL REFERENCES player_group(id)
@@ -189,31 +189,31 @@ CREATE TABLE chapter_permission (
   permission       chapter_permission_type NOT NULL,
   chapter_id       integer                 NOT NULL REFERENCES chapter(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT chapter_permission_player_or_group
+  CONSTRAINT chapters_permissions_player_or_group
   CHECK ((player_id IS NULL OR player_group_id IS NULL)));
 
 -- Unique partial indices to ensure uniqueness in the chapter permission table.
-CREATE UNIQUE INDEX chapter_permission_player_index
-  ON chapter_permission (player_id, permission, chapter_id)
+CREATE UNIQUE INDEX chapters_permissions_player_index
+  ON chapters_permissions (player_id, permission, chapter_id)
   WHERE player_id IS NOT NULL;
 
-CREATE UNIQUE INDEX chapter_permission_player_group_index
-  ON chapter_permission (player_group_id, permission, chapter_id)
+CREATE UNIQUE INDEX chapters_permissions_player_group_index
+  ON chapters_permissions (player_group_id, permission, chapter_id)
   WHERE player_group_id IS NOT NULL;
 
-CREATE UNIQUE INDEX chapter_permission_global_index
-  ON chapter_permission ( permission, chapter_id)
+CREATE UNIQUE INDEX chapters_permissions_global_index
+  ON chapters_permissions ( permission, chapter_id)
   WHERE player_id IS NULL AND player_group_id IS NULL;
 
 
 
 -- Creates the chapter link table.
-CREATE TABLE chapter_link (
+CREATE TABLE chapter_links (
   link_from integer NOT NULL REFERENCES chapter(id)
                     ON UPDATE CASCADE ON DELETE CASCADE,
   link_to   integer NOT NULL REFERENCES chapter(id)
                     ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT chapter_link_primary_key
+  CONSTRAINT chapter_links_primary_key
   PRIMARY KEY (link_from, link_to));
 
 

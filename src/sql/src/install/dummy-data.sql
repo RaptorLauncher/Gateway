@@ -61,7 +61,7 @@ INSERT INTO timeline (id, name, description, creation_time, last_edit_time)
          (5, 'Timeline 5', 'Timeline 5',  now() - INTERVAL '1 HOUR', now()),
          (6, 'Timeline 6', 'Timeline 6',  now() - INTERVAL '1 HOUR', now());
 
-INSERT INTO timeline_permission (player_id, timeline_id, permission)
+INSERT INTO timelines_permissions (player_id, timeline_id, permission)
   VALUES (1, 1, 'administer'),
          (2, 2, 'change_permissions'),
          (3, 2, 'change_name'),
@@ -70,7 +70,7 @@ INSERT INTO timeline_permission (player_id, timeline_id, permission)
          (6, 2, 'link_from'),
          (7, 2, 'link_to');
 
-INSERT INTO timeline_permission (player_group_id, timeline_id, permission)
+INSERT INTO timelines_permissions (player_group_id, timeline_id, permission)
   VALUES (1, 3, 'administer'),
          (2, 4, 'change_permissions'),
          (2, 4, 'change_name'),
@@ -79,5 +79,5 @@ INSERT INTO timeline_permission (player_group_id, timeline_id, permission)
          (2, 4, 'link_from'),
          (2, 4, 'link_to');
 
-INSERT INTO timeline_permission (timeline_id, permission)
+INSERT INTO timelines_permissions (timeline_id, permission)
   VALUES (5, 'view');
