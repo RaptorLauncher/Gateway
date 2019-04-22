@@ -19,6 +19,7 @@
   (execute-file-with-transaction "uninstall.sql"))
 
 (defun install ()
+  (execute-file-with-transaction "utils.sql")
   (execute-file-with-transaction "install.sql")
   (execute-file-with-transaction "install-errors.sql"))
 
