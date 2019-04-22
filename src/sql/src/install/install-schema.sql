@@ -139,9 +139,9 @@ CREATE TABLE timelines_permissions (
                                            ON UPDATE CASCADE ON DELETE CASCADE,
   player_group_id integer                  NULL REFERENCES player_group(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
-  permission      timeline_permission_type NOT NULL,
   timeline_id     integer                  NOT NULL REFERENCES timeline(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
+  permission      timeline_permission_type NOT NULL,
   CONSTRAINT timelines_permissions_player_or_group
   CHECK ((player_id IS NULL OR player_group_id IS NULL)));
 
@@ -193,9 +193,9 @@ CREATE TABLE chapters_permissions (
                                            ON UPDATE CASCADE ON DELETE CASCADE,
   player_group_id  integer                 NULL REFERENCES player_group(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
-  permission       chapter_permission_type NOT NULL,
   chapter_id       integer                 NOT NULL REFERENCES chapter(id)
                                            ON UPDATE CASCADE ON DELETE CASCADE,
+  permission       chapter_permission_type NOT NULL,
   CONSTRAINT chapters_permissions_player_or_group
   CHECK ((player_id IS NULL OR player_group_id IS NULL)));
 
