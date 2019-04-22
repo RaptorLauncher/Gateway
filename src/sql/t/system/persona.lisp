@@ -82,7 +82,7 @@
   4 "Trying to return a non-existent persona returns nothing."
   5 "Trying to update a non-existent persona returns nothing."
   6 "Trying to delete a non-existent persona returns nothing."
-  7"Last edit time must not be earlier than creation time.")
+  7 "Last edit time must not be earlier than creation time.")
 
 (define-test persona-negative
   :parent sql-negative

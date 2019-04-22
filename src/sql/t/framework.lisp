@@ -26,17 +26,12 @@
 (defvar *dummy-data* nil)
 
 (defun compute-exports ()
-  (let ((exports (loop with package = (find-package '#:gateway.sql/system)
-                       for x being the external-symbols of package
-                       collect x))
-        ;; (ignored '(install uninstall install-dummy-data
-        ;;            with-db with-test-db))
-        )
-    ;; (set-difference exports ignored)
-    exports))
+  (loop with package = (find-package '#:gateway.sql/system)
+        for x being the external-symbols of package collect x))
 
 ;;; FIXME: Most of this hack should go away when Shinmera implements running
 ;;; code around tests in a test suite.
+;;; TODO: Shinmera implemented it, now you fix it!
 
 (defmacro define-test (name &body arguments-and-body)
   `(protest/parachute:define-test ,name
