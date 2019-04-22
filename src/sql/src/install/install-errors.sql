@@ -1,3 +1,5 @@
+-- TODO create utils.sql
+
 -- The following two functions are © Jamie Begin, 2010.
 -- source: http://www.jamiebegin.com/base36-conversion-in-postgresql/
 
@@ -97,16 +99,16 @@ CREATE OR REPLACE FUNCTION raise_error(IN message text, IN id text)
 $$ LANGUAGE plpgsql STABLE;
 
 -- Creates the function signaling Gateway errors.
-CREATE OR REPLACE FUNCTION gateway_error(IN error_name text, VARIADIC format_args text[])
+CREATE OR REPLACE FUNCTION gateway_error_int(IN error_name text, VARIADIC format_args text[])
   RETURNS void AS $$
   SELECT
     CASE
       WHEN NOT EXISTS (SELECT 1 FROM gateway_error e
                        WHERE e.name = error_name)
-        THEN gateway_error('gateway_error_not_found', VARIADIC ARRAY [error_name])
+        THEN gateway_error_int('gateway_error_not_found', VARIADIC ARRAY [error_name])
       WHEN array_upper(format_args, 1) <>
                        (SELECT argcount FROM gateway_error e WHERE e.name = error_name)
-        THEN gateway_error('gateway_error_argcount_invalid',
+        THEN gateway_error_int('gateway_error_argcount_invalid',
                          VARIADIC ARRAY
                          [error_name, (SELECT argcount FROM gateway_error e
                                        WHERE e.name = error_name)::text])
@@ -116,3 +118,37 @@ CREATE OR REPLACE FUNCTION gateway_error(IN error_name text, VARIADIC format_arg
                     (SELECT id FROM gateway_error e WHERE e.name = error_name)::text)
     END;
 $$ LANGUAGE sql STABLE;
+
+-- Generates the overloads for the error-signaling function.
+CREATE OR REPLACE FUNCTION generate_gateway_error() RETURNS SETOF text AS $A$
+  WITH RECURSIVE t(i) AS (
+    VALUES ('integer'), ('boolean'), ('text')
+  ), cte AS (
+    SELECT '' AS arglist, '' AS varlist, i, 1 AS ct FROM t
+     UNION ALL
+    SELECT cte.arglist || ', ' || 'v' || ct || ' ' || t.i,
+           cte.varlist || ', ' || 'v' || ct || '::text',
+           t.i, ct + 1
+      FROM cte, t
+     WHERE ct <= 3
+  ), data AS (
+    SELECT DISTINCT arglist AS a, RIGHT(varlist, LENGTH(varlist) - 2) AS v
+      FROM cte ORDER BY a, v
+  ), functions AS (
+    SELECT 'CREATE OR REPLACE FUNCTION gateway_error(IN error_name text' || data.a || ') ' || E'\n'
+             || 'RETURNS void AS $$' || E'\n'
+             || '  SELECT gateway_error_int(error_name, VARIADIC ARRAY ['
+             || data.v || ']::text[]) ' || E'\n'
+             || '$$ LANGUAGE sql STABLE;' AS function
+      FROM data
+  ) SELECT function FROM functions; $A$ LANGUAGE sql;
+
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN SELECT generate_gateway_error()
+  LOOP
+    EXECUTE r.generate_gateway_error;
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql;

@@ -16,6 +16,7 @@ CREATE TABLE player (
   login          varchar(64)  NOT NULL UNIQUE,
   email          varchar(256) NOT NULL UNIQUE,
   name           varchar(256) NOT NULL,
+  -- TODO explicit length checks instead of VARCHAR(n)
   ------------
   pass_hash      bytea        NOT NULL DEFAULT ''::bytea,
   pass_salt      bytea        NOT NULL DEFAULT ''::bytea,
