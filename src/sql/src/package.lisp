@@ -18,3 +18,6 @@
            #:install
            #:uninstall
            #:install-dummy-data))
+
+(uiop:define-package #:gateway.sql/system
+  (:use))

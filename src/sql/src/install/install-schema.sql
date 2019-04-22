@@ -105,13 +105,19 @@ CREATE UNIQUE INDEX players_personas_only_one_owner
 
 -- Creates the timeline table.
 CREATE TABLE timeline (
-  id             serial      NOT NULL PRIMARY KEY,
+  id             serial        NOT NULL PRIMARY KEY,
   ------------
-  name           text        NOT NULL,
-  description    text        NOT NULL DEFAULT '',
+  name           varchar(64)   NOT NULL,
+  description    varchar(8192) NOT NULL DEFAULT '',
   ------------
-  creation_time  timestamptz NOT NULL DEFAULT now(),
-  last_edit_time timestamptz NOT NULL DEFAULT now());
+  creation_time  timestamptz   NOT NULL DEFAULT now(),
+  last_edit_time timestamptz   NOT NULL DEFAULT now(),
+  CONSTRAINT timeline_name_not_empty
+  CHECK (name <> ''),
+  CONSTRAINT timeline_name_no_newlines
+  CHECK (NOT (name ~ E'\n')),
+  CONSTRAINT timeline_last_edit_not_before_creation
+  CHECK (creation_time <= last_edit_time));
 
 
 

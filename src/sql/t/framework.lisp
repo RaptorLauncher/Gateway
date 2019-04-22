@@ -14,7 +14,7 @@
 (defun check-tables-empty ()
   (loop with result = (pomo:query *test-tables-empty-query*)
         for (name count) in result
-        unless (= 0 count)
+        unless (or (string= "gateway_error" name) (= 0 count))
           do (error "Cleanup failure: table ~S has ~D entries after the test.
 ~S" name count (pomo:query (uiop:strcat "SELECT * FROM " name)))))
 
@@ -26,12 +26,14 @@
 (defvar *dummy-data* nil)
 
 (defun compute-exports ()
-  (let ((exports (loop with package = (find-package '#:gateway.sql)
+  (let ((exports (loop with package = (find-package '#:gateway.sql/system)
                        for x being the external-symbols of package
                        collect x))
-        (ignored '(install uninstall reinstall install-dummy-data
-                   with-db with-test-db)))
-    (set-difference exports ignored)))
+        ;; (ignored '(install uninstall install-dummy-data
+        ;;            with-db with-test-db))
+        )
+    ;; (set-difference exports ignored)
+    exports))
 
 ;;; FIXME: Most of this hack should go away when Shinmera implements running
 ;;; code around tests in a test suite.
@@ -47,7 +49,7 @@
                 (pushnew x *checked-exports*))))
        (serapeum:walk-tree #'walk ',arguments-and-body))))
 
-(defparameter *warn-on-untested-symbols* nil)
+(defparameter *warn-on-untested-symbols* t)
 
 (defun test (&rest args)
   (let ((args (or args '(sql)))

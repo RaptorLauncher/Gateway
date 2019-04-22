@@ -9,7 +9,8 @@
         #:phoe-toolbox
         #:local-time
         #:named-readtables
-        #:gateway.sql)
+        #:gateway.sql
+        #:gateway.sql/system)
   (:import-from #:serapeum
                 #:vector=)
   (:import-from #:protest/test-case
