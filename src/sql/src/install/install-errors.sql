@@ -23,15 +23,19 @@ INSERT INTO gateway_error (name, argcount, reason)
   ('general_error', 0,
    'A general Gateway database error has been signaled.'),
   ------------
-  ('gateway_error_not_found', 1,
-   'Database function gateway_error called with unknown error %I.'),
+  ('gateway_no_such_error', 1,
+   'GATEWAY BUG: Database function gateway_error called with unknown error ' ||
+   'name %I.'),
   ------------
   ('gateway_error_argcount_invalid', 2,
-   'Database function gateway_error called with invalid argument count %I ' ||
-   'for error name %I.'),
+   'GATEWAY BUG: Database function gateway_error called with invalid ' ||
+   'argument count %I for error name %I.'),
   ------------
-  ('user_does_not_exist', 1,
-   'No user with the login %I exists in the system.');
+  ('no_such_user_id', 1,
+  'No user with ID %I exists in the system.'),
+  ------------
+  ('no_such_timeline_id', 1,
+  'No timeline with ID %I exists in the system.');
 
 -- Creates the function signaling Gateway errors.
 CREATE OR REPLACE FUNCTION raise_error(IN message text, IN id text)
@@ -48,7 +52,7 @@ CREATE OR REPLACE FUNCTION gateway_error_int(IN error_name text, VARIADIC format
     CASE
       WHEN NOT EXISTS (SELECT 1 FROM gateway_error e
                        WHERE e.name = error_name)
-        THEN gateway_error_int('gateway_error_not_found', VARIADIC ARRAY [error_name])
+        THEN gateway_error_int('gateway_no_such_error', VARIADIC ARRAY [error_name])
       WHEN array_upper(format_args, 1) <>
                        (SELECT argcount FROM gateway_error e WHERE e.name = error_name)
         THEN gateway_error_int('gateway_error_argcount_invalid',
