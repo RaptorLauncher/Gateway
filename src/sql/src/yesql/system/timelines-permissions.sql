@@ -26,3 +26,19 @@ SELECT player_id, player_group_id, timeline_id, permission FROM timeline
 -- timeline.
 SELECT player_id, player_group_id, timeline_id, permission FROM timeline
  WHERE player_group_id = ? AND timeline_id = ?;
+
+
+
+-- name: add-timeline-permission-to-player
+SELECT 'TODO';
+
+-- name: add-timeline-permission-to-player-group
+SELECT 'TODO';
+
+
+
+-- name: remove-timeline-permission-from-player
+SELECT 'TODO';
+
+-- name: remove-timeline-permission-from-player-group
+SELECT 'TODO';
