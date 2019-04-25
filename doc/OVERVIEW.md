@@ -40,6 +40,8 @@ When a user wants to access a world, their gateway connects to that world and ro
 
 The systems for world access and roleplay are decoupled from each other, so users who are only interested in worldbuilding and users who are only interested in roleplaying do not have to use the functionalities they are not interested in.
 
+**TODO** Are we really sure about it? Why not use some form of user authentication between gateways and worlds? A gateway can sign a one-time cookie provided by the world to the user to verify that it allows that user to enter the world, and the world can verify the gateway's signature on that to verify the user. This approach puts less network stress on gateways, as worlds may be very bandwidth-intensive in case of highly dynamic scripts and content.
+
 ### Blocking
 
 ![Blocking](img/overview/06-blocking.png)
