@@ -57,6 +57,7 @@ INSERT INTO timeline_permission (timeline_id, player_group_id, permission)
   ON CONFLICT DO NOTHING;
 
 -- name: add-global-timeline-permission
+-- TODO export sql-dummy test suite from gateway.sql/test
 WITH timeline_id AS (SELECT ?::integer AS p),
      permission AS (SELECT ?::timeline_permission_type AS p)
 INSERT INTO timeline_permission (timeline_id, permission)
