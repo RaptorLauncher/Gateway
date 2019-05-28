@@ -18,12 +18,12 @@
   '(:gateway.init
     :gateway.base/test
     :gateway.cable/test
-    :gateway.connector/test
+    ;; :gateway.connector/test
     :gateway.engine/test
     :gateway.sql/test))
 
 (defun test-gateway ()
-  (mapc #'asdf:load-system *systems*)
+  (mapc #'ql:quickload *systems*)
   (let ((result (test 'gateway.init:gateway-full-test)))
     (when-let ((failed (results-with-status :failed result)))
       (cerror "Continue." "There are test failures: ~{~%~A~}" failed))

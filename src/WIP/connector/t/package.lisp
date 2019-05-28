@@ -25,4 +25,5 @@
      :tags (:gateway :connector :suite)))
 
 (define-test connector
-  :parent (#:gateway.init #:gateway-full-test))
+  ;; :parent (#:gateway.init #:gateway-full-test)
+  )

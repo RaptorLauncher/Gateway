@@ -54,6 +54,8 @@ from a listener's connection list."
                   #4?(false (deadp listener))
                   #5?(is = 1 (connection-count listener))
                   #6?(kill connection-2)
+                  (true (deadp connection-1))
+                  (true (deadp connection-2))
                   #7?(true (wait () (= 0 (connection-count listener))))
                   #8?(false (deadp listener))
                   #9?(true flag))
