@@ -25,27 +25,40 @@
 (define-widget image-widget (qwidget)
   ((foreground-path :accessor foreground-path :initarg :foreground-path)
    (background-path :accessor background-path :initarg :background-path)
+   (foreground :accessor foreground :initarg :foreground)
+   (background :accessor background :initarg :background)
    (eye-level :accessor eye-level :initarg :eye-level)
    (min-width :accessor min-width :initarg :min-width)
    (shadow-height :accessor shadow-height :initarg :shadow-height)
    (background-hue :accessor background-hue :initarg :background-hue))
-  (:default-initargs :foreground-path (required-argument :foreground-path)
-                     :background-path (required-argument :background-path)
+  (:default-initargs :foreground-path nil :foreground nil
+                     :background-path nil :background nil
                      :eye-level nil :min-width nil :shadow-height 1000
                      :background-hue 0.0))
-
-(define-subwidget (image-widget foreground) (q+:make-qimage foreground-path))
 
 (define-subwidget (image-widget shadow)
     (make-shadow-qpixmap min-width shadow-height))
 
-(define-subwidget (image-widget background) (q+:make-qimage background-path))
-
-(define-qt-constructor (image-widget)
-  (when (/= 0.0 background-hue)
-    (qui:hue-shift background background-hue))
-  (when min-width
-    (setf (q+:minimum-width image-widget) min-width)))
+(define-constructor (image-widget foreground-path foreground
+                                  background-path background)
+  (cond ((and (null foreground) (null foreground-path))
+         (error "Must specify FOREGROUND or FOREGROUND-PATH."))
+        ((and foreground foreground-path)
+         (error "Cannot specify both FOREGROUND and FOREGROUND-PATH."))
+        (foreground-path
+         (setf (foreground image-widget)
+               (q+:make-qimage foreground-path))))
+  (cond ((and (null background) (null background-path))
+         (error "Must specify BACKGROUND or BACKGROUND-PATH."))
+        ((and background background-path)
+         (error "Cannot specify both BACKGROUND and BACKGROUND-PATH."))
+        (background-path
+         (setf (background image-widget)
+               (q+:make-qimage background-path))))
+  (when (/= 0.0 (background-hue image-widget))
+    (qui:hue-shift (background image-widget) (background-hue image-widget)))
+  (when (min-width image-widget)
+    (setf (q+:minimum-width image-widget) (min-width image-widget))))
 
 (define-override (image-widget paint-event) (ev)
   (with-finalizing ((painter (q+:make-qpainter image-widget)))
