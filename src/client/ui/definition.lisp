@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; definition.lisp
 
-(in-package #:gateway.ui)
+(in-package #:gateway.client.ui)
 (in-readtable :qtools)
 
 (define-widget raptor-chat (qwidget) ())

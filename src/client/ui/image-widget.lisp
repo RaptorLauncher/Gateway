@@ -1,10 +1,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2019
-;;;; dictionary.lisp
+;;;; image-widget.lisp
 
-(in-package #:gateway.ui)
+(in-package #:gateway.client.ui)
 (in-readtable :qtools)
+
+(defun make-shadow-qpixmap (width height)
+  (let* ((pixmap (q+:make-qpixmap width height)))
+    (q+:fill pixmap (q+:make-qcolor 0 0 0 0))
+    (with-finalizing ((gradient (q+:make-qlineargradient 0 0 0 height))
+                      (painter (q+:make-qpainter pixmap)))
+      (setf (q+:color-at gradient 0.0) (q+:qcolor-from-rgb 0 0 0 0)
+            (q+:color-at gradient 1.0) (q+:qcolor-from-rgb 0 0 0 255))
+      (q+:fill-rect painter 0 0 width height (q+:make-qbrush gradient)))
+    pixmap))
 
 (define-widget image-widget (qwidget)
   ((foreground-path :accessor foreground-path :initarg :foreground-path)

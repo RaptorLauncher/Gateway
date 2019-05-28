@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016-2018
-;;;; gateway.ui.asd
+;;;; gateway.client.ui.asd
 
-(asdf:defsystem #:gateway.ui
+(asdf:defsystem #:gateway.client.ui
   :description "Gateway UI"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license  "AGPL3"
@@ -20,8 +20,6 @@
                #:qtools-commons)
   :components ((:file "package")
                (:file "definition")
-               (:file "spellchecked-text-edit")
-               (:file "dictionary")
                ;; (:file "image-widget")
                ;; (:file "chat")
                ))
