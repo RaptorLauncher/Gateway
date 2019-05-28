@@ -17,7 +17,7 @@
                #:split-sequence
                #:phoe-toolbox
                #:trivial-indent
-               #:qtools-commons)
+               #:qtools-ui-imagetools)
   :components ((:file "package")
                (:file "definition")
                ;; (:file "image-widget")

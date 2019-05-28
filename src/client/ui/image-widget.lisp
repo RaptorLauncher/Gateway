@@ -43,7 +43,7 @@
 
 (define-qt-constructor (image-widget)
   (when (/= 0.0 background-hue)
-    (qcom:hue-shift background background-hue))
+    (qui:hue-shift background background-hue))
   (when min-width
     (setf (q+:minimum-width image-widget) min-width)))
 
@@ -55,29 +55,27 @@
     (let ((box (q+:rect image-widget))
           (height (q+:height image-widget))
           (width (q+:width image-widget))
-          (foreground-height (q+:height foreground))
-          result)
+          (foreground-height (q+:height foreground)))
+      ;; TODO: draw shadow in a similar way as foreground
       (q+:draw-pixmap
        painter box shadow
        (q+:make-qrect 0 (- (q+:height shadow) height) width height))
-      (if (<= foreground-height height)
-          (let ((widget-height (q+:height image-widget)))
+      (let (result)
+        (if (<= foreground-height height)
             (setf result (q+:make-qrect 0 (- foreground-height height)
-                                        width widget-height)))
-          ;; TODO fix this
-          (let* ((percentage (/ height foreground-height))
-                 (y (round (+ (- (* percentage height))
-                              (* eye-level foreground-height)))))
-            (setf result (q+:make-qrect 0 y width height))))
-      (q+:draw-image painter box foreground result))))
+                                        width (q+:height image-widget)))
+            (let* ((ratio (/ height foreground-height))
+                   (y (truncate (* foreground-height eye-level (- 1 ratio)))))
+              (setf result (q+:make-qrect 0 y width height))))
+        (q+:draw-image painter box foreground result)))))
 
 (defun image1 ()
   (make-instance
    'image-widget
-   :foreground-path "/home/emiherd/Downloads/archie.png"
-   :background-path "/home/emiherd/Projects/Raptor Chat/tile2.png"
+   :foreground-path "/home/phoe/Downloads/archie.png"
+   :background-path "/home/phoe/Projects/Raptor Chat/tile2.png"
    :min-width 300 :shadow-height 1000
-   :eye-level 0.15 :background-hue 300.0))
+   :eye-level 0.115 :background-hue 1/6))
 
 ;; (defun image2 ()
 ;;   (make-instance
