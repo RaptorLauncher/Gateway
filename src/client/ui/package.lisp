@@ -7,7 +7,6 @@
   (:use #:cl+qt
         #:alexandria
         #:phoe-toolbox
-        #:split-sequence
         #:qtools
         #:named-readtables)
   (:shadowing-import-from #:phoe-toolbox #:split))

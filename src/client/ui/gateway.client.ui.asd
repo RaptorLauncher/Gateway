@@ -11,15 +11,10 @@
   :serial t
   :depends-on (#:qtgui
                #:qtools
-               #:qtools-ui-fixed-qtextedit
-               #:spell/simple
-               #:wordnet
-               #:split-sequence
                #:phoe-toolbox
-               #:trivial-indent
                #:qtools-ui-imagetools)
   :components ((:file "package")
                (:file "definition")
-               ;; (:file "image-widget")
+               (:file "image-widget")
                ;; (:file "chat")
                ))

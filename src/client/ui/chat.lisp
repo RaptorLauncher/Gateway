@@ -17,7 +17,7 @@
 
 ;;; Main widget
 
-(define-widget chat-window (qwidget chat)
+(define-widget chat-window (qwidget)
   ((ic-posts :reader ic-posts :initarg :ic-posts :initform '())
    (ooc-posts :reader ooc-posts :initarg :ooc-posts :initform '())
    (colors :accessor colors :initarg :colors)
