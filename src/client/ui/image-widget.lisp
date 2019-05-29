@@ -84,8 +84,8 @@
 (defun image1 ()
   (make-instance
    'image-widget
-   :foreground-path "/home/phoe/Downloads/archie.png"
-   :background-path "/home/phoe/Projects/Raptor Chat/tile2.png"
+   :foreground-path (homepath "archie.png")
+   :background-path (homepath "tile2.png")
    :min-width 300 :eye-level 0.115 :background-hue 1/6
    :shadow-level 0.2 :shadow-height 1000))
 

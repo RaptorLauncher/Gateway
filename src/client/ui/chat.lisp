@@ -6,15 +6,6 @@
 (in-package :raptor-launcher/raptor-chat)
 (in-readtable :qtools)
 
-;;; Util
-
-(defun homepath (filename)
-  (uiop:native-namestring
-   (uiop:nest
-    (merge-pathnames filename)
-    (merge-pathnames "Projects/Raptor Chat/")
-    (user-homedir-pathname))))
-
 ;;; Main widget
 
 (define-widget chat-window (qwidget)
