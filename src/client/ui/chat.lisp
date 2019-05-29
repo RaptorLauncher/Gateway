@@ -30,8 +30,9 @@
 
 ;;; PLACECHCKED-TEXT-EDIT
 
+;; TODO fix spellchecking
 (define-widget placechecked-text-edit
-      (qtextedit placeholder-text-edit) ())
+      (qtextedit qui:spellchecked-text-edit placeholder-text-edit) ())
 
 (define-override (placeholder-text-edit paint-event) (ev)
   (when (string= "" (q+:to-plain-text placeholder-text-edit))
