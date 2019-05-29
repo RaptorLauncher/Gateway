@@ -87,7 +87,7 @@
    :foreground-path (homepath "archie.png")
    :background-path (homepath "tile2.png")
    :min-width 300 :eye-level 0.115 :background-hue 1/6
-   :shadow-level 0.2 :shadow-height 1000))
+   :shadow-level 0.5 :shadow-height 1000))
 
 ;;; TODO move to utils or remove
 ;; (defmacro define-qt-constructor ((class . keys) &body body)

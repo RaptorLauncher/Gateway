@@ -12,9 +12,15 @@
   :depends-on (#:qtgui
                #:qtools
                #:phoe-toolbox
-               #:qtools-ui-imagetools)
+               #:local-time
+               #:lorem-ipsum
+               #:qtools-ui-imagetools
+               #:qtools-ui-fixed-qtextedit
+               #:qtools-ui-spellchecked-text-edit
+               #:qtools-ui-dictionary)
   :components ((:file "package")
                (:file "definition")
                (:file "image-widget")
-               ;; (:file "chat")
+               (:file "classes")
+               (:file "chat")
                ))

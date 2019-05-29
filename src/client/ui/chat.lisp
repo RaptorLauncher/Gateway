@@ -1,26 +1,71 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; RAPTOR-LAUNCHER
-;;;; © Michał "phoe" Herda 2017
+;;;; GATEWAY
+;;;; © Michał "phoe" Herda 2017-2019
 ;;;; chat.lisp
 
-(in-package :raptor-launcher/raptor-chat)
+(in-package :gateway.client.ui)
 (in-readtable :qtools)
+
+;;; PLACEHOLDER-TEXT-EDIT
+
+(define-widget placeholder-text-edit (qtextedit qui:fixed-qtextedit)
+  ((placeholder :accessor placeholder :initarg :placeholder)
+   (font :accessor font :initarg :font))
+  (:default-initargs :placeholder "" :font (q+:make-qfont)))
+
+(defmethod initialize-instance :after
+    ((object placeholder-text-edit) &key font-size)
+  (let* ((palette (q+:palette object))
+         (color (q+:color palette (q+:background-role object))))
+    (when (and (< (q+:red color) 80)
+               (< (q+:blue color) 80)
+               (< (q+:green color) 80))
+      (setf (q+:default-style-sheet (q+:document object))
+            "a { color: #8888ff; }")))
+  (with-accessors ((font font)) object
+    (setf (q+:italic font) t)
+    (when font-size
+      (setf (q+:point-size-f font)
+            (* font-size (q+:point-size-f font))))))
+
+;;; PLACECHCKED-TEXT-EDIT
+
+(define-widget placechecked-text-edit
+      (qtextedit placeholder-text-edit) ())
+
+(define-override (placeholder-text-edit paint-event) (ev)
+  (when (string= "" (q+:to-plain-text placeholder-text-edit))
+    (let ((viewport (q+:viewport placeholder-text-edit)))
+      (with-finalizing ((painter (q+:make-qpainter viewport)))
+        (let* ((color (q+:color (q+:brush (q+:pen painter))))
+               (old-font (q+:font painter)))
+          (setf (q+:alpha color) 80
+                (q+:font painter) font)
+          (q+:draw-text painter (q+:rect placeholder-text-edit)
+                        (logior (q+:qt.text-word-wrap)
+                                (q+:qt.align-center))
+                        (placeholder placeholder-text-edit))
+          (setf (q+:alpha color) 255
+                (q+:font painter) old-font)))))
+  (call-next-qmethod))
+
+;; TODO: do not spellcheck the upper two panels
+(defun make-placeholder-text-edit (placeholder &optional font-size)
+  (make-instance 'placechecked-text-edit :placeholder placeholder
+                                         :font-size font-size))
 
 ;;; Main widget
 
 (define-widget chat-window (qwidget)
   ((ic-posts :reader ic-posts :initarg :ic-posts :initform '())
-   (ooc-posts :reader ooc-posts :initarg :ooc-posts :initform '())
-   (colors :accessor colors :initarg :colors)
-   ;; TODO remove, store colors on characters instead
-   ))
+   (ooc-posts :reader ooc-posts :initarg :ooc-posts :initform '())))
 
 (define-subwidget (chat-window layout) (q+:make-qgridlayout)
   (setf (q+:layout chat-window) layout))
 
 ;;; Bottom row
 
-(define-subwidget (chat-window image-left) (image1) ;; (q+:make-qlabel)
+(define-subwidget (chat-window image-left) (q+:make-qlabel)
   (q+:add-widget layout image-left 1 0)
   ;; (setf (q+:pixmap image-left)
   ;;       (q+:make-qpixmap (homepath "sha.png")))
@@ -30,7 +75,7 @@
     (q+:make-qsplitter (q+:qt.horizontal))
   (q+:add-widget layout splitter 1 1))
 
-(define-subwidget (chat-window image-right) (image2) ;; (q+:make-qlabel)
+(define-subwidget (chat-window image-right) (q+:make-qlabel)
   (q+:add-widget layout image-right 1 2)
   ;; (setf (q+:pixmap image-right)
   ;;       (q+:make-qpixmap (homepath "undies.png")))
@@ -84,7 +129,7 @@
   (setf (q+:minimum-height ooc-input) 100
         (q+:stretch-factor ooc 1) 1))
 
-(define-subwidget (chat-window dictionary) (make-instance 'dictionary)
+(define-subwidget (chat-window dictionary) (make-instance 'qui:dictionary)
   (q+:add-widget splitter dictionary)
   (setf (q+:stretch-factor splitter 1) 1)
   (q+:hide dictionary))
@@ -107,51 +152,6 @@
   (setf (q+:html description-right)
         (format nil "<h3>Undies</h3>~%~A"
                 (read-file-into-string "~/Projects/Raptor Chat/undies.txt"))))
-
-;;; PLACEHOLDER-TEXT-EDIT
-
-(define-widget placeholder-text-edit (qtextedit)
-  ((placeholder :accessor placeholder :initarg :placeholder)
-   (font :accessor font :initarg :font))
-  (:default-initargs :placeholder "" :font (q+:make-qfont)))
-
-(defmethod initialize-instance :after
-    ((object placeholder-text-edit) &key font-size)
-  (let* ((palette (q+:palette object))
-         (color (q+:color palette (q+:background-role object))))
-    (when (and (< (q+:red color) 80)
-               (< (q+:blue color) 80)
-               (< (q+:green color) 80))
-      (setf (q+:default-style-sheet (q+:document object))
-            "a { color: #8888ff; }")))
-  (with-accessors ((font font)) object
-    (setf (q+:italic font) t)
-    (when font-size
-      (setf (q+:point-size-f font)
-            (* font-size (q+:point-size-f font))))))
-
-(define-override (placeholder-text-edit paint-event) (ev)
-  (when (string= "" (q+:to-plain-text placeholder-text-edit))
-    (let ((viewport (q+:viewport placeholder-text-edit)))
-      (with-finalizing ((painter (q+:make-qpainter viewport)))
-        (let* ((color (q+:color (q+:brush (q+:pen painter))))
-               (old-font (q+:font painter)))
-          (setf (q+:alpha color) 80
-                (q+:font painter) font)
-          (q+:draw-text painter (q+:rect placeholder-text-edit)
-                        (logior (q+:qt.text-word-wrap)
-                                (q+:qt.align-center))
-                        (placeholder placeholder-text-edit))
-          (setf (q+:alpha color) 255
-                (q+:font painter) old-font)))))
-  (call-next-qmethod))
-
-(define-widget placechecked-text-edit
-      (qtextedit placeholder-text-edit spellchecked-text-edit) ())
-
-(defun make-placeholder-text-edit (placeholder &optional font-size)
-  (make-instance 'placechecked-text-edit :placeholder placeholder
-                                         :font-size font-size))
 
 ;;; BUTTONS
 
@@ -188,6 +188,13 @@
 
 (define-subwidget (chat-window buttons-layout) (q+:make-qhboxlayout)
   (q+:add-layout layout buttons-layout 0 1))
+
+(defun make-text-qtoolbutton (text)
+  (let ((button (q+:make-qtoolbutton)))
+    (setf (q+:text button) text
+          (q+:tool-button-style button)
+          (q+:qt.tool-button-text-only))
+    button))
 
 (defun make-chat-button (string)
   (let ((button (make-text-qtoolbutton string))
@@ -265,10 +272,7 @@
 
 (define-slot (chat-window spellchecker-button-clicked) ()
   (declare (connected spellchecker-button (clicked)))
-  (let ((position (with-finalizing ((cursor (q+:text-cursor ic-input)))
-                    (q+:position cursor))))
-    (spellcheck ic-input position)))
-
+  (qui:spellcheck ic-input))
 
 (define-slot (chat-window dictionary-text-selection) ()
   (declare (connected ic-input (selection-changed)))
@@ -283,35 +287,35 @@
 
 ;;; Random post generation
 
-(defun make-lorem-ipsum-posts (n author-names)
-  (loop repeat n
-        for name = (random-elt author-names)
-          then (random-elt (remove name author-names :test #'string=))
-        collect (make-instance
-                 'cl-furcadia/clos:standard-post
-                 :shortname name
-                 :contents (lorem-ipsum:paragraph :prologue nil))))
+(defun make-lorem-ipsum-posts (n personas)
+  (let ((personas (copy-list personas)))
+    (setf (cdr (last personas)) personas)
+    (loop repeat n
+          for persona in personas
+          for contents = (lorem-ipsum:paragraph :prologue nil)
+          collect (make-instance 'post :persona persona
+                                       :contents contents))))
 
-(defun make-posts-from-file (&optional (filename (homepath "posts.txt")))
-  (with-open-file (stream filename)
-    (loop for line = (read-line stream nil stream)
-          until (eq line stream)
-          collect (make-instance
-                   'cl-furcadia/clos:standard-post
-                   :shortname
-                   (if (eql #\J (aref line 0)) "jacula" "xiaohui")
-                   :contents line))))
+;; (defun make-posts-from-file (&optional (filename (homepath "posts.txt")))
+;;   (with-open-file (stream filename)
+;;     (loop for line = (read-line stream nil stream)
+;;           until (eq line stream)
+;;           collect (make-instance
+;;                    'cl-furcadia/clos:standard-post
+;;                    :shortname
+;;                    (if (eql #\J (aref line 0)) "jacula" "xiaohui")
+;;                    :contents line))))
 
 (defun generate-html ;; TODO s/posts/post and mapcar on top of it
-    (posts names-and-colors &key print-names-p print-times-p justifyp)
+    (posts &key print-names-p print-times-p justifyp)
   (with-output-to-string (*standard-output*)
     (loop
       for post in posts
-      for name = (cl-furcadia/protocol:shortname post)
-      for date = (cl-furcadia/protocol:date post)
-      for contents = (cl-furcadia/protocol:contents post)
-      do (format t "<p style=\"color: ~A;\"~A>"
-                 (assoc-value names-and-colors name :test #'string=)
+      for name = (name (persona post))
+      for date = (timestamp post)
+      for color = (color-dark (persona post))
+      for contents = (contents post)
+      do (format t "<p style=\"color: ~A;\"~A>" color
                  (if justifyp " align=justify" ""))
          (when print-times-p
            (multiple-value-bind (ns ss mm hh day month year dow dstp tzo tza)
@@ -324,8 +328,6 @@
          (princ contents)
          (format t "</p>~%"))))
 
-;;; update-outputs
-
 ;;; TODO these should call signals to make this thread-safe
 
 (defmethod (setf ic-posts) (new-value (chat-window chat-window))
@@ -336,21 +338,19 @@
   (setf (slot-value chat-window 'ooc-posts) new-value)
   (update-ooc-output chat-window))
 
-(defmethod add-ic-post
-    ((chat-window chat-window) (post cl-furcadia/protocol:post))
+(defmethod add-ic-post ((chat-window chat-window) (post post))
   (appendf (slot-value chat-window 'ic-posts) post)
   (with-slots-bound (chat-window chat-window)
     (q+:append ic-output (posts-html chat-window (list post)))))
 
-(defmethod add-ooc-post
-    ((chat-window chat-window) (post cl-furcadia/protocol:post))
+(defmethod add-ooc-post ((chat-window chat-window) (post post))
   (appendf (slot-value chat-window 'ooc-posts) post)
   (with-slots-bound (chat-window chat-window)
     (q+:append ooc-output (posts-html chat-window (list post)))))
 
 (defun posts-html (chat-window posts)
   (with-slots-bound (chat-window chat-window)
-    (generate-html posts colors
+    (generate-html posts
                    :print-names-p (q+:is-checked names-button)
                    :print-times-p (q+:is-checked timestamps-button)
                    :justifyp (q+:is-checked justify-button))))
@@ -385,7 +385,7 @@
 (defun chat ()
   (with-main-window (chat-window 'chat-window)
     (with-slots-bound (chat-window chat-window)
-      (setf colors '(("jacula" . "#CC33FF") ("xiaohui" . "#EEFF88"))
-            ic-posts (make-posts-from-file)
-            ooc-posts (make-posts-from-file))
-      (update-outputs chat-window))))
+      (let ((personas (make-dummy-personas)))
+        (setf ic-posts (make-lorem-ipsum-posts 10 personas)
+              ooc-posts (make-lorem-ipsum-posts 10 personas))
+        (update-outputs chat-window)))))
