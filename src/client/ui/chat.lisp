@@ -28,12 +28,6 @@
       (setf (q+:point-size-f font)
             (* font-size (q+:point-size-f font))))))
 
-;;; PLACECHCKED-TEXT-EDIT
-
-;; TODO fix spellchecking
-(define-widget placechecked-text-edit
-      (qtextedit qui:spellchecked-text-edit placeholder-text-edit) ())
-
 (define-override (placeholder-text-edit paint-event) (ev)
   (when (string= "" (q+:to-plain-text placeholder-text-edit))
     (let ((viewport (q+:viewport placeholder-text-edit)))
@@ -50,8 +44,17 @@
                 (q+:font painter) old-font)))))
   (call-next-qmethod))
 
-;; TODO: do not spellcheck the upper two panels
 (defun make-placeholder-text-edit (placeholder &optional font-size)
+  (make-instance 'placeholder-text-edit :placeholder placeholder
+                                        :font-size font-size))
+
+;;; PLACECHCKED-TEXT-EDIT
+
+;; TODO fix spellchecking
+(define-widget placechecked-text-edit
+      (qtextedit qui:spellchecked-text-edit placeholder-text-edit) ())
+
+(defun make-placechecked-text-edit (placeholder &optional font-size)
   (make-instance 'placechecked-text-edit :placeholder placeholder
                                          :font-size font-size))
 
@@ -107,7 +110,7 @@
          "~/Projects/Raptor Chat/ic.txt")))
 
 (define-subwidget (chat-window ic-input)
-    (make-placeholder-text-edit "Type your IC here!")
+    (make-placechecked-text-edit "Type your IC here!")
   (q+:add-widget ic ic-input)
   (setf (q+:minimum-height ic-input) 100
         (q+:stretch-factor ic 1) 1
@@ -125,7 +128,7 @@
          "~/Projects/Raptor Chat/ooc.txt")))
 
 (define-subwidget (chat-window ooc-input)
-    (make-placeholder-text-edit "[Type your OOC here!]")
+    (make-placechecked-text-edit "[Type your OOC here!]")
   (q+:add-widget ooc ooc-input)
   (setf (q+:minimum-height ooc-input) 100
         (q+:stretch-factor ooc 1) 1))
