@@ -6,57 +6,16 @@
 (in-package :gateway.client.ui)
 (in-readtable :qtools)
 
-;;; PLACEHOLDER-TEXT-EDIT
-
-(define-widget placeholder-text-edit (qtextedit qui:fixed-qtextedit)
-  ((placeholder :accessor placeholder :initarg :placeholder)
-   (font :accessor font :initarg :font))
-  (:default-initargs :placeholder "" :font (q+:make-qfont)))
-
-(defmethod initialize-instance :after
-    ((object placeholder-text-edit) &key font-size)
-  (let* ((palette (q+:palette object))
-         (color (q+:color palette (q+:background-role object))))
-    (when (and (< (q+:red color) 80)
-               (< (q+:blue color) 80)
-               (< (q+:green color) 80))
-      (setf (q+:default-style-sheet (q+:document object))
-            "a { color: #8888ff; }")))
-  (with-accessors ((font font)) object
-    (setf (q+:italic font) t)
-    (when font-size
-      (setf (q+:point-size-f font)
-            (* font-size (q+:point-size-f font))))))
-
-(define-override (placeholder-text-edit paint-event) (ev)
-  (when (string= "" (q+:to-plain-text placeholder-text-edit))
-    (let ((viewport (q+:viewport placeholder-text-edit)))
-      (with-finalizing ((painter (q+:make-qpainter viewport)))
-        (let* ((color (q+:color (q+:brush (q+:pen painter))))
-               (old-font (q+:font painter)))
-          (setf (q+:alpha color) 80
-                (q+:font painter) font)
-          (q+:draw-text painter (q+:rect placeholder-text-edit)
-                        (logior (q+:qt.text-word-wrap)
-                                (q+:qt.align-center))
-                        (placeholder placeholder-text-edit))
-          (setf (q+:alpha color) 255
-                (q+:font painter) old-font)))))
-  (call-next-qmethod))
-
-(defun make-placeholder-text-edit (placeholder &optional font-size)
-  (make-instance 'placeholder-text-edit :placeholder placeholder
-                                        :font-size font-size))
+(defun make-placeholder-text-edit (placeholder)
+  (make-instance 'qui:placeholder-text-edit :placeholder placeholder))
 
 ;;; PLACECHCKED-TEXT-EDIT
 
-;; TODO fix spellchecking
 (define-widget placechecked-text-edit
-      (qtextedit qui:spellchecked-text-edit placeholder-text-edit) ())
+      (qtextedit qui:spellchecked-text-edit qui:placeholder-text-edit) ())
 
-(defun make-placechecked-text-edit (placeholder &optional font-size)
-  (make-instance 'placechecked-text-edit :placeholder placeholder
-                                         :font-size font-size))
+(defun make-placechecked-text-edit (placeholder)
+  (make-instance 'placechecked-text-edit :placeholder placeholder))
 
 ;;; Main widget
 
@@ -100,7 +59,7 @@
         (q+:stretch-factor splitter 1) 1))
 
 (define-subwidget (chat-window ic-output)
-    (make-placeholder-text-edit "No IC chat yet." 1.25)
+    (make-placeholder-text-edit "No IC chat yet.") ;; TODO size
   (q+:add-widget ic ic-output)
   (setf (q+:read-only ic-output) t
         (q+:minimum-height ic-output) 100
@@ -118,7 +77,7 @@
         "Hello world! This, as yyou can see, jjkhdssdfs ain't no joke."))
 
 (define-subwidget (chat-window ooc-output)
-    (make-placeholder-text-edit "[No OOC chat yet.]" 1.25)
+    (make-placeholder-text-edit "[No OOC chat yet.]") ;; TODO size
   (q+:add-widget ooc ooc-output)
   (setf (q+:read-only ooc-output) t
         (q+:minimum-height ooc-output) 100
@@ -139,7 +98,7 @@
   (q+:hide dictionary))
 
 (define-subwidget (chat-window description-left)
-    (make-instance 'placeholder-text-edit)
+    (make-instance 'qui:fixed-qtextedit)
   (q+:add-widget splitter description-left)
   (setf (q+:stretch-factor splitter 2) 1)
   (q+:hide description-left)
@@ -148,7 +107,7 @@
                 (read-file-into-string "~/Projects/Raptor Chat/sha.txt"))))
 
 (define-subwidget (chat-window description-right)
-    (make-instance 'placeholder-text-edit)
+    (make-instance 'qui:fixed-qtextedit)
   (q+:add-widget splitter description-right)
   (setf (q+:stretch-factor splitter 3) 1
         (q+:stretch-factor splitter 4) 1)

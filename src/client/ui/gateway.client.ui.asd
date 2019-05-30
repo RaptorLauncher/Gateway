@@ -17,6 +17,7 @@
                #:qtools-ui-imagetools
                #:qtools-ui-fixed-qtextedit
                #:qtools-ui-spellchecked-text-edit
+               #:qtools-ui-placeholder-text-edit
                #:qtools-ui-dictionary)
   :components ((:file "package")
                (:file "definition")
