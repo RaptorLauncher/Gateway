@@ -6,6 +6,8 @@
 (in-package :gateway.client.ui)
 (in-readtable :qtools)
 
+;;; PERSONA
+
 (defclass persona ()
   ((%name :accessor name :initarg :name)
    (%image-path :accessor image-path :initarg :image-path)
@@ -18,6 +20,8 @@
 (defun make-persona (name image color-light color-dark)
   (make-instance 'persona :name name :image-path image
                           :color-light color-light :color-dark color-dark))
+
+;;; POST
 
 (defclass post ()
   ((persona :accessor persona :initarg :persona)

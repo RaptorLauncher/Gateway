@@ -20,8 +20,10 @@
 ;;; Main widget
 
 (define-widget chat-window (qwidget)
-  ((ic-posts :reader ic-posts :initarg :ic-posts :initform '())
-   (ooc-posts :reader ooc-posts :initarg :ooc-posts :initform '())))
+  ((personas :accessor personas :initarg :personas)
+   (ic-posts :reader ic-posts :initarg :ic-posts)
+   (ooc-posts :reader ooc-posts :initarg :ooc-posts))
+  (:default-initargs :personas '() :ic-posts '() :ooc-posts '()))
 
 (define-subwidget (chat-window layout) (q+:make-qgridlayout)
   (setf (q+:layout chat-window) layout))
@@ -34,8 +36,7 @@
   ;;       (q+:make-qpixmap (homepath "sha.png")))
   )
 
-(define-subwidget (chat-window splitter)
-    (q+:make-qsplitter (q+:qt.horizontal))
+(define-subwidget (chat-window splitter) (q+:make-qsplitter (q+:qt.horizontal))
   (q+:add-widget layout splitter 1 1))
 
 (define-subwidget (chat-window image-right) (q+:make-qlabel)
@@ -59,7 +60,7 @@
         (q+:stretch-factor splitter 1) 1))
 
 (define-subwidget (chat-window ic-output)
-    (make-placeholder-text-edit "No IC chat yet.") ;; TODO size
+    (make-placeholder-text-edit "(No IC chat yet.)")
   (q+:add-widget ic ic-output)
   (setf (q+:read-only ic-output) t
         (q+:minimum-height ic-output) 100
@@ -77,7 +78,7 @@
         "Hello world! This, as yyou can see, jjkhdssdfs ain't no joke."))
 
 (define-subwidget (chat-window ooc-output)
-    (make-placeholder-text-edit "[No OOC chat yet.]") ;; TODO size
+    (make-placeholder-text-edit "[No OOC chat yet.]")
   (q+:add-widget ooc ooc-output)
   (setf (q+:read-only ooc-output) t
         (q+:minimum-height ooc-output) 100
@@ -294,10 +295,12 @@
 ;;; TODO these should call signals to make this thread-safe
 
 (defmethod (setf ic-posts) (new-value (chat-window chat-window))
+  ;; TODO :after method
   (setf (slot-value chat-window 'ic-posts) new-value)
   (update-ic-output chat-window))
 
 (defmethod (setf ooc-posts) (new-value (chat-window chat-window))
+  ;; TODO :after method
   (setf (slot-value chat-window 'ooc-posts) new-value)
   (update-ooc-output chat-window))
 
@@ -348,7 +351,8 @@
 (defun chat ()
   (with-main-window (chat-window 'chat-window)
     (with-slots-bound (chat-window chat-window)
-      (let ((personas (make-dummy-personas)))
-        (setf ic-posts (make-lorem-ipsum-posts 10 personas)
-              ooc-posts (make-lorem-ipsum-posts 10 personas))
+      (let ((dummy-personas (make-dummy-personas)))
+        (setf personas dummy-personas
+              ic-posts (make-lorem-ipsum-posts 10 dummy-personas)
+              ooc-posts (make-lorem-ipsum-posts 10 dummy-personas))
         (update-outputs chat-window)))))
