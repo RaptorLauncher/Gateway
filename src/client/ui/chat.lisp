@@ -244,7 +244,8 @@
     (when (q+:is-visible dictionary)
       (let ((selection (q+:selected-text cursor)))
         (when (string/= selection "")
-          (setf (q+:text (slot-value dictionary 'input)) selection))))))
+          (setf (q+:text (slot-value dictionary 'qui:dictionary-input))
+                selection))))))
 
 ;; TODO hyperlink style
 ;; TODO descriptions
