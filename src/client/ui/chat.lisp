@@ -21,8 +21,8 @@
 
 (define-widget chat-window (qwidget)
   ((personas :accessor personas :initarg :personas)
-   (ic-posts :reader ic-posts :initarg :ic-posts)
-   (ooc-posts :reader ooc-posts :initarg :ooc-posts))
+   (ic-posts :accessor ic-posts :initarg :ic-posts)
+   (ooc-posts :accessor ooc-posts :initarg :ooc-posts))
   (:default-initargs :personas '() :ic-posts '() :ooc-posts '()))
 
 (define-subwidget (chat-window layout) (q+:make-qgridlayout)
@@ -228,6 +228,18 @@
     :init-forms
     ((q+:add-widget layout description-button-right 0 2 (q+:qt.align-right))))))
 
+(define-signal (chat-window ic-output-modified) ())
+
+(define-signal (chat-window ooc-output-modified) ())
+
+(define-slot (chat-window update-ic-output) ()
+  (declare (connected chat-window (ic-output-modified)))
+  (update-ic-output chat-window))
+
+(define-slot (chat-window update-ooc-output) ()
+  (declare (connected chat-window (ooc-output-modified)))
+  (update-ooc-output chat-window))
+
 (define-slot (chat-window buttons-update-outputs) ()
   (declare (connected timestamps-button (clicked))
            (connected names-button (clicked))
@@ -251,15 +263,6 @@
 ;; TODO descriptions
 
 ;;; Random post generation
-
-(defun make-lorem-ipsum-posts (n personas)
-  (let ((personas (copy-list personas)))
-    (setf (cdr (last personas)) personas)
-    (loop repeat n
-          for persona in personas
-          for contents = (lorem-ipsum:paragraph :prologue nil)
-          collect (make-instance 'post :persona persona
-                                       :contents contents))))
 
 ;; (defun make-posts-from-file (&optional (filename (homepath "posts.txt")))
 ;;   (with-open-file (stream filename)
@@ -293,17 +296,11 @@
          (princ contents)
          (format t "</p>~%"))))
 
-;;; TODO these should call signals to make this thread-safe
+(defmethod (setf ic-posts) :after (new-value (chat-window chat-window))
+  (signal! chat-window (ic-output-modified)))
 
-(defmethod (setf ic-posts) (new-value (chat-window chat-window))
-  ;; TODO :after method
-  (setf (slot-value chat-window 'ic-posts) new-value)
-  (update-ic-output chat-window))
-
-(defmethod (setf ooc-posts) (new-value (chat-window chat-window))
-  ;; TODO :after method
-  (setf (slot-value chat-window 'ooc-posts) new-value)
-  (update-ooc-output chat-window))
+(defmethod (setf ooc-posts) :after (new-value (chat-window chat-window))
+  (signal! chat-window (ooc-output-modified)))
 
 (defmethod add-ic-post ((chat-window chat-window) (post post))
   (appendf (slot-value chat-window 'ic-posts) post)

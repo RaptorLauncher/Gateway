@@ -37,3 +37,12 @@
          (image-2 (homepath "scaletail.png"))
          (persona-2 (make-persona name-2 image-2 "#EEFF88" "#110077")))
     (list persona-1 persona-2)))
+
+(defun make-lorem-ipsum-posts (n personas)
+  (let ((personas (copy-list personas)))
+    (setf (cdr (last personas)) personas)
+    (loop repeat n
+          for persona in personas
+          for contents = (lorem-ipsum:paragraph :prologue nil)
+          collect (make-instance 'post :persona persona
+                                       :contents contents))))
