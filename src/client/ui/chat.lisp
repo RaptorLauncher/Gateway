@@ -167,15 +167,15 @@
           (q+:font button) font)
     button))
 
-#|
-(define-subwidget (chat-window description-button-left)
-    (make-chat-button "Description")
-  (q+:add-widget layout description-button-left 0 0))
+;; (define-subwidget (chat-window description-button-left)
+;;     (make-chat-button "Description")
+;;   (q+:add-widget layout description-button-left 0 0))
 
-(define-subwidget (chat-window description-button-right)
-    (make-chat-button "Description")
-  (q+:add-widget layout description-button-right 0 2))
-|#
+;; (define-subwidget (chat-window description-button-right)
+;;     (make-chat-button "Description")
+;;   (q+:add-widget layout description-button-right 0 2))
+
+(trivial-indent:define-indentation define-chat-buttons (4 2 2))
 
 (defmacro define-chat-buttons
     (widget
@@ -203,8 +203,6 @@
      ,(apply #'make-slot widget far-left-button)
      ,(apply #'make-button widget far-right-button)
      ,(apply #'make-slot widget far-right-button)))
-
-(trivial-indent:define-indentation define-chat-buttons (4 2 2))
 
 (define-chat-buttons chat-window
   ((description-button-left
