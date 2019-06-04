@@ -57,42 +57,42 @@
 
 ;; TODO refactor
 (define-override (image-widget paint-event) (ev)
-  (with-finalizing ((painter (q+:make-qpainter image-widget)))
-    (setf (q+:render-hint painter) (q+:qpainter.antialiasing))
-    (let ((box (q+:rect image-widget))
-          (height (q+:height image-widget))
-          (width (q+:width image-widget))
-          (bg-width (q+:width background)))
-      (flet ((scale (image &optional (multiplier 1) (width width))
-               (q+:scaled-to-width image (round (* width multiplier))
-                                   (q+:qt.smooth-transformation))))
-        (with-finalizing
-            ((scaled-shadow (scale shadow))
-             (scaled-foreground (scale foreground)))
-          (let ((foreground-height (q+:height scaled-foreground))
-                (ratio (float (/ (q+:width scaled-foreground)
-                                 (q+:width foreground)))))
-            (with-finalizing*
-                ((background (q+:qpixmap-from-image background))
-                 (scaled-background (scale background ratio bg-width)))
-              (q+:draw-tiled-pixmap painter (q+:rect image-widget)
-                                    scaled-background))
-            (flet ((variable-height-box (value)
-                     (let* ((ratio (/ height foreground-height))
-                            (y (truncate (* foreground-height value
-                                            (- 1 ratio)))))
-                       (q+:make-qrect 0 y width height))))
-              (q+:draw-pixmap painter box scaled-shadow
-                              (if (<= foreground-height height)
-                                  (q+:make-qrect
-                                   0 (- (q+:height scaled-shadow) height)
-                                   width height)
-                                  (variable-height-box shadow-level)))
-              (q+:draw-image painter box scaled-foreground
-                             (if (<= foreground-height height)
-                                 (q+:make-qrect 0 (- foreground-height height)
-                                                width (q+:height image-widget))
-                                 (variable-height-box eye-level))))))))))
+  (let ((box (q+:rect image-widget))
+        (height (q+:height image-widget))
+        (width (q+:width image-widget))
+        (bg-width (q+:width background)))
+    (flet ((scale (image &optional (multiplier 1) (width width))
+             (q+:scaled-to-width image (round (* width multiplier))
+                                 (q+:qt.smooth-transformation))))
+      (with-finalizing
+          ((painter (q+:make-qpainter image-widget))
+           (scaled-shadow (scale shadow))
+           (scaled-foreground (scale foreground)))
+        (setf (q+:render-hint painter) (q+:qpainter.antialiasing))
+        (let ((foreground-height (q+:height scaled-foreground))
+              (ratio (float (/ (q+:width scaled-foreground)
+                               (q+:width foreground)))))
+          (with-finalizing*
+              ((background (q+:qpixmap-from-image background))
+               (scaled-background (scale background ratio bg-width)))
+            (q+:draw-tiled-pixmap painter (q+:rect image-widget)
+                                  scaled-background))
+          (flet ((variable-height-box (value)
+                   (let* ((ratio (/ height foreground-height))
+                          (y (truncate (* foreground-height value
+                                          (- 1 ratio)))))
+                     (q+:make-qrect 0 y width height))))
+            (q+:draw-pixmap painter box scaled-shadow
+                            (if (<= foreground-height height)
+                                (q+:make-qrect
+                                 0 (- (q+:height scaled-shadow) height)
+                                 width height)
+                                (variable-height-box shadow-level)))
+            (q+:draw-image painter box scaled-foreground
+                           (if (<= foreground-height height)
+                               (q+:make-qrect 0 (- foreground-height height)
+                                              width (q+:height image-widget))
+                               (variable-height-box eye-level)))))))))
 
 (define-finalizer (image-widget finalize-image-widget)
   (when foreground (finalize foreground))
