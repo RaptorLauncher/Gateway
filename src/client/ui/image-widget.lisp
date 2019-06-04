@@ -55,6 +55,7 @@
   (setf (q+:minimum-width image-widget) 1
         (q+:minimum-height image-widget) 1))
 
+;; TODO refactor
 (define-override (image-widget paint-event) (ev)
   (with-finalizing ((painter (q+:make-qpainter image-widget)))
     (setf (q+:render-hint painter) (q+:qpainter.antialiasing))
@@ -104,7 +105,7 @@
    'image-widget
    :foreground-path (homepath "archie.png")
    :background-path (homepath "tile2.png")
-   :optimal-width 300 :eye-level 0.115 :background-hue (random 1.0) ;1/6
+   :optimal-width 300 :eye-level 0.115 :background-hue (random 1.0)
    :shadow-level 0.2 :shadow-height 1000))
 
 ;;; TODO move to utils or remove
