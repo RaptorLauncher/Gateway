@@ -22,6 +22,7 @@
   :components ((:file "package")
                (:file "definition")
                (:file "image-widget")
+               (:file "image-widget-holder")
                (:file "classes")
-               (:file "chat")
+               ;; (:file "chat")
                ))

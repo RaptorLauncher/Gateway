@@ -11,11 +11,25 @@
 (defclass persona ()
   ((%name :accessor name :initarg :name)
    (%image-path :accessor image-path :initarg :image-path)
-   ;; TODO stuff all required image-widget data here
    (%color-light :accessor color-light :initarg :color-light)
-   (%color-dark :accessor color-dark :initarg :color-dark))
+   (%color-dark :accessor color-dark :initarg :color-dark)
+   ;; TODO stuff all required image-widget data here
+   (%foreground-path :accessor foreground-path :initarg :foreground-path)
+   (%background-path :accessor background-path :initarg :background-path)
+   (%foreground :accessor foreground :initarg :foreground)
+   (%background :accessor background :initarg :background)
+   (%eye-level :accessor eye-level :initarg :eye-level)
+   (%min-width :accessor min-width :initarg :min-width)
+   (%shadow-level :accessor shadow-level :initarg :shadow-level)
+   (%shadow-height :accessor shadow-height :initarg :shadow-height)
+   (%background-hue :accessor background-hue :initarg :background-hue))
   (:default-initargs :name (required-argument :name)
-                     :image-path nil :color-light nil :color-dark nil))
+                     :color-light nil :color-dark nil
+                     :foreground-path nil :foreground nil
+                     :background-path nil :background nil
+                     :eye-level nil :min-width nil
+                     :shadow-level 0.5 :shadow-height 1000
+                     :background-hue 0.0))
 
 (defun make-persona (name image color-light color-dark)
   (make-instance 'persona :name name :image-path image
