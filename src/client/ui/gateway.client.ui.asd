@@ -20,6 +20,7 @@
                #:qtools-ui-placeholder-text-edit
                #:qtools-ui-dictionary)
   :components ((:file "package")
+               (:file "utils")
                (:file "definition")
                (:file "image-widget")
                (:file "image-widget-holder")

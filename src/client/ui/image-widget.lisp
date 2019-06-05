@@ -22,17 +22,6 @@
                      :shadow-level 0.5 :shadow-height 1000
                      :background-hue 0.0))
 
-;; TODO move to utils
-(defun make-shadow-qpixmap (width height)
-  (let* ((pixmap (q+:make-qpixmap width height)))
-    (q+:fill pixmap (q+:make-qcolor 0 0 0 0))
-    (with-finalizing ((gradient (q+:make-qlineargradient 0 0 0 height))
-                      (painter (q+:make-qpainter pixmap)))
-      (setf (q+:color-at gradient 0.0) (q+:qcolor-from-rgb 0 0 0 0)
-            (q+:color-at gradient 1.0) (q+:qcolor-from-rgb 0 0 0 255))
-      (q+:fill-rect painter 0 0 width height (q+:make-qbrush gradient)))
-    pixmap))
-
 (define-subwidget (image-widget shadow)
     (make-shadow-qpixmap optimal-width shadow-height))
 
@@ -107,9 +96,3 @@
    :background-path (homepath "tile2.png")
    :optimal-width 300 :eye-level 0.115 :background-hue (random 1.0)
    :shadow-level 0.2 :shadow-height 1000))
-
-;;; TODO move to utils or remove
-;; (defmacro define-qt-constructor ((class . keys) &body body)
-;;   `(define-constructor (,class ,@keys)
-;;      (qtools:with-slots-bound (,class ,class)
-;;        ,@body)))

@@ -19,7 +19,7 @@
   (dolist (widget widgets)
     (add-widget image-widget-holder widget)))
 
-(defun add-widget (image-widget-holder widget)
+(defmethod add-widget (image-widget-holder widget)
   (with-slots-bound (image-widget-holder image-widget-holder)
     (push widget widgets)
     (q+:add-widget layout widget)))
