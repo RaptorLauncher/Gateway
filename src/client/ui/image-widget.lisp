@@ -89,10 +89,17 @@
 
 ;;; Examples
 
-(defun image1 ()
+(defun image1 (&optional (image "archie.png") (eye-level 0.115))
   (make-instance
    'image-widget
-   :foreground-path (homepath "archie.png")
-   :background-path (homepath "tile2.png")
-   :optimal-width 300 :eye-level 0.115 :background-hue (random 1.0)
+   :foreground-path (homepath image)
+   :background-path (homepath (whichever "tile.png" "tile2.png"))
+   :optimal-width 300 :eye-level eye-level :background-hue (random 1.0)
    :shadow-level 0.2 :shadow-height 1000))
+
+;; (with-main-window (window (make-instance 'image-widget-holder))
+;;   (add-widget window (image1 "archie.png" 0.115))
+;;   (add-widget window (image1 "cyan.png" 0.115))
+;;   (add-widget window (image1 "scale.png" 0.18))
+;;   (add-widget window (image1 "tzix.png" 0.1))
+;;   (q+:resize window 300 300))
