@@ -13,20 +13,14 @@
    (background :accessor background :initarg :background)
    (eye-level :accessor eye-level :initarg :eye-level)
    (optimal-width :accessor optimal-width :initarg :optimal-width)
-   ;; TODO remove shadow-level
-   (shadow-level :accessor shadow-level :initarg :shadow-level)
-   (shadow-height :accessor shadow-height :initarg :shadow-height)
    (background-hue :accessor background-hue :initarg :background-hue))
   (:default-initargs :foreground-path nil :foreground nil
                      :background-path nil :background nil
                      :eye-level nil :optimal-width nil
-                     :shadow-level 0.5 :shadow-height 1000
                      :background-hue 0.0))
 
 (define-subwidget (image-widget shadow)
-    (make-shadow-qpixmap optimal-width optimal-width)
-  ;; (make-shadow-qpixmap optimal-width shadow-height)
-  )
+    (make-shadow-qpixmap optimal-width optimal-width))
 
 (define-constructor (image-widget foreground-path foreground
                                   background-path background
@@ -58,7 +52,6 @@
                                  (q+:qt.smooth-transformation))))
       (with-finalizing
           ((painter (q+:make-qpainter image-widget))
-           (scaled-shadow (scale shadow))
            (scaled-foreground (scale foreground)))
         (setf (q+:render-hint painter) (q+:qpainter.antialiasing))
         (let ((foreground-height (q+:height scaled-foreground))
@@ -69,24 +62,15 @@
                (scaled-background (scale background ratio bg-width)))
             (q+:draw-tiled-pixmap painter (q+:rect image-widget)
                                   scaled-background))
-          (flet ((variable-height-box (value)
-                   (let* ((ratio (/ height foreground-height))
-                          (y (truncate (* foreground-height value
-                                          (- 1 ratio)))))
-                     (q+:make-qrect 0 y width height))))
-            (q+:draw-pixmap painter box shadow ;; scaled-shadow
-                            (q+:rect shadow)
-                            ;; (if (<= foreground-height height)
-                            ;;     (q+:make-qrect
-                            ;;      0 (- (q+:height scaled-shadow) height)
-                            ;;      width height)
-                            ;;     (variable-height-box shadow-level))
-                            )
-            (q+:draw-image painter box scaled-foreground
-                           (if (<= foreground-height height)
-                               (q+:make-qrect 0 (- foreground-height height)
-                                              width (q+:height image-widget))
-                               (variable-height-box eye-level)))))))))
+          (q+:draw-pixmap painter box shadow (q+:rect shadow))
+          (q+:draw-image painter box scaled-foreground
+                         (if (<= foreground-height height)
+                             (q+:make-qrect 0 (- foreground-height height)
+                                            width (q+:height image-widget))
+                             (let* ((ratio (/ height foreground-height))
+                                    (y (truncate (* foreground-height eye-level
+                                                    (- 1 ratio)))))
+                               (q+:make-qrect 0 y width height)))))))))
 
 (define-finalizer (image-widget finalize-image-widget)
   (when foreground (finalize foreground))
@@ -99,8 +83,7 @@
    'image-widget
    :foreground-path (homepath image)
    :background-path (homepath (whichever "tile.png" "tile2.png"))
-   :optimal-width 300 :eye-level eye-level :background-hue (random 1.0)
-   :shadow-level 0.5 :shadow-height 1000))
+   :optimal-width 300 :eye-level eye-level :background-hue (random 1.0)))
 
 ;; (with-main-window (window (make-instance 'image-widget-holder))
 ;;   (add-widget window (image1 "archie.png" 0.115))
