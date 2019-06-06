@@ -24,7 +24,9 @@
                      :background-hue 0.0))
 
 (define-subwidget (image-widget shadow)
-    (make-shadow-qpixmap optimal-width shadow-height))
+    (make-shadow-qpixmap optimal-width optimal-width)
+  ;; (make-shadow-qpixmap optimal-width shadow-height)
+  )
 
 (define-constructor (image-widget foreground-path foreground
                                   background-path background
