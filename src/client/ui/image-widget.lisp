@@ -13,6 +13,7 @@
    (background :accessor background :initarg :background)
    (eye-level :accessor eye-level :initarg :eye-level)
    (optimal-width :accessor optimal-width :initarg :optimal-width)
+   ;; TODO remove shadow-level
    (shadow-level :accessor shadow-level :initarg :shadow-level)
    (shadow-height :accessor shadow-height :initarg :shadow-height)
    (background-hue :accessor background-hue :initarg :background-hue))
@@ -71,12 +72,14 @@
                           (y (truncate (* foreground-height value
                                           (- 1 ratio)))))
                      (q+:make-qrect 0 y width height))))
-            (q+:draw-pixmap painter box scaled-shadow
-                            (if (<= foreground-height height)
-                                (q+:make-qrect
-                                 0 (- (q+:height scaled-shadow) height)
-                                 width height)
-                                (variable-height-box shadow-level)))
+            (q+:draw-pixmap painter box shadow ;; scaled-shadow
+                            (q+:rect shadow)
+                            ;; (if (<= foreground-height height)
+                            ;;     (q+:make-qrect
+                            ;;      0 (- (q+:height scaled-shadow) height)
+                            ;;      width height)
+                            ;;     (variable-height-box shadow-level))
+                            )
             (q+:draw-image painter box scaled-foreground
                            (if (<= foreground-height height)
                                (q+:make-qrect 0 (- foreground-height height)
@@ -95,11 +98,14 @@
    :foreground-path (homepath image)
    :background-path (homepath (whichever "tile.png" "tile2.png"))
    :optimal-width 300 :eye-level eye-level :background-hue (random 1.0)
-   :shadow-level 0.2 :shadow-height 1000))
+   :shadow-level 0.5 :shadow-height 1000))
 
 ;; (with-main-window (window (make-instance 'image-widget-holder))
 ;;   (add-widget window (image1 "archie.png" 0.115))
 ;;   (add-widget window (image1 "cyan.png" 0.115))
 ;;   (add-widget window (image1 "scale.png" 0.18))
+;;   (add-widget window (image1 "solyre.png" 0.07))
+;;   (add-widget window (image1 "bahta.png" 0.17))
+;;   (add-widget window (image1 "sashasa.png" 0.07))
 ;;   (add-widget window (image1 "tzix.png" 0.1))
 ;;   (q+:resize window 300 300))
