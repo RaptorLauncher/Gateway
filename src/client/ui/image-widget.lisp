@@ -78,19 +78,19 @@
 
 ;;; Examples
 
-(defun image1 (image eye-level)
+(defun image1 (image eye-level tile-number)
   (make-instance
    'image-widget
    :foreground-path (homepath image)
-   :background-path (homepath (whichever "tile.png" "tile2.png"))
+   :background-path (homepath (format nil "tile~D.png" tile-number))
    :optimal-width 300 :eye-level eye-level :background-hue (random 1.0)))
 
-;; (with-main-window (window (make-instance 'image-widget-holder))
-;;   (add-widget window (image1 "archie.png" 0.115))
-;;   (add-widget window (image1 "cyan.png" 0.115))
-;;   (add-widget window (image1 "scale.png" 0.18))
-;;   (add-widget window (image1 "solyre.png" 0.07))
-;;   (add-widget window (image1 "bahta.png" 0.17))
-;;   (add-widget window (image1 "sashasa.png" 0.07))
-;;   (add-widget window (image1 "tzix.png" 0.1))
-;;   (q+:resize window 300 300))
+(with-main-window (window (make-instance 'image-widget-holder))
+  (add-widget window (image1 "archie.png" 0.115 1))
+  (add-widget window (image1 "cyan.png" 0.115 2))
+  (add-widget window (image1 "scale.png" 0.18 5))
+  (add-widget window (image1 "solyre.png" 0.07 5))
+  (add-widget window (image1 "bahta.png" 0.17 3))
+  (add-widget window (image1 "sashasa.png" 0.07 4))
+  (add-widget window (image1 "tzix.png" 0.1 3))
+  (q+:resize window 300 300))
