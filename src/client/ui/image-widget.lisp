@@ -78,7 +78,7 @@
 
 ;;; Examples
 
-(defun image1 (&optional (image "archie.png") (eye-level 0.115))
+(defun image1 (image eye-level)
   (make-instance
    'image-widget
    :foreground-path (homepath image)
