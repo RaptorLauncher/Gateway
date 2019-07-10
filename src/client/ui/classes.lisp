@@ -45,6 +45,17 @@
                      :contents (required-argument :contents)
                      :timestamp (local-time:now)))
 
+(defmethod print-object ((post post) stream)
+  (with-slots (persona timestamp contents) post
+    (print-unreadable-object (post stream :type t)
+      (format stream "(~A, ~A) \"~A\""
+              (typecase persona (persona (name persona)) (t persona))
+              (local-time:format-timestring nil timestamp
+                                            :format local-time:+asctime-format+)
+              (if (<= (length contents) 20)
+                  contents
+                  (format nil "~A..." (subseq contents 0 20)))))))
+
 (defun make-dummy-personas (&key (name-1 "Erchembod") (name-2 "Scaletail"))
   (let* ((image-1 (homepath "erchembod.png"))
          (persona-1 (make-persona name-1 image-1 "#CC33FF" "#33CC00"))
