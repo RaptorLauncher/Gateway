@@ -73,8 +73,6 @@
   (when foreground (finalize foreground))
   (when background (finalize background)))
 
-;;; Examples
-
 (defun make-image-widget (image)
   (make-instance 'image-widget
                  :foreground-path (foreground-path image)
@@ -82,20 +80,3 @@
                  :eye-level (eye-level image)
                  :optimal-width (optimal-width image)
                  :background-hue (background-hue image)))
-
-;; (defun image1 (image eye-level tile-number hue)
-;;   (make-instance
-;;    'image-widget
-;;    :foreground-path (homepath image)
-;;    :background-path (homepath (format nil "tile~D.png" tile-number))
-;;    :optimal-width 300 :eye-level eye-level :background-hue hue))
-
-(defun image2 (foreground-path eye-level tile-number background-hue)
-  (let ((image (make-instance
-                'image
-                :foreground-path (homepath foreground-path)
-                :background-path (homepath (format nil "tile~D.png" tile-number))
-                :optimal-width 300
-                :eye-level eye-level
-                :background-hue background-hue)))
-    (make-image-widget image)))
