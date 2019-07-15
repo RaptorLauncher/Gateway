@@ -10,29 +10,14 @@
 
 (defclass persona ()
   ((%name :accessor name :initarg :name)
-   (%image-path :accessor image-path :initarg :image-path)
+   (%images :accessor images :initarg :images)
    (%color-light :accessor color-light :initarg :color-light)
-   (%color-dark :accessor color-dark :initarg :color-dark)
-   ;; TODO stuff all required image-widget data here
-   (%foreground-path :accessor foreground-path :initarg :foreground-path)
-   (%background-path :accessor background-path :initarg :background-path)
-   (%foreground :accessor foreground :initarg :foreground)
-   (%background :accessor background :initarg :background)
-   (%eye-level :accessor eye-level :initarg :eye-level)
-   (%min-width :accessor min-width :initarg :min-width)
-   (%shadow-level :accessor shadow-level :initarg :shadow-level)
-   (%shadow-height :accessor shadow-height :initarg :shadow-height)
-   (%background-hue :accessor background-hue :initarg :background-hue))
+   (%color-dark :accessor color-dark :initarg :color-dark))
   (:default-initargs :name (required-argument :name)
-                     :color-light nil :color-dark nil
-                     :foreground-path nil :foreground nil
-                     :background-path nil :background nil
-                     :eye-level nil :min-width nil
-                     :shadow-level 0.5 :shadow-height 1000
-                     :background-hue 0.0))
+                     :color-light nil :color-dark nil))
 
-(defun make-persona (name image color-light color-dark)
-  (make-instance 'persona :name name :image-path image
+(defun make-persona (name images color-light color-dark)
+  (make-instance 'persona :name name :images '()
                           :color-light color-light :color-dark color-dark))
 
 ;;; POST
@@ -57,10 +42,11 @@
                   (format nil "~A..." (subseq contents 0 20)))))))
 
 (defun make-dummy-personas (&key (name-1 "Erchembod") (name-2 "Scaletail"))
-  (let* ((image-1 (homepath "erchembod.png"))
-         (persona-1 (make-persona name-1 image-1 "#CC33FF" "#33CC00"))
-         (image-2 (homepath "scaletail.png"))
-         (persona-2 (make-persona name-2 image-2 "#EEFF88" "#110077")))
+  (let* (;; (image-1 (homepath "erchembod.png"))
+         ;; (image-2 (homepath "scaletail.png"))
+         ;; TODO add proper image classes here
+         (persona-1 (make-persona name-1 '() "#CC33FF" "#33CC00"))
+         (persona-2 (make-persona name-2 '() "#EEFF88" "#110077")))
     (list persona-1 persona-2)))
 
 (defun make-lorem-ipsum-posts (n personas)
@@ -71,3 +57,17 @@
           for contents = (lorem-ipsum:paragraph :prologue nil)
           collect (make-instance 'post :persona persona
                                        :contents contents))))
+
+;;; IMAGE
+
+(defclass image ()
+  ((%foreground-path :accessor foreground-path :initarg :foreground-path)
+   (%background-path :accessor background-path :initarg :background-path)
+   (%eye-level :accessor eye-level :initarg :eye-level)
+   (%optimal-width :accessor optimal-width :initarg :optimal-width)
+   (%background-hue :accessor background-hue :initarg :background-hue))
+  (:default-initargs :foreground-path nil :background-path nil
+                     :eye-level nil :optimal-width nil
+                     :background-hue 0.0))
+
+;; TODO (defun make-image-widget (image))

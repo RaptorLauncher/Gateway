@@ -11,8 +11,7 @@
 (defun load-file (path expected-personas)
   (flet ((scan (x) (nth-value 1 (cl-ppcre:scan-to-strings *load-regex* x))))
     (let* ((file (read-file-into-string path))
-           (splits (split-sequence:split-sequence #\Newline file
-                                                  :remove-empty-subseqs t))
+           (splits (split-sequence #\Newline file :remove-empty-subseqs t))
            (scanned (mapcar #'scan splits))
            (scanned (mapcar (rcurry #'coerce 'list) scanned))
            (scanned (delete nil scanned)))

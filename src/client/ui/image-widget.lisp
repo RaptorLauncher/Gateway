@@ -7,15 +7,12 @@
 (in-readtable :qtools)
 
 (define-widget image-widget (qwidget)
-  ((foreground-path :accessor foreground-path :initarg :foreground-path)
-   (background-path :accessor background-path :initarg :background-path)
-   (foreground :accessor foreground :initarg :foreground)
+  ((foreground :accessor foreground :initarg :foreground)
    (background :accessor background :initarg :background)
    (eye-level :accessor eye-level :initarg :eye-level)
    (optimal-width :accessor optimal-width :initarg :optimal-width)
    (background-hue :accessor background-hue :initarg :background-hue))
-  (:default-initargs :foreground-path nil :foreground nil
-                     :background-path nil :background nil
+  (:default-initargs :foreground nil :background nil
                      :eye-level nil :optimal-width nil
                      :background-hue 0.0))
 
@@ -78,9 +75,27 @@
 
 ;;; Examples
 
-(defun image1 (image eye-level tile-number hue)
-  (make-instance
-   'image-widget
-   :foreground-path (homepath image)
-   :background-path (homepath (format nil "tile~D.png" tile-number))
-   :optimal-width 300 :eye-level eye-level :background-hue hue))
+(defun make-image-widget (image)
+  (make-instance 'image-widget
+                 :foreground-path (foreground-path image)
+                 :background-path (background-path image)
+                 :eye-level (eye-level image)
+                 :optimal-width (optimal-width image)
+                 :background-hue (background-hue image)))
+
+;; (defun image1 (image eye-level tile-number hue)
+;;   (make-instance
+;;    'image-widget
+;;    :foreground-path (homepath image)
+;;    :background-path (homepath (format nil "tile~D.png" tile-number))
+;;    :optimal-width 300 :eye-level eye-level :background-hue hue))
+
+(defun image2 (foreground-path eye-level tile-number background-hue)
+  (let ((image (make-instance
+                'image
+                :foreground-path (homepath foreground-path)
+                :background-path (homepath (format nil "tile~D.png" tile-number))
+                :optimal-width 300
+                :eye-level eye-level
+                :background-hue background-hue)))
+    (make-image-widget image)))

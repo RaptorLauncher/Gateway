@@ -12,6 +12,7 @@
   :depends-on (#:qtgui
                #:qtools
                #:phoe-toolbox
+               #:split-sequence
                #:local-time
                #:lorem-ipsum
                #:qtools-ui-imagetools
@@ -22,8 +23,8 @@
   :components ((:file "package")
                (:file "utils")
                (:file "definition")
+               (:file "classes") ;; TODO move out of UI
                (:file "image-widget")
                (:file "image-widget-holder")
-               (:file "classes")
                ;; (:file "chat")
                ))
