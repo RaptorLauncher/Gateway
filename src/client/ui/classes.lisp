@@ -23,9 +23,9 @@
 ;;; POST
 
 (defclass post ()
-  ((persona :accessor persona :initarg :persona)
-   (timestamp :accessor timestamp :initarg :timestamp)
-   (contents :accessor contents :initarg :contents))
+  ((%persona :accessor persona :initarg :persona)
+   (%timestamp :accessor timestamp :initarg :timestamp)
+   (%contents :accessor contents :initarg :contents))
   (:default-initargs :persona (required-argument :persona)
                      :contents (required-argument :contents)
                      :timestamp (local-time:now)))
@@ -58,6 +58,16 @@
           collect (make-instance 'post :persona persona
                                        :contents contents))))
 
+;;; STREAM
+
+(shadow '#:stream)
+
+(defclass stream ()
+  ((%name :accessor name :initarg :name)
+   (%posts :accessor posts :initarg :posts))
+  (:default-initargs :name (required-argument :name)
+                     :posts '()))
+
 ;;; IMAGE
 
 (defclass image ()
@@ -69,5 +79,3 @@
   (:default-initargs :foreground-path nil :background-path nil
                      :eye-level nil :optimal-width nil
                      :background-hue 0.0))
-
-;; TODO (defun make-image-widget (image))
