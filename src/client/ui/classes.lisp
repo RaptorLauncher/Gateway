@@ -58,6 +58,7 @@
 
 ;;; STREAM
 
+;; TODO shadow this properly
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (shadow '#:stream))
 
