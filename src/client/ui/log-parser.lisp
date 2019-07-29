@@ -29,7 +29,7 @@
 
 (defun detect-persona (contents personas)
   (loop for persona in personas
-        for regex = (format nil "^(\\* |)~A" persona)
+        for regex = (format nil "^(\\* |)~A" (name persona))
         for match = (cl-ppcre:scan regex contents)
         when match return persona))
 
@@ -42,7 +42,8 @@
       (if third-person-p
           post-contents
           (let* ((format-control (if persona "^~A: (.*)" "^.*?: (.*)"))
-                 (regex (format nil format-control persona))
+                 (name (when persona (name persona)))
+                 (regex (format nil format-control name))
                  (strings (nth-value 1 (cl-ppcre:scan-to-strings
                                         regex post-contents))))
             (aref strings 0))))))

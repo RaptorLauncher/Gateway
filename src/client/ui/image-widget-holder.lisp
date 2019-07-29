@@ -46,6 +46,8 @@
              :eye-level eye-level
              :background-hue background-hue))))
     (with-main-window (window (make-instance 'image-widget-holder))
+      ;; (add-widget window (make-image-widget *image-bahtami*))
+      ;; (add-widget window (make-image-widget *image-kimya*))
       (dolist (image-data *image-widget-holder-example-data*)
         (add-widget window (apply #'make image-data)))
       (q+:resize window 300 600))))

@@ -24,6 +24,7 @@
                (:file "utils")
                (:file "definition")
                (:file "classes") ;; TODO move out of UI
+               (:file "examples") ;; TODO move out of UI
                (:file "image-widget")
                (:file "image-widget-holder")
                ;; (:file "chat")
