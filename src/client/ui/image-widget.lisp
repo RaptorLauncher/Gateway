@@ -16,6 +16,18 @@
                      :eye-level nil :optimal-width nil
                      :background-hue 0.0))
 
+(defun make-shadow-qpixmap (width height)
+  (let* ((pixmap (q+:make-qpixmap width height)))
+    (q+:fill pixmap (q+:make-qcolor 0 0 0 0))
+    (with-finalizing ((gradient (q+:make-qradialgradient (/ height 2)
+                                                         (/ height 2)
+                                                         (/ height 5/4)))
+                      (painter (q+:make-qpainter pixmap)))
+      (setf (q+:color-at gradient 0.0) (q+:qcolor-from-rgb 0 0 0 0)
+            (q+:color-at gradient 1.0) (q+:qcolor-from-rgb 0 0 0 255))
+      (q+:fill-rect painter 0 0 width height (q+:make-qbrush gradient)))
+    pixmap))
+
 (define-subwidget (image-widget shadow)
     (make-shadow-qpixmap optimal-width optimal-width))
 

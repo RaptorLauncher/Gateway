@@ -22,10 +22,10 @@
                #:qtools-ui-dictionary)
   :components ((:file "package")
                (:file "utils")
-               (:file "definition")
                (:file "classes") ;; TODO move out of UI
-               (:file "examples") ;; TODO move out of UI
                (:file "image-widget")
                (:file "image-widget-holder")
-               ;; (:file "chat")
+               (:file "log-parser")
+               (:file "example") ;; TODO move out of UI
+               (:file "chat")
                ))

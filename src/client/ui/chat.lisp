@@ -13,8 +13,7 @@
    (ooc-posts :accessor ooc-posts :initarg :ooc-posts))
   (:default-initargs :personas '() :ic-posts '() :ooc-posts '()))
 
-(define-subwidget (chat-window layout) (q+:make-qgridlayout)
-  (setf (q+:layout chat-window) layout))
+(define-subwidget (chat-window layout) (q+:make-qgridlayout chat-window))
 
 ;;; Bottom row
 
@@ -87,23 +86,25 @@
   (q+:hide dictionary))
 
 (define-subwidget (chat-window description-left)
-    (make-instance 'qui:fixed-qtextedit)
+    (q+:make-qtextbrowser)
   (q+:add-widget splitter description-left)
   (setf (q+:stretch-factor splitter 2) 1)
   (q+:hide description-left)
   (setf (q+:html description-left)
         (format nil "<h3>Sashasa</h3>~%~A"
-                (read-file-into-string "~/Projects/Raptor Chat/sha.txt"))))
+                (read-file-into-string "~/Projects/Raptor Chat/sha.txt"))
+        (q+:open-external-links description-left) t))
 
 (define-subwidget (chat-window description-right)
-    (make-instance 'qui:fixed-qtextedit)
+    (q+:make-qtextbrowser)
   (q+:add-widget splitter description-right)
   (setf (q+:stretch-factor splitter 3) 1
         (q+:stretch-factor splitter 4) 1)
   (q+:hide description-right)
   (setf (q+:html description-right)
         (format nil "<h3>Undies</h3>~%~A"
-                (read-file-into-string "~/Projects/Raptor Chat/undies.txt"))))
+                (read-file-into-string "~/Projects/Raptor Chat/undies.txt"))
+        (q+:open-external-links description-right) t))
 
 ;;; BUTTONS
 

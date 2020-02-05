@@ -10,4 +10,5 @@
         #:split-sequence
         #:qtools
         #:named-readtables)
+  (:shadow #:stream)
   (:shadowing-import-from #:phoe-toolbox #:split))

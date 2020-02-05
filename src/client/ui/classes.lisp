@@ -57,11 +57,6 @@
                   (format nil "~A..." (subseq contents 0 20)))))))
 
 ;;; STREAM
-
-;; TODO shadow this properly
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (shadow '#:stream))
-
 (defclass stream ()
   ((%name :accessor name :initarg :name)
    (%posts :accessor posts :initarg :posts))
