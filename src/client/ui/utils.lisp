@@ -20,8 +20,8 @@
 
 ;;; PLACECHCKED-TEXT-EDIT
 
-(define-widget placechecked-text-edit
+(define-widget input-text-edit
       (qtextedit qui:spellchecked-text-edit qui:placeholder-text-edit) ())
 
-(defun make-placechecked-text-edit (placeholder)
-  (make-instance 'placechecked-text-edit :placeholder placeholder))
+(defun make-input-text-edit (placeholder)
+  (make-instance 'input-text-edit :placeholder placeholder))
