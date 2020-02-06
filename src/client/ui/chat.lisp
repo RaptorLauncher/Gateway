@@ -266,9 +266,11 @@
   (with-output-to-string (*standard-output*)
     (loop
       for post in posts
-      for name = (name (persona post))
+      for persona = (persona post)
+      for name = (name persona)
       for date = (timestamp post)
-      for color = (color-dark (persona post))
+      for outfit = (first (outfits persona))
+      for color = (color-dark outfit)
       for contents = (contents post)
       do (format t "<p style=\"color: ~A;\"~A>" color
                  (if justifyp " align=justify" ""))
@@ -338,6 +340,6 @@
     (with-slots-bound (chat-window chat-window)
       (let ((dummy-personas (make-dummy-personas)))
         (setf personas dummy-personas
-              ic-posts (make-lorem-ipsum-posts 10 dummy-personas)
+              ic-posts *posts* ;; (make-lorem-ipsum-posts 10 dummy-personas)
               ooc-posts (make-lorem-ipsum-posts 10 dummy-personas))
         (update-outputs chat-window)))))

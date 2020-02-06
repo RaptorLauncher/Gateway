@@ -27,13 +27,14 @@
 ;; Examples
 
 (defparameter *image-widget-holder-example-data*
-  '(("archie.png"   0.115  1  0.0)
-    ("cyan.png"     0.115  2  0.2)
-    ("scale.png"    0.18   5  0.0)
-    ("solyre.png"   0.07   5  0.0)
-    ("bahta.png"    0.17   3  0.0)
-    ("sashasa.png"  0.07   4  0.0)
-    ("tzix.png"     0.1    3  0.0)))
+  '(("archie.png"        0.115  1  0.0)
+    ("scale.png"         0.18   5  0.0)
+    ("cyan.png"          0.115  2  0.2)
+    ("solyre.png"        0.07   5  0.0)
+    ("bahta.png"         0.17   3  0.0)
+    ("sashasa.png"       0.07   4  0.0)
+    ("tzix.png"          0.1    3  0.0)
+    ("kimya-cropped.png" 0.075  4  0.05)))
 
 (defun image-widget-holder-example ()
   (flet ((make (foreground-path eye-level tile-number background-hue)
@@ -46,8 +47,6 @@
              :eye-level eye-level
              :background-hue background-hue))))
     (with-main-window (window (make-instance 'image-widget-holder))
-      ;; (add-widget window (make-image-widget *image-bahtami*))
-      ;; (add-widget window (make-image-widget *image-kimya*))
       (dolist (image-data *image-widget-holder-example-data*)
         (add-widget window (apply #'make image-data)))
       (q+:resize window 300 600))))

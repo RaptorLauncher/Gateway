@@ -18,17 +18,23 @@
                      :eye-level nil :optimal-width nil
                      :background-hue 0.0))
 
+;;; OUTFIT
+
+(defclass outfit ()
+  ((%description :accessor description :initarg :description)
+   (%images :accessor images :initarg :images)
+   (%color-light :accessor color-light :initarg :color-light)
+   (%color-dark :accessor color-dark :initarg :color-dark))
+  (:default-initargs :description nil :images '()
+                     :color-light "#111111" :color-dark "#EEEEEE"))
+
 ;;; PERSONA
 
 (defclass persona ()
   ((%name :accessor name :initarg :name)
-   (%description :accessor description :initarg :description)
-   (%images :accessor images :initarg :images)
-   (%color-light :accessor color-light :initarg :color-light)
-   (%color-dark :accessor color-dark :initarg :color-dark))
+   (%outfits :accessor outfits :initarg :outfits))
   (:default-initargs :name (required-argument :name)
-                     :description nil
-                     :color-light "#111111" :color-dark "#EEEEEE"))
+                     :outfits '()))
 
 (defmethod print-object ((persona persona) stream)
   (print-unreadable-object (persona stream :type t)
@@ -57,32 +63,9 @@
                   (format nil "~A..." (subseq contents 0 20)))))))
 
 ;;; STREAM
+
 (defclass stream ()
   ((%name :accessor name :initarg :name)
    (%posts :accessor posts :initarg :posts))
   (:default-initargs :name (required-argument :name)
                      :posts '()))
-
-;;; EXAMPLES
-
-;; TODO deprecate or add DESCRIPTION arg
-(defun make-persona (name images color-light color-dark)
-  (make-instance 'persona :name name :images '()
-                          :color-light color-light :color-dark color-dark))
-
-(defun make-dummy-personas (&key (name-1 "Erchembod") (name-2 "Scaletail"))
-  (let* (;; (image-1 (homepath "erchembod.png"))
-         ;; (image-2 (homepath "scaletail.png"))
-         ;; TODO add proper image classes here
-         (persona-1 (make-persona name-1 '() "#CC33FF" "#33CC00"))
-         (persona-2 (make-persona name-2 '() "#EEFF88" "#110077")))
-    (list persona-1 persona-2)))
-
-(defun make-lorem-ipsum-posts (n personas)
-  (let ((personas (copy-list personas)))
-    (setf (cdr (last personas)) personas)
-    (loop repeat n
-          for persona in personas
-          for contents = (lorem-ipsum:paragraph :prologue nil)
-          collect (make-instance 'post :persona persona
-                                       :contents contents))))
