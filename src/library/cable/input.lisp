@@ -56,8 +56,8 @@
     char))
 
 (defun lpeek* (stream &key eof)
-  (let ((char (phoe-toolbox:peek-char-no-hang stream (not eof) eof)))
-    (when (and (characterp char) *read-limit*)
+  (let ((char (phoe-toolbox:peek-char-no-hang stream eof nil)))
+    (when (and char *read-limit*)
       (when (<= *read-limit* *read-counter*)
         (error 'read-limit-hit)))
     char))
@@ -153,8 +153,8 @@
                     (read-sexpr-number stream))
                    (t (lunread char stream)
                     (read-sexpr-symbol stream)))))
-    (loop for char = (lpeek* stream :eof stream)
-          while (phoe-toolbox:whitespacep char)
+    (loop for char = (lpeek* stream :eof nil)
+          while (and char (phoe-toolbox:whitespacep char))
           do (lread stream))
     result))
 
