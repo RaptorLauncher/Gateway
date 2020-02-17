@@ -20,21 +20,25 @@
 (defun make-backup-string ()
   (make-array 0 :element-type 'character :adjustable t :fill-pointer 0))
 
-(define-condition incomplete-input () ())
+(define-condition cable-condition () ())
 
-(define-condition read-limit-hit (error) ())
+(define-condition incomplete-input (cable-condition) ())
 
-(define-condition depth-limit-hit (error) ())
+(define-condition cable-error (cable-condition error) ())
 
-(define-condition cable-error (simple-condition error) ())
+(define-condition read-limit-hit (cable-error) ())
+
+(define-condition depth-limit-hit (cable-error) ())
+
+(define-condition simple-cable-error (simple-condition cable-error) ())
 
 (defun cable-error (&optional format-control &rest format-arguments)
   "Signals a CABLE-ERROR with the provided format control and arguments."
-  (error (make-instance 'cable-error :format-control format-control
-                                     :format-arguments format-arguments)))
+  (error (make-instance 'simple-cable-error
+                        :format-control format-control
+                        :format-arguments format-arguments)))
 
 ;;; LREAD/LPEEK/LUNREAD
-
 
 (defun lread (stream &optional eof)
   (when *read-limit*
