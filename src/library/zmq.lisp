@@ -4,7 +4,7 @@
 
 (defparameter *client-socket* nil)
 
-(defun start-client (&optional (server-address "tcp://localhost:5555"))
+(defun start-client (&optional (server-address "tcp://localhost:6500"))
   (let ((context (pzmq:ctx-new)))
     (setf *client-context* context)
     (let* ((socket (pzmq:socket context :dealer)))
@@ -40,17 +40,6 @@
 
 (defparameter *server-socket* nil)
 
-(defun start-server (&optional (listen-address "tcp://*:5555"))
-  (let ((context (pzmq:ctx-new)))
-    (setf *server-context* context)
-    (let* ((socket (pzmq:socket context :router)))
-      ;; Wait for PZMQ to catch up with these
-      ;; (pzmq:setsockopt socket :router-handover 1)
-      ;; (pzmq:setsockopt socket :hearbeat-ivl 10000)
-      ;; (pzmq:setsockopt socket :hearbeat-timeout 30000)
-      (pzmq:bind socket listen-address)
-      (setf *server-socket* socket))))
-
 (defun stop-server ()
   (when *server-socket*
     (pzmq:close *server-socket*)
@@ -59,7 +48,21 @@
     (pzmq:ctx-term *server-context*)
     (setf *server-context* nil)))
 
-
+(defun start-server (&optional (listen-address "tcp://*:6500"))
+  (let ((complete-p nil))
+    (unwind-protect
+         (let ((context (pzmq:ctx-new)))
+           (setf *server-context* context)
+           (let* ((socket (pzmq:socket context :router)))
+             (setf *server-socket* socket)
+             (pzmq:setsockopt socket :router-handover 1)
+             (pzmq:setsockopt socket :heartbeat-ivl 10000)
+             (pzmq:setsockopt socket :connect-timeout 30000)
+             (pzmq:setsockopt socket :heartbeat-timeout 30000)
+             (pzmq:setsockopt socket :immediate 1)
+             (pzmq:bind socket listen-address)
+             (setf complete-p t)))
+      (unless complete-p (stop-server)))))
 
 ;; Server logic
 
