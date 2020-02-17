@@ -11,10 +11,6 @@
 
 ;;; VARS AND UTILS
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defvar *whitespace*
-    (map 'vector #'code-char '(#x0009 #x000A #x000B #x000C #x000D #x0020))))
-
 (defvar *read-limit* nil)
 (defvar *read-counter*)
 (defvar *depth-limit* nil)
@@ -32,13 +28,10 @@
 
 (define-condition cable-error (simple-condition error) ())
 
-(defun make-cable-error (&optional format-control &rest format-arguments)
-  "Creates a CABLE-ERROR with the provided format control and arguments."
-  (make-instance 'cable-error :format-control format-control
-                              :format-arguments format-arguments))
-
-(defun whitespace-p (char)
-  (find char *whitespace*))
+(defun cable-error (&optional format-control &rest format-arguments)
+  "Signals a CABLE-ERROR with the provided format control and arguments."
+  (error (make-instance 'cable-error :format-control format-control
+                                     :format-arguments format-arguments)))
 
 ;;; LREAD/LPEEK/LUNREAD
 
@@ -80,7 +73,7 @@
   (loop for char = (lread stream)
         unless char
           do (signal 'incomplete-input)
-        while (find char *whitespace*)
+        while (phoe-toolbox:whitespacep char)
         when *read-limit*
           do (when (< *read-limit* *read-counter*)
                (error 'read-limit-hit))
@@ -128,7 +121,7 @@
                (#\\ (write-char (lread stream) out))
                (#.(list* #\" #\( #\) #\0 #\1 #\2 #\3
                          #\4 #\5 #\6 #\7 #\8 #\9 #\. #\Nul
-                         (coerce *whitespace* 'list))
+                         phoe-toolbox:*whitespace*)
                 (lunread char stream) (return))
                (:eof (return))
                (t (write-char (char-upcase char) out))))))
@@ -151,9 +144,9 @@
   (skip-whitespace stream)
   (let* ((char (lread stream))
          (result (case char
-                   (#\Nul (error (make-cable-error "Stray null found.")))
+                   (#\Nul (cable-error "Stray null found."))
                    (#\( (read-sexpr-list stream))
-                   (#\) (error (make-cable-error "Stray closing paren found.")))
+                   (#\) (cable-error "Stray closing paren found."))
                    (#\" (read-sexpr-string stream))
                    ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 #\.)
                     (lunread char stream)
@@ -161,7 +154,7 @@
                    (t (lunread char stream)
                     (read-sexpr-symbol stream)))))
     (loop for char = (lpeek* stream :eof stream)
-          while (whitespace-p char)
+          while (phoe-toolbox:whitespacep char)
           do (lread stream))
     result))
 
