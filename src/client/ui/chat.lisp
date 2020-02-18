@@ -333,7 +333,7 @@
   (with-slots-bound (chat-window chat-window)
     (update-output chat-window ooc-output ooc-posts)))
 
-;;; main
+;;; MAIN
 
 (defun chat ()
   (with-main-window (chat-window 'chat-window)
