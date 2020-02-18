@@ -99,9 +99,11 @@
                         (pzmq:msg-data message) `(:array :unsigned-char 5)
                         :element-type '(unsigned-byte 8)))
              (integer (array-to-integer identity)))
-        (unless (gethash integer *identities*)
-          (setf (gethash integer *identities*) (local-time:now))
-          (format t "~&Adding identity ~S." identity))
+        (cond ((gethash integer *identities*)
+               (setf (gethash integer *identities*) (local-time:now))
+               (format t "~&Adding identity ~S." identity))
+              (t
+               (format t "~&Receiving from identity ~S." identity)))
         (finish-output))
       ;; Receive/send data
       (pzmq:msg-recv message *server-socket*)
