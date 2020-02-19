@@ -34,10 +34,7 @@ install:
   cp libzmq-v141-mt-4_3_2.dll libzmq.dll;
   ls -alh;
   cd ..;
-  export INCLUDE=~/zmq:$INCLUDE;
-  echo $INCLUDE;
-  export CGO_CFLAGS="-I`pwd`/zmq/";
-  echo $CGO_FLAGS;
+  echo | gcc -E -Wp,-v -;
   fi
 - echo $PATH
 # Windows - bootstrap from the official 1.4.14 binary
