@@ -36,13 +36,7 @@ install:
   ls -alh /usr/include/;
   cd ..;
   fi
-- sleep 1
-- gcc -v
-- sleep 1
-- echo | gcc -E -Wp,-v -
-- sleep 1
-- echo $PATH
-- sleep 1
+- export PATH=~/zmq:$PATH
 # Windows - bootstrap from the official 1.4.14 binary
 - if [ "$TRAVIS_OS_NAME" = "windows" -a ! -f "$HOME/sbcl/bin/sbcl" ]; then
   SBCL_WINDOWS="http://prdownloads.sourceforge.net/sbcl/sbcl-1.4.14-x86-64-windows-binary.msi";
