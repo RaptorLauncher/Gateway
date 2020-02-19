@@ -130,7 +130,7 @@ before_deploy:
   fi
 # Zip the release
 - mkdir release
-- zip -r "release/binaries-$TRAVIS_OS_NAME.zip" bin/bin;
+- zip -r "release/binaries-$TRAVIS_OS_NAME.zip" bin;
 - export SHORT_HASH="`git rev-parse --short ${TRAVIS_COMMIT}`"
 - export TRAVIS_TAG="nightly-${SHORT_HASH}"
 deploy:
