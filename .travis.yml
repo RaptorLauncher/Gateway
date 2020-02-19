@@ -17,6 +17,22 @@ cache:
 install:
 - SOURCE_DIR=$(pwd)
 - cd ~
+# Install ZeroMQ
+- if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+  brew install zmq;
+  fi
+- if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+  apt install libzmq3-dev;
+  fi
+- if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+  wget https://dl.bintray.com/zeromq/generic/libzmq-v141-x64-4_3_2.zip;
+  mkdir zmq;
+  cd zmq;
+  7z x ../libzmq-v141-x64-4_3_2.zip;
+  cp libzmq-v141-mt-4_3_2.dll libzmq.dll;
+  cd ..;
+  export PATH=~/zmq:$PATH;
+  fi
 # Windows - bootstrap from the official 1.4.14 binary
 - if [ "$TRAVIS_OS_NAME" = "windows" -a ! -f "$HOME/sbcl/bin/sbcl" ]; then
   SBCL_WINDOWS="http://prdownloads.sourceforge.net/sbcl/sbcl-1.4.14-x86-64-windows-binary.msi";
