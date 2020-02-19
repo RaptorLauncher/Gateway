@@ -9,6 +9,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; PZMQ stuff
 
+(cffi:define-foreign-library libsodium
+  (:darwin "libsodium.dylib")
+  (:unix "libsodium.so")
+  (:windows "libsodium.dll")
+  (t (:default "libsodium")))
+
+(cffi:load-foreign-library 'libsodium)
+
 (defmacro kill-socket (place)
   `(when ,place
      (pzmq:close ,place)
