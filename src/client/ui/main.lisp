@@ -9,10 +9,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; PZMQ stuff
 
-(defun fformat (destination control-string &rest args)
-  (prog1 (apply #'format destination control-string args)
-    (finish-output)))
-
 (defmacro kill-socket (place)
   `(when ,place
      (pzmq:close ,place)
