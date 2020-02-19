@@ -1,7 +1,8 @@
-os:
-- linux
-- windows
-- osx
+#os:
+#- linux
+#- windows
+#- osx
+os: windows
 language: c
 env:
 - SBCL_VERSION="1.5.7"
@@ -33,8 +34,10 @@ install:
   cp libzmq-v141-mt-4_3_2.dll libzmq.dll;
   ls -alh;
   cd ..;
-  export C_INCLUDE_PATH=~/zmq:$C_INCLUDE_PATH;
-  export LIBRARY_PATH=~/zmq:$LIBRARY_PATH;
+  export INCLUDE=~/zmq:$INCLUDE;
+  echo $INCLUDE;
+  export CGO_CFLAGS="-I`pwd`/zmq/";
+  echo $CGO_FLAGS;
   fi
 - echo $PATH
 # Windows - bootstrap from the official 1.4.14 binary
