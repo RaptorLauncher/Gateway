@@ -37,7 +37,7 @@ install:
   cd ..;
   fi
 - sleep 1
-- `gcc -print-prog-name=cc1` -v
+- gcc -v
 - sleep 1
 - echo $PATH
 - sleep 1
