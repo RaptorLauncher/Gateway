@@ -7,7 +7,7 @@
 (in-readtable :qtools)
 
 (defun main ()
-  (dolist (lib '("smokebase" "smokeqtcore" "smokeqtgui"))
+  (dolist (lib '("smokebase" "smokeqtcore" "smokeqtgui" "smokeqimageblitz"))
     (cffi:load-foreign-library (format nil
                                        #+win32 "~A.dll"
                                        #+darwin "qtlibs!~A.dylib"
