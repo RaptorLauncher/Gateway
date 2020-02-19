@@ -1,8 +1,7 @@
-#os:
-#- linux
-#- windows
-#- osx
-os: windows
+os:
+- linux
+- windows
+- osx
 language: c
 env:
 - SBCL_VERSION="1.5.7"
@@ -18,14 +17,16 @@ cache:
 install:
 - SOURCE_DIR=$(pwd)
 - cd ~
-# Install ZeroMQ
+# macOS - install ZeroMQ
 - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
   HOMEBREW_NO_AUTO_UPDATE=1 brew install zmq;
   fi
+# Linux - install ZeroMQ
 - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
   sudo apt update;
   sudo apt install libzmq3-dev;
   fi
+# Windows - "install" ZeroMQ
 - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
   wget https://dl.bintray.com/zeromq/generic/libzmq-v141-x64-4_3_2.zip;
   mkdir zmq;
@@ -129,7 +130,7 @@ before_deploy:
   fi
 # Zip the release
 - mkdir release
-- zip -r "release/binaries-$TRAVIS_OS_NAME.zip" bin/;
+- zip -r "release/binaries-$TRAVIS_OS_NAME.zip" bin/bin;
 - export SHORT_HASH="`git rev-parse --short ${TRAVIS_COMMIT}`"
 - export TRAVIS_TAG="nightly-${SHORT_HASH}"
 deploy:
