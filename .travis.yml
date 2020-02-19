@@ -33,9 +33,14 @@ install:
   7z x ../libzmq-v141-x64-4_3_2.zip;
   cp libzmq-v141-mt-4_3_2.dll libzmq.dll;
   cp zmq.h /usr/include/;
+  ls -alh /usr/include/;
   cd ..;
   fi
+- sleep 1
+- `gcc -print-prog-name=cc1` -v
+- sleep 1
 - echo $PATH
+- sleep 1
 # Windows - bootstrap from the official 1.4.14 binary
 - if [ "$TRAVIS_OS_NAME" = "windows" -a ! -f "$HOME/sbcl/bin/sbcl" ]; then
   SBCL_WINDOWS="http://prdownloads.sourceforge.net/sbcl/sbcl-1.4.14-x86-64-windows-binary.msi";
