@@ -11,6 +11,8 @@
   :serial t
   :depends-on (#:qtgui
                #:qtools
+               #:pzmq          ;; temporary!
+               #:gateway.cable ;; temporary!
                #:phoe-toolbox
                #:split-sequence
                #:local-time

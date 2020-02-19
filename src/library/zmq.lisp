@@ -3,6 +3,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Utils
 
+(defun fformat (destination control-string &rest args)
+  (prog1 (apply #'format destination control-string args)
+    (finish-output)))
+
 (defmacro kill-socket (place)
   `(when ,place
      (pzmq:close ,place)
@@ -74,7 +78,7 @@
 ;;; Client logic
 
 (defun client-send (data)
-  (format t "~&Sending data ~S." data)
+  (fformat t "~&Sending data ~S." data)
   (pzmq:send *client-socket*
              (with-output-to-string (stream) (gateway.cable:to-cable data stream))))
 
@@ -82,7 +86,7 @@
   (loop for message = (handler-case (pzmq:recv-string *client-socket* :dontwait t)
                         (pzmq:eagain () nil))
         while message
-        do (format t "~&Received data ~S." message)
+        do (fformat t "~&Received data ~S." message)
         collect (with-input-from-string (stream message)
                   (gateway.cable:from-cable stream))))
 
@@ -100,22 +104,20 @@
                         :element-type '(unsigned-byte 8)))
              (integer (array-to-integer identity)))
         (cond ((gethash integer *identities*)
-               (setf (gethash integer *identities*) (local-time:now))
-               (format t "~&Adding identity ~S." identity))
+               (fformat t "~&Adding identity ~S." identity))
               (t
-               (format t "~&Receiving from identity ~S." identity)))
-        (finish-output))
+               (fformat t "~&Receiving from identity ~S." identity)))
+        (setf (gethash integer *identities*) (local-time:now)))
       ;; Receive/send data
       (pzmq:msg-recv message *server-socket*)
       (let ((string (cffi:foreign-string-to-lisp
                      (pzmq:msg-data message)
                      :count (pzmq:msg-size message))))
         (when (string/= string "")
-          (format t "~&Received data ~S." string)
+          (fformat t "~&Received data ~S." string)
           (loop for integer being the hash-key of *identities*
                 for identity = (integer-to-array integer 5)
-                do (format t "~&Sending to identity ~S." identity)
-                   (finish-output)
+                do (fformat t "~&Sending to identity ~S." identity)
                    (cffi:with-pointer-to-vector-data (pointer identity)
                      (pzmq:send *server-socket* pointer :len 5 :sndmore t))
                    (pzmq:send *server-socket* string)))))))
