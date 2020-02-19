@@ -39,6 +39,8 @@ install:
 - sleep 1
 - gcc -v
 - sleep 1
+- echo | gcc -E -Wp,-v -
+- sleep 1
 - echo $PATH
 - sleep 1
 # Windows - bootstrap from the official 1.4.14 binary
