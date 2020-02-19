@@ -11,4 +11,5 @@
         #:qtools
         #:named-readtables)
   (:shadow #:stream)
-  (:shadowing-import-from #:phoe-toolbox #:split))
+  (:shadowing-import-from #:phoe-toolbox #:split)
+  (:export #:main))

@@ -20,6 +20,10 @@
                #:qtools-ui-spellchecked-text-edit
                #:qtools-ui-placeholder-text-edit
                #:qtools-ui-dictionary)
+  :defsystem-depends-on (:qtools)
+  :build-operation "qt-program-op"
+  :build-pathname "gateway"
+  :entry-point "gateway.client.ui:main"
   :components ((:file "package")
                (:file "utils")
                (:file "classes") ;; TODO move out of UI
@@ -28,4 +32,5 @@
                (:file "log-parser")
                (:file "example") ;; TODO move out of UI
                (:file "chat")
+               (:file "main")
                ))
