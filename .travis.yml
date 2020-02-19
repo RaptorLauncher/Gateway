@@ -22,6 +22,7 @@ install:
   HOMEBREW_NO_AUTO_UPDATE=1 brew install zmq;
   fi
 - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+  sudo apt update;
   sudo apt install libzmq3-dev;
   fi
 - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
@@ -30,6 +31,7 @@ install:
   cd zmq;
   7z x ../libzmq-v141-x64-4_3_2.zip;
   cp libzmq-v141-mt-4_3_2.dll libzmq.dll;
+  ls -alh;
   cd ..;
   export PATH=~/zmq:$PATH;
   fi
