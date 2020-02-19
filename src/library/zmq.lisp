@@ -94,6 +94,14 @@
 
 (defvar *identities* (make-hash-table :synchronized t))
 
+(defun send-message-all-around (string)
+  (loop for integer being the hash-key of *identities*
+        for identity = (integer-to-array integer 5)
+        do (fformat t "~&Sending to identity ~S." identity)
+           (cffi:with-pointer-to-vector-data (pointer identity)
+             (pzmq:send *server-socket* pointer :len 5 :sndmore t))
+           (pzmq:send *server-socket* string)))
+
 (defun echo-server ()
   (loop
     (pzmq:with-message message
@@ -104,7 +112,8 @@
                         :element-type '(unsigned-byte 8)))
              (integer (array-to-integer identity)))
         (cond ((gethash integer *identities*)
-               (fformat t "~&Adding identity ~S." identity))
+               (fformat t "~&Adding identity ~S." identity)
+               (send-message-all-around "Someone new just arrived!"))
               (t
                (fformat t "~&Receiving from identity ~S." identity)))
         (setf (gethash integer *identities*) (local-time:now)))
@@ -115,12 +124,7 @@
                      :count (pzmq:msg-size message))))
         (when (string/= string "")
           (fformat t "~&Received data ~S." string)
-          (loop for integer being the hash-key of *identities*
-                for identity = (integer-to-array integer 5)
-                do (fformat t "~&Sending to identity ~S." identity)
-                   (cffi:with-pointer-to-vector-data (pointer identity)
-                     (pzmq:send *server-socket* pointer :len 5 :sndmore t))
-                   (pzmq:send *server-socket* string)))))))
+          (send-message-all-around string))))))
 
 (defun retransmit (from to)
   (pzmq:with-message message
