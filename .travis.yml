@@ -32,7 +32,7 @@ install:
   cd zmq;
   7z x ../libzmq-v141-x64-4_3_2.zip;
   cp libzmq-v141-mt-4_3_2.dll libzmq.dll;
-  cp zmq.h /usr/include/;
+  cp zmq.h C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/lib/gcc/x86_64-w64-mingw32/8.1.0/include/;
   ls -alh /usr/include/;
   cd ..;
   fi
