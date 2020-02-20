@@ -112,10 +112,11 @@
                         :element-type '(unsigned-byte 8)))
              (integer (array-to-integer identity)))
         (cond ((gethash integer *identities*)
-               (fformat t "~&Adding identity ~S." identity)
-               (send-message-all-around "Someone new just arrived!"))
+               (fformat t "~&Receiving from identity ~S." identity))
               (t
-               (fformat t "~&Receiving from identity ~S." identity)))
+               (fformat t "~&Adding identity ~S." identity)
+               (send-message-all-around
+                (prin1-to-string '(message "Someone new just arrived!")))))
         (setf (gethash integer *identities*) (local-time:now)))
       ;; Receive/send data
       (pzmq:msg-recv message *server-socket*)
