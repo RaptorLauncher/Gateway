@@ -39,11 +39,11 @@ value was not found."
 (default-config "localhost" :db-host)
 (default-config 5432 :db-port)
 (default-config "gateway" :db-name)
-(default-config :yes :db-use-ssl)
+(default-config :no :db-use-ssl)
 
 (default-config "phoe" :test-db-user)
 (default-config "gateway" :test-db-pass)
 (default-config "localhost" :test-db-host)
 (default-config 5432 :test-db-port)
 (default-config "gateway_test" :test-db-name)
-(default-config :yes :test-db-use-ssl)
+(default-config :no :test-db-use-ssl)
