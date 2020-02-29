@@ -22,11 +22,8 @@
     :gateway.engine/test
     :gateway.sql/test))
 
-(defun test-gateway ()
+(defun test-gateway (&optional (report 'parachute:plain))
   (mapc #'ql:quickload *systems*)
-  (let ((result (test 'gateway.init:gateway-full-test)))
-    (when-let ((failed (results-with-status :failed result)))
-      (cerror "Continue." "There are test failures: ~{~%~A~}" failed))
-    result))
+  (test 'gateway.init:gateway-full-test :report report))
 
 ;; TODO make sure that we deprecate MAKE-CONDITION and instead use MAKE-INSTANCE
