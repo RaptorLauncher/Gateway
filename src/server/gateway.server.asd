@@ -13,12 +13,14 @@
   :description "Server for Gateway - source code"
   :author "Michał \"phoe\" Herda"
   :license "AGPL3"
-  :depends-on (#:phoe-toolbox
+  :depends-on (#:alexandria
+               #:phoe-toolbox
                #:ironclad
                #:bordeaux-threads
                #:pzmq
                #:local-time
-               #:cffi)
+               #:cffi
+               #:gateway.library)
   :serial t
   ;; :pathname "src/"
   :components ((:file "server")))

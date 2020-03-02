@@ -15,7 +15,8 @@
   :license "AGPL3"
   :depends-on (#:pzmq
                #:legit
-               #:ironclad)
+               #:ironclad
+               #:gateway.cable)
   :serial t
   ;; :pathname "src/"
   :components ((:file "library")))

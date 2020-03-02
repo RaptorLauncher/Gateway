@@ -16,7 +16,8 @@
   :depends-on (#:phoe-toolbox
                #:ironclad
                #:pzmq
-               #:gateway.library)
+               #:gateway.library
+               #:gateway.cable)
   :serial t
   ;; :pathname "src/"
   :components ((:file "client")))

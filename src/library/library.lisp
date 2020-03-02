@@ -29,7 +29,8 @@
         do (z:setsockopt socket key value)))
 
 (defun gateway-version (&optional (system :gateway.library))
-  (or (ignore-errors (g:current-commit (asdf:system-source-directory system)
-                                       :short t))
+  (or (ignore-errors
+       (format nil "git-~A" (g:current-commit
+                             (asdf:system-source-directory system) :short t)))
       (ignore-errors (asdf:system-version system))
       "unknown"))
