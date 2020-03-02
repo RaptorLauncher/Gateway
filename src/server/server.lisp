@@ -21,7 +21,7 @@
 
 (defparameter *server-context* nil)
 (defparameter *server-socket* nil)
-(defparameter *connection-timeout* 60000)
+(defparameter *connection-timeout* (* 2 60 1000))
 (defparameter *server-socket-options*
   `(:immediate 1
     :router-handover 1
@@ -123,7 +123,7 @@
                            (cffi:foreign-string-to-lisp
                             (z:msg-data message) :count (z:msg-size message)))))
           (when (string/= string "")
-            (φ:fformat t "~&Received data ~S." string)
+            (φ:fformat t "~&Received data ~A." string)
             (handler-case
                 (with-input-from-string (stream string)
                   (let ((data (c:from-cable stream)))
@@ -160,6 +160,9 @@
                (assert (stringp client-version))
                (send-response :hello "Gateway Server"
                               (l:gateway-version) (machine-instance))))
+            (:ping
+             (assert (null data))
+             (send-response :pong))
             (:cryptography?
              (assert (null data))
              (let* ((plist (i:destructure-public-key *server-public-key*))

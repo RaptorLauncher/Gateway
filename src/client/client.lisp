@@ -20,13 +20,21 @@
 (defparameter *client-context* nil)
 (defparameter *client-socket* nil)
 (defparameter *client-socket-options*
-  '(:linger 1000
-    :probe-router 1))
+  '(:linger 1000))
 
 (defun start-client (&optional (server-address "tcp://localhost:6500"))
   (setf *client-context* (z:ctx-new))
   (setf *client-socket* (z:socket *client-context* :dealer))
   (apply #'l:set-socket-options *client-socket* *client-socket-options*)
+  (setf *random-state* (make-random-state t))
+  (let ((identity
+          ;; TODO: wait for pzmq ticket #26 to be solved
+          ;; (concatenate '(vector (unsigned-byte 8))
+          ;;              (b:string-to-octets "Gateway Client")
+          ;;              '(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+          ;;              (i:random-data 32))
+          (format nil "Gateway Client ~32,'0X" (random (expt 2 128)))))
+    (z:setsockopt *client-socket* :identity identity))
   (z:connect *client-socket* server-address))
 
 (defun stop-client ()
@@ -77,7 +85,7 @@
 (defun client-receive-plaintext (&optional dontwait)
   (let ((string (handler-case (z:recv-string *client-socket* :dontwait dontwait)
                   (z:eagain () (return-from client-receive-plaintext)))))
-    (φ:fformat t "~&Received data ~S." string)
+    (φ:fformat t "~&Received data ~A." string)
     (with-input-from-string (stream string)
       (gateway.cable:from-cable stream))))
 
@@ -92,7 +100,7 @@
              (decrypted (i:decrypt-message *cipher* octets))
              (string (b:octets-to-string decrypted)))
         (when (string/= string "")
-          (φ:fformat t "~&Received data ~S." string)
+          (φ:fformat t "~&Received data ~A." string)
           (handler-case
               (with-input-from-string (stream string)
                 (c:from-cable stream))
