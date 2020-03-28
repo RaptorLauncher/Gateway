@@ -34,4 +34,4 @@
 (defmethod asdf:perform ((o asdf:test-op)
                          (c (eql (asdf:find-system '#:gateway.cable))))
   (asdf:operate 'asdf:load-op '#:gateway.cable/test)
-  (uiop:symbol-call '#:gateway.cable/test '#:run))
+  (uiop:symbol-call '#:parachute '#:test '#:gateway.cable/test))

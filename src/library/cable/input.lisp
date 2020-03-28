@@ -94,28 +94,19 @@
                (#\" (return))
                (t (write-char char out))))))
 
-(defun read-sexpr-number (stream)
-  (let ((out (make-string-output-stream))
-        (point nil))
-    (loop for i from 0
-          for char = (lread stream :eof)
-          do (case char
-               (:eof (return))
-               (#\. (cond (point (lunread char stream) (return))
-                          (t (setf point i))))
-               ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9)
-                (write-char char out))
-               (t (lunread char stream) (return))))
-    (let* ((number-string (get-output-stream-string out))
-           (number (if (string= number-string "")
-                       0
-                       (parse-integer number-string))))
-      (if point
-          (let ((decimal (- (length number-string) point)))
-            (if (= 0 decimal)
-                (coerce number 'double-float)
-                (coerce (/ number (expt 10 decimal)) 'double-float)))
-          number))))
+(defun valid-number-p (string)
+  (let ((lastpos (1- (length string))))
+    (or (every #'digit-char-p string)
+        (and (digit-char-p (char string 0))
+             (digit-char-p (char string lastpos))
+             (loop with period = nil
+                   for i from 1 below lastpos
+                   for char = (char string i)
+                   do (cond ((digit-char-p char))
+                            ((not (eql char #\.)) (return nil))
+                            ((not period) (setf period t))
+                            (period (return nil)))
+                   finally (return t))))))
 
 (defun read-sexpr-token (stream)
   (lpeek stream)
@@ -123,16 +114,19 @@
     (loop for char = (lread stream :eof)
           do (case char
                (#\\ (write-char (lread stream) out))
-               (#.(list* #\" #\( #\) #\. #\Nul
-                         ;; #\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9
+               (#.(list* #\" #\( #\) ;;#\.
+                         #\Nul
                          phoe-toolbox:*whitespace*)
                 (lunread char stream) (return))
                (:eof (return))
                (t (write-char (char-upcase char) out))))))
 
-(defun read-sexpr-symbol (stream)
+(defun read-sexpr-symbol-or-number (stream)
   (let ((token (read-sexpr-token stream)))
-    (make-symbol token)))
+    (if (valid-number-p token)
+        (let ((*read-default-float-format* 'double-float))
+          (read-from-string token))
+        (make-symbol token))))
 
 (defun read-sexpr-list (stream)
   (when *depth-limit*
@@ -152,11 +146,8 @@
                    (#\( (read-sexpr-list stream))
                    (#\) (cable-error "Stray closing paren found."))
                    (#\" (read-sexpr-string stream))
-                   ((#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 #\.)
-                    (lunread char stream)
-                    (read-sexpr-number stream))
                    (t (lunread char stream)
-                    (read-sexpr-symbol stream)))))
+                    (read-sexpr-symbol-or-number stream)))))
     (loop for char = (lpeek* stream :eof nil)
           while (and char (phoe-toolbox:whitespacep char))
           do (lread stream))

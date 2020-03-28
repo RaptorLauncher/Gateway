@@ -20,10 +20,10 @@
   :parent (#:gateway.init #:gateway-full-test))
 
 (defparameter *input-sexp*
-  '(1 2.0d0 "foo BAR \\ \" baz" foo123 foo :foo #:foo (1 2 3) (4 5)))
+  '(1 2.0d0 "foo BAR \\ \" baz" 123foo foo123 foo :foo #:foo (1 2 3) (4 5)))
 
 (defparameter *input-string*
-  "(1 2.0 \"foo BAR \\\\ \\\" baz\" FOO123 FOO FOO FOO (1 2 3) (4 5))")
+  "(1 2.0 \"foo BAR \\\\ \\\" baz\" 123FOO FOO123 FOO FOO FOO (1 2 3) (4 5))")
 
 (define-test-case cable-equal
     (:documentation "Check whether the CABLE-EQUAL predicate works."
