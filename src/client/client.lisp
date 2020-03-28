@@ -27,13 +27,10 @@
   (setf *client-socket* (z:socket *client-context* :dealer))
   (apply #'l:set-socket-options *client-socket* *client-socket-options*)
   (setf *random-state* (make-random-state t))
-  (let ((identity
-          ;; TODO: wait for pzmq ticket #26 to be solved
-          ;; (concatenate '(vector (unsigned-byte 8))
-          ;;              (b:string-to-octets "Gateway Client")
-          ;;              '(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-          ;;              (i:random-data 32))
-          (format nil "Gateway Client ~32,'0X" (random (expt 2 128)))))
+  (let ((identity (concatenate '(vector (unsigned-byte 8))
+                               (b:string-to-octets "Gateway Client")
+                               '(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+                               (i:random-data 32))))
     (z:setsockopt *client-socket* :identity identity))
   (z:connect *client-socket* server-address))
 

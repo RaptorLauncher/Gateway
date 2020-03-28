@@ -58,15 +58,15 @@
 (defvar *server-public-key*)
 (defvar *server-private-key*)
 
+(defparameter *poll-timeout* 1000)
+(defvar *incoming-data* '())
+(defvar *outgoing-data* '())
+
 (defun prepare-server ()
   (unless (and (boundp '*server-private-key*) (boundp '*server-public-key*))
     (setf (values *server-private-key* *server-public-key*)
           (i:generate-key-pair :curve25519)))
   (unless (and *server-context* *server-socket*) (start-server)))
-
-(defparameter *poll-timeout* 1000)
-(defvar *incoming-data* '())
-(defvar *outgoing-data* '())
 
 (defun server ()
   (prepare-server)
