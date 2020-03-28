@@ -114,8 +114,7 @@
     (loop for char = (lread stream :eof)
           do (case char
                (#\\ (write-char (lread stream) out))
-               (#.(list* #\" #\( #\) ;;#\.
-                         #\Nul
+               (#.(list* #\" #\( #\) #\Nul
                          phoe-toolbox:*whitespace*)
                 (lunread char stream) (return))
                (:eof (return))
