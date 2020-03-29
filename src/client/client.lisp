@@ -55,53 +55,44 @@
   (receive client))
 
 (defun receive (client)
-  (if (l:cipher client)
-      (receive-aes client)
-      (receive-plaintext client)))
-
-(defun send (client data)
-  (if (l:cipher client)
-      (send-aes client data)
-      (send-plaintext client data)))
+  (let ((string (if (l:cipher client)
+                    (receive-aes client)
+                    (receive-plaintext client))))
+    (when string
+      (φ:fformat t "~&Received data ~A." string)
+      (handler-case (with-input-from-string (s string) (c:from-cable s))
+        (error (e) (φ:fformat t "~&Malformed message ~S:~%~A" string e))))))
 
 (defun receive-plaintext (client &optional dontwait)
-  (let ((string (handler-case
-                    (z:recv-string (l:socket client) :dontwait dontwait)
-                  (z:eagain () (return-from receive-plaintext)))))
-    (φ:fformat t "~&Received data ~A." string)
-    (with-input-from-string (stream string)
-      (gateway.cable:from-cable stream))))
+  (handler-case (z:recv-string (l:socket client) :dontwait dontwait)
+    (z:eagain () (return-from receive-plaintext))))
 
 (defun receive-aes (client &optional dontwait)
-  (flet ((message-octets (message)
-           (let ((type `(:array :unsigned-char ,(z:msg-size message))))
-             (cffi:foreign-array-to-lisp (z:msg-data message) type
-                                         :element-type '(unsigned-byte 8)))))
-    (z:with-message message
-      (z:msg-recv message (l:socket client) :dontwait dontwait)
-      (let* ((octets (message-octets message))
-             (decrypted (i:decrypt-message (l:cipher client) octets))
-             (string (b:octets-to-string decrypted)))
-        (when (string/= string "")
-          (φ:fformat t "~&Received data ~A." string)
-          (handler-case
-              (with-input-from-string (stream string)
-                (c:from-cable stream))
-            (error (e)
-              (φ:fformat t "~&Dropping malformed message ~S:~%~A"
-                         string e))))))))
+  (z:with-message message
+    (handler-case (z:msg-recv message (l:socket client) :dontwait dontwait)
+      (z:eagain () (return-from receive-aes)))
+    (let* ((size (z:msg-size message))
+           (octets (cffi:foreign-array-to-lisp
+                    (z:msg-data message) `(:array :unsigned-char ,size)
+                    :element-type '(unsigned-byte 8)))
+           (decrypted (i:decrypt-message (l:cipher client) octets)))
+      (b:octets-to-string decrypted))))
+
+(defun send (client data)
+  (let ((*print-right-margin* most-positive-fixnum))
+    (φ:fformat t "~&Sending data ~S." data)
+    (if (l:cipher client)
+        (send-aes client data)
+        (send-plaintext client data))))
 
 (defun send-plaintext (client data)
-  (φ:fformat t "~&Sending data ~S." data)
   (z:send (l:socket client)
           (with-output-to-string (stream)
             (gateway.cable:to-cable data stream))))
 
 (defun send-aes (client data)
   (flet ((round-up-to-8 (x) (* (ceiling x 8) 8)))
-    (let ((string (with-output-to-string (stream) (c:to-cable data stream)))
-          (*print-right-margin* most-positive-fixnum))
-      (φ:fformat t "~&Sending data ~S." data)
+    (let ((string (with-output-to-string (stream) (c:to-cable data stream))))
       (let* ((octets (b:string-to-octets string))
              (new-length (round-up-to-8 (length octets)))
              (new-octets (make-array new-length
