@@ -22,15 +22,13 @@
 (defparameter *server-socket* nil)
 (defparameter *connection-timeout* (* 2 60 1000))
 (defparameter *server-socket-options*
-  '()
-  ;; `(:immediate 1
-  ;;   :router-handover 1
-  ;;   :ipv6 t
-  ;;   :maxmsgsize #.(expt 2 16)
-  ;;   :heartbeat-ivl 10000
-  ;;   :connect-timeout ,*connection-timeout*
-  ;;   :heartbeat-timeout ,*connection-timeout*)
-  )
+  `(:immediate 1
+    :router-handover 1
+    :ipv6 t
+    :maxmsgsize #.(expt 2 16)
+    :heartbeat-ivl 10000
+    :connect-timeout ,*connection-timeout*
+    :heartbeat-timeout ,*connection-timeout*))
 
 (defun start-server (&optional (listen-address "tcp://*:6500"))
   (setf *server-socket* (z:socket l:*context* :router))
