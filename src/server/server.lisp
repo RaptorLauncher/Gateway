@@ -19,27 +19,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Server networking
 
-(defparameter *server-context* nil)
 (defparameter *server-socket* nil)
 (defparameter *connection-timeout* (* 2 60 1000))
 (defparameter *server-socket-options*
-  `(:immediate 1
-    :router-handover 1
-    :ipv6 t
-    :maxmsgsize #.(expt 2 16)
-    :heartbeat-ivl 10000
-    :connect-timeout ,*connection-timeout*
-    :heartbeat-timeout ,*connection-timeout*))
+  '()
+  ;; `(:immediate 1
+  ;;   :router-handover 1
+  ;;   :ipv6 t
+  ;;   :maxmsgsize #.(expt 2 16)
+  ;;   :heartbeat-ivl 10000
+  ;;   :connect-timeout ,*connection-timeout*
+  ;;   :heartbeat-timeout ,*connection-timeout*)
+  )
 
 (defun start-server (&optional (listen-address "tcp://*:6500"))
-  (setf *server-context* (z:ctx-new))
-  (setf *server-socket* (z:socket *server-context* :router))
+  (setf *server-socket* (z:socket l:*context* :router))
   (apply #'l:set-socket-options *server-socket* *server-socket-options*)
   (z:bind *server-socket* listen-address))
 
 (defun stop-server ()
-  (l:kill-socket *server-socket*)
-  (l:kill-context *server-context*))
+  (l:kill-socket *server-socket*))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Server logic
@@ -58,7 +57,7 @@
 (defvar *server-public-key*)
 (defvar *server-private-key*)
 
-(defparameter *poll-timeout* 1000)
+(defparameter *poll-timeout* 10)
 (defvar *incoming-data* '())
 (defvar *outgoing-data* '())
 
@@ -66,32 +65,32 @@
   (unless (and (boundp '*server-private-key*) (boundp '*server-public-key*))
     (setf (values *server-private-key* *server-public-key*)
           (i:generate-key-pair :curve25519)))
-  (unless (and *server-context* *server-socket*) (start-server)))
+  (unless *server-socket* (start-server)))
 
 (defun server ()
   (prepare-server)
   (unwind-protect
-       (z:with-poll-items item (*server-socket*)
-         (tagbody
-          :receive-incoming
+       (tagbody
+        :receive-incoming
+          (z:with-poll-items item ((*server-socket* :pollin))
             (pzmq:poll item *poll-timeout*)
             (when (member :pollin (pzmq:revents item 0))
               (receive-incoming *server-socket*)
-              (go :receive-incoming))
-          :process-incoming
-            (dolist (incoming *incoming-data*)
-              (destructuring-bind (connection data) incoming
-                (process-incoming connection data)))
-            (setf *incoming-data* '())
-          :send-outgoing
-            (dolist (outgoing *outgoing-data*)
-              (destructuring-bind (connection data) outgoing
-                (send-outgoing *server-socket* connection data)))
-            (setf *outgoing-data* '())
-          :clean-up-old-connections
-            (clean-up-old-connections)
-          :loop
-            (go :receive-incoming)))
+              (go :receive-incoming)))
+        :process-incoming
+          (dolist (incoming *incoming-data*)
+            (destructuring-bind (connection data) incoming
+              (process-incoming connection data)))
+          (setf *incoming-data* '())
+        :send-outgoing
+          (dolist (outgoing *outgoing-data*)
+            (destructuring-bind (connection data) outgoing
+              (send-outgoing *server-socket* connection data)))
+          (setf *outgoing-data* '())
+        :clean-up-old-connections
+          (clean-up-old-connections)
+        :loop
+          (go :receive-incoming))
     (stop-server)))
 
 (defun receive-incoming (socket)

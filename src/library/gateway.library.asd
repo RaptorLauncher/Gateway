@@ -16,6 +16,7 @@
   :depends-on (#:pzmq
                #:legit
                #:ironclad
+               #:alexandria
                #:gateway.cable)
   :serial t
   ;; :pathname "src/"
